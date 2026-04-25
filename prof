@@ -2,8 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Gestion des présences - Espace Professeur</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Gestion Académique - Professeur</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -12,71 +13,121 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f5f7fa;
             min-height: 100vh;
-            padding-bottom: 80px;
+            font-size: 14px;
+            color: #1a1a2e;
         }
 
-        .container {
+        /* Layout principal */
+        .app-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 20px 20px 80px 20px;
         }
 
-        /* Login Section */
-        .login-container {
+        /* Login */
+        .login-card {
             background: white;
-            border-radius: 30px;
+            border-radius: 24px;
             padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            margin-top: 50px;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
+            max-width: 420px;
+            margin: 60px auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
         }
 
         .login-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
+        }
+
+        .login-header i {
+            font-size: 48px;
+            color: #2c3e50;
+            margin-bottom: 16px;
         }
 
         .login-header h1 {
-            color: #667eea;
-            font-size: 2em;
-            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 8px;
         }
 
         .login-header p {
-            color: #666;
+            color: #6c757d;
+            font-size: 14px;
         }
 
-        /* Main Container */
-        .main-container {
-            display: none;
+        .form-group {
+            margin-bottom: 20px;
         }
 
-        /* Header */
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 13px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #2c3e50;
+        }
+
+        button {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        button:hover {
+            background: #1a252f;
+            transform: translateY(-1px);
+        }
+
+        /* Header Dashboard */
         .dashboard-header {
             background: white;
             border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #edf2f7;
         }
 
-        .dashboard-header h1 {
-            color: #667eea;
-            font-size: 1.8em;
-            margin-bottom: 5px;
+        .prof-info h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 4px;
         }
 
-        .dashboard-header p {
-            color: #666;
-            font-size: 1.1em;
+        .prof-info p {
+            color: #6c757d;
+            font-size: 13px;
         }
 
-        /* Bottom Navigation */
+        /* Navigation Bottom */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -85,41 +136,43 @@
             background: white;
             display: flex;
             justify-content: space-around;
-            padding: 12px 20px;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            padding: 12px 16px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
             z-index: 1000;
-            backdrop-filter: blur(10px);
+            border-top: 1px solid #edf2f7;
         }
 
         .nav-btn {
             flex: 1;
-            margin: 0 8px;
-            padding: 12px;
-            background: #f5f5f5;
-            color: #667eea;
+            margin: 0 4px;
+            padding: 10px 8px;
+            background: transparent;
+            color: #6c757d;
             border: none;
-            border-radius: 15px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
+            gap: 6px;
+        }
+
+        .nav-btn i {
+            font-size: 20px;
         }
 
         .nav-btn.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+            background: #f0f4f8;
+            color: #2c3e50;
         }
 
         /* Content Panels */
         .content-panel {
             display: none;
-            animation: fadeIn 0.4s ease-out;
+            animation: fadeIn 0.3s ease;
         }
 
         .content-panel.active {
@@ -127,381 +180,448 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Cards */
-        .class-card {
+        /* Cartes classes */
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .class-item {
             background: white;
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 20px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #edf2f7;
+            transition: all 0.2s;
             cursor: pointer;
         }
 
-        .class-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        .class-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
         }
 
-        .class-info h3 {
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .class-info p {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .view-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 10px 25px;
+        .class-icon {
+            width: 48px;
+            height: 48px;
+            background: #f0f4f8;
             border-radius: 12px;
-            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .class-icon i {
+            font-size: 24px;
+            color: #2c3e50;
+        }
+
+        .class-item h3 {
+            font-size: 16px;
             font-weight: 600;
-            transition: transform 0.2s;
+            margin-bottom: 4px;
         }
 
-        .view-btn:hover {
-            transform: scale(1.05);
+        .class-item p {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 12px;
         }
 
-        /* Student Table - Horizontal Layout */
-        .students-table-container {
+        /* Sélecteurs date et heures */
+        .filters-bar {
             background: white;
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 20px;
-            overflow-x: auto;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .header-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
+            border: 1px solid #edf2f7;
         }
 
-        .back-btn {
-            background: #f5f5f5;
-            color: #667eea;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
+        .filters-row {
             display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .date-time-selector {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 15px;
+            gap: 16px;
             flex-wrap: wrap;
             align-items: flex-end;
         }
 
-        .date-group, .time-group {
+        .filter-group {
             flex: 1;
-            min-width: 200px;
+            min-width: 180px;
         }
 
-        .date-group label, .time-group label {
+        .filter-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 0.9em;
+            margin-bottom: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #2c3e50;
         }
 
-        .date-group input, .time-group select {
+        .filter-group input, .filter-group select {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
+            padding: 10px 12px;
+            border: 1.5px solid #e9ecef;
             border-radius: 10px;
-            font-size: 14px;
-            transition: border-color 0.2s;
+            font-size: 13px;
         }
 
-        .date-group input:focus, .time-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .time-group select {
-            cursor: pointer;
+        /* Tableau des élèves */
+        .students-table-wrapper {
+            background: white;
+            border-radius: 16px;
+            overflow-x: auto;
+            border: 1px solid #edf2f7;
         }
 
         .students-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
+            min-width: 700px;
         }
 
         .students-table th {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px;
+            background: #f8fafc;
+            padding: 14px 12px;
             text-align: left;
+            font-size: 12px;
             font-weight: 600;
-            position: sticky;
-            top: 0;
+            color: #2c3e50;
+            border-bottom: 1px solid #edf2f7;
         }
 
         .students-table td {
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
-            vertical-align: middle;
+            padding: 14px 12px;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 13px;
         }
 
-        .students-table tr:hover {
-            background: #f9f9f9;
+        .students-table tr.present-row {
+            background: #f0fdf4;
         }
 
-        .student-photo {
-            width: 45px;
-            height: 45px;
+        .students-table tr.absent-row {
+            background: #fef2f2;
+        }
+
+        .students-table tr.retard-row {
+            background: #fff7ed;
+        }
+
+        .student-avatar {
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             object-fit: cover;
+            background: #f0f4f8;
         }
 
-        .status-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+      .status-btns {
+    display: flex;
+    gap: 0;  /* Pas d'espace entre les boutons */
+    flex-wrap: nowrap;
+}
 
-        .status-btn {
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 0.85em;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
+.status-btn {
+    padding: 6px 10px;
+    border-radius: 0;  /* Boutons carrés */
+    border: 1px solid #e9ecef;
+    background: white;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s;
+    width: auto;
+    white-space: nowrap;
+}
 
-        .status-btn.present {
-            background: #4CAF50;
+.status-btn:first-child {
+    border-radius: 6px 0 0 6px;  /* Arrondi seulement à gauche */
+}
+
+.status-btn:last-child {
+    border-radius: 0 6px 6px 0;  /* Arrondi seulement à droite */
+}
+
+.status-btn:not(:first-child) {
+    border-left: none;  /* Supprime la double bordure */
+}
+
+        .status-btn.present.active {
+            background: #10b981;
+            border-color: #10b981;
             color: white;
         }
 
-        .status-btn.absent {
-            background: #f44336;
+        .status-btn.absent.active {
+            background: #ef4444;
+            border-color: #ef4444;
             color: white;
         }
 
-        .status-btn.retard {
-            background: #ff9800;
+        .status-btn.retard.active {
+            background: #f59e0b;
+            border-color: #f59e0b;
             color: white;
         }
 
-        .status-btn.active {
-            transform: scale(0.95);
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .status-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .save-all-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1em;
-            margin-top: 20px;
-            width: 100%;
-        }
-
-        /* Notes Panel - Bulk Entry */
-        .notes-options {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .form-field {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .form-field label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .form-field input, .form-field select {
-            width: 100%;
+        .save-btn {
+            background: #2c3e50;
             padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
+            margin-top: 16px;
             font-size: 14px;
         }
 
-        .notes-bulk-table {
+        /* Panel Notes */
+        .notes-header {
             background: white;
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #edf2f7;
+        }
+
+        .notes-filters {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .notes-filters .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .notes-table-wrapper {
+            background: white;
+            border-radius: 16px;
             overflow-x: auto;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border: 1px solid #edf2f7;
         }
 
         .notes-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 600px;
+            min-width: 500px;
         }
 
         .notes-table th {
-            background: #667eea;
-            color: white;
-            padding: 12px;
-            text-align: left;
+            background: #f8fafc;
+            padding: 14px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 1px solid #edf2f7;
         }
 
         .notes-table td {
             padding: 12px;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #edf2f7;
         }
 
-        .note-input {
+        .note-field {
             width: 80px;
             padding: 8px;
-            border: 2px solid #e0e0e0;
+            border: 1.5px solid #e9ecef;
             border-radius: 8px;
             text-align: center;
+            font-size: 13px;
         }
 
-        .appreciation-input {
+        .appreciation-field {
             width: 100%;
             padding: 8px;
-            border: 2px solid #e0e0e0;
+            border: 1.5px solid #e9ecef;
             border-radius: 8px;
             font-size: 12px;
         }
 
-        .save-notes-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 20px;
-            width: 100%;
-        }
-
-        /* History Panel */
+        /* Historique */
         .history-filters {
             background: white;
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
+            border: 1px solid #edf2f7;
         }
 
         .history-list {
             background: white;
-            border-radius: 20px;
-            padding: 20px;
-            max-height: 500px;
-            overflow-y: auto;
+            border-radius: 16px;
+            padding: 0;
+            border: 1px solid #edf2f7;
+            overflow: hidden;
         }
 
         .history-item {
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: #f9f9f9;
-            border-radius: 10px;
+            padding: 16px;
+            border-bottom: 1px solid #edf2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-info strong {
+            font-size: 14px;
+            color: #1a1a2e;
+        }
+
+        .history-info p {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        .history-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-present {
+            background: #f0fdf4;
+            color: #10b981;
+        }
+
+        .status-absent {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .status-retard {
+            background: #fff7ed;
+            color: #f59e0b;
+        }
+
+        /* Profil */
+        .profile-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #edf2f7;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
+            .app-container {
+                padding: 12px 12px 70px 12px;
             }
             
-            .status-buttons {
-                flex-direction: column;
-            }
-            
-            .status-btn {
-                width: 100%;
+            .bottom-nav {
+                padding: 8px 12px;
             }
             
             .nav-btn span {
-                display: none;
+                display: inline;
+                font-size: 10px;
             }
             
-            .nav-btn {
-                font-size: 20px;
+            .nav-btn i {
+                font-size: 18px;
+            }
+            
+            .filters-row {
+                flex-direction: column;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+            
+            .status-btns {
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
             }
         }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #2c3e50;
+            text-decoration: none;
+            font-size: 13px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            background: none;
+            width: auto;
+            padding: 0;
+        }
+
+        .back-link:hover {
+            background: none;
+            transform: none;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+      
+      .icon-btn {
+    transition: all 0.2s;
+}
+
+.icon-btn:hover {
+    background: #e9ecef !important;
+    transform: translateY(-2px);
+}
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
         <!-- Login Section -->
-        <div id="loginSection" class="login-container">
+        <div id="loginSection" class="login-card">
             <div class="login-header">
-                <h1>👨‍🏫 Espace Professeur</h1>
+                <i class="fas fa-chalkboard-user"></i>
+                <h1>Espace Professeur</h1>
                 <p>Gestion des présences et des notes</p>
             </div>
             <div class="form-group">
-                <label>📧 Identifiant</label>
-                <input type="text" id="loginId" placeholder="Entrez votre identifiant">
+                <label>Identifiant</label>
+                <input type="text" id="loginId" placeholder="ex: prof.ahmed">
             </div>
             <div class="form-group">
-                <label>🔒 Mot de passe</label>
-                <input type="password" id="loginPassword" placeholder="Entrez votre mot de passe">
+                <label>Mot de passe</label>
+                <input type="password" id="loginPassword" placeholder="••••••">
             </div>
             <button onclick="login()">Se connecter</button>
         </div>
 
         <!-- Main Section -->
-        <div id="mainSection" class="main-container">
+        <div id="mainSection" style="display:none;">
             <div class="dashboard-header">
-                <h1 id="profName"></h1>
-                <p id="profMatiere"></p>
+                <div class="prof-info">
+                    <h2 id="profName"></h2>
+                    <p id="profMatiere"></p>
+                </div>
             </div>
 
             <!-- Classes Panel -->
             <div id="classesPanel" class="content-panel active">
-                <h2 style="color: white; margin-bottom: 20px;">📚 Mes classes</h2>
-                <div id="classesList"></div>
+                <h3><i class="fas fa-book-open"></i> Mes classes</h3>
+                <div id="classesList" class="classes-grid"></div>
             </div>
 
             <!-- Presence Panel -->
@@ -511,54 +631,52 @@
 
             <!-- Notes Panel -->
             <div id="notesPanel" class="content-panel">
-                <div class="notes-options">
-                    <h3 style="margin-bottom: 20px;">📝 Saisie des notes</h3>
-                    <div class="form-row">
-                        <div class="form-field">
+                <div class="notes-header">
+                    <div class="notes-filters">
+                        <div class="filter-group">
                             <label>Classe</label>
                             <select id="noteClasse" onchange="loadElevesForNotes()">
-                                <option value="">Sélectionner une classe</option>
+                                <option value="">Sélectionner</option>
                             </select>
                         </div>
-                        <div class="form-field">
-                            <label>Type d'évaluation</label>
-                            <select id="noteType">
+                        <div class="filter-group">
+                            <label>Type évaluation</label>
+                            <select id="noteType" onchange="loadElevesForNotes()">
                                 <option value="CC1">CC1</option>
                                 <option value="CC2">CC2</option>
                                 <option value="Composition">Composition</option>
                             </select>
                         </div>
-                        <div class="form-field">
+                        <div class="filter-group">
                             <label>Semestre</label>
-                            <select id="noteSemestre">
+                            <select id="noteSemestre" onchange="loadElevesForNotes()">
                                 <option value="1">Semestre 1</option>
                                 <option value="2">Semestre 2</option>
                             </select>
                         </div>
                     </div>
                 </div>
-                <div id="notesBulkList" class="notes-bulk-table"></div>
+                <div id="notesBulkList"></div>
             </div>
 
             <!-- History Panel -->
             <div id="historyPanel" class="content-panel">
                 <div class="history-filters">
-                    <h3 style="margin-bottom: 20px;">📜 Historique des présences</h3>
-                    <div class="form-row">
-                        <div class="form-field">
+                    <div class="filters-row">
+                        <div class="filter-group">
                             <label>Date début</label>
                             <input type="date" id="historyStartDate">
                         </div>
-                        <div class="form-field">
+                        <div class="filter-group">
                             <label>Date fin</label>
                             <input type="date" id="historyEndDate">
                         </div>
-                        <div class="form-field">
+                        <div class="filter-group">
                             <label>Élève</label>
-                            <input type="text" id="historyStudentName" placeholder="Nom de l'élève">
+                            <input type="text" id="historyStudentName" placeholder="Nom">
                         </div>
-                        <div class="form-field">
-                            <button onclick="loadHistory()" style="margin-top: 32px;">🔍 Rechercher</button>
+                        <div class="filter-group">
+                            <button onclick="loadHistory()" style="margin-top: 22px;">Rechercher</button>
                         </div>
                     </div>
                 </div>
@@ -567,26 +685,26 @@
 
             <!-- Profile Panel -->
             <div id="profilePanel" class="content-panel">
-                <div style="background: white; border-radius: 20px; padding: 30px;">
-                    <h3 style="margin-bottom: 20px;">👤 Mon profil</h3>
-                    <div class="form-field">
+                <div class="profile-card">
+                    <h3><i class="fas fa-user"></i> Mon profil</h3>
+                    <div class="form-group">
                         <label>Identifiant</label>
                         <input type="text" id="profileId" readonly>
                     </div>
-                    <div class="form-field">
+                    <div class="form-group">
                         <label>Nom complet</label>
                         <input type="text" id="profileNom" readonly>
                     </div>
-                    <div class="form-field">
+                    <div class="form-group">
                         <label>Matière</label>
                         <input type="text" id="profileMatiere" readonly>
                     </div>
-                    <div class="form-field">
+                    <div class="form-group">
                         <label>Nouveau mot de passe</label>
-                        <input type="password" id="newPassword" placeholder="Laissez vide pour ne pas changer">
+                        <input type="password" id="newPassword" placeholder="Laisser vide pour ne pas changer">
                     </div>
                     <button onclick="updateProfile()">Mettre à jour</button>
-                    <button onclick="logout()" style="margin-top: 10px; background: #f44336;">Se déconnecter</button>
+                    <button onclick="logout()" style="margin-top: 12px; background: #dc2626;">Déconnexion</button>
                 </div>
             </div>
         </div>
@@ -594,10 +712,10 @@
 
     <!-- Bottom Navigation -->
     <div class="bottom-nav" id="bottomNav" style="display:none;">
-        <button class="nav-btn active" onclick="showPanel('classesPanel')">📚 Classes</button>
-        <button class="nav-btn" onclick="showPanel('notesPanel')">📝 Notes</button>
-        <button class="nav-btn" onclick="showPanel('historyPanel')">📜 Historique</button>
-        <button class="nav-btn" onclick="showPanel('profilePanel')">👤 Profil</button>
+        <button class="nav-btn active" onclick="showPanel('classesPanel')"><i class="fas fa-graduation-cap"></i><span>Classes</span></button>
+        <button class="nav-btn" onclick="showPanel('notesPanel')"><i class="fas fa-pen-fancy"></i><span>Notes</span></button>
+        <button class="nav-btn" onclick="showPanel('historyPanel')"><i class="fas fa-history"></i><span>Historique</span></button>
+        <button class="nav-btn" onclick="showPanel('profilePanel')"><i class="fas fa-user-circle"></i><span>Profil</span></button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -619,11 +737,10 @@
         let currentStudents = [];
         let currentPresences = {};
 
-        // Créneaux horaires
         const timeSlots = [
-            "08:00 - 09:00", "09:00 - 10:00", "10:00 - 10:50", "10:50 - 11:05",
-            "11:05 - 12:05", "12:05 - 13:05", "13:05 - 13:35", "13:35 - 14:35",
-            "14:35 - 15:35", "15:35 - 16:35", "16:35 - 17:35"
+            "08:00-09:00", "09:00-10:00", "10:00-10:50", "10:50-11:05",
+            "11:05-12:05", "12:05-13:05", "13:05-13:35", "13:35-14:35",
+            "14:35-15:35", "15:35-16:35", "16:35-17:35"
         ];
 
         async function login() {
@@ -636,7 +753,7 @@
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('mainSection').style.display = 'block';
                 document.getElementById('bottomNav').style.display = 'flex';
-                document.getElementById('profName').textContent = `Bienvenue ${currentProf.nom}`;
+                document.getElementById('profName').textContent = currentProf.nom;
                 document.getElementById('profMatiere').textContent = `Professeur de ${currentProf.matiere}`;
                 document.getElementById('profileId').value = currentProf.id;
                 document.getElementById('profileNom').value = currentProf.nom;
@@ -649,156 +766,380 @@
             }
         }
 
-        async function loadMyClasses() {
-            const container = document.getElementById('classesList');
-            container.innerHTML = '';
-            
-            for (const className of currentProf.classes) {
-                const classCard = document.createElement('div');
-                classCard.className = 'class-card';
-                classCard.innerHTML = `
-                    <div class="class-info">
-                        <h3>📖 ${className}</h3>
-                        <p>${currentProf.matiere}</p>
-                    </div>
-                    <button class="view-btn" onclick="showPresencePanel('${className}')">Gérer les présences</button>
-                `;
-                container.appendChild(classCard);
-            }
-        }
+   async function loadMyClasses() {
+    const container = document.getElementById('classesList');
+    container.innerHTML = '';
+    
+    for (const className of currentProf.classes) {
+        const classCard = document.createElement('div');
+        classCard.className = 'class-item';
+        classCard.innerHTML = `
+            <div class="class-icon"><i class="fas fa-chalkboard"></i></div>
+            <h3>${className}</h3>
+            <p>${currentProf.matiere}</p>
+            <div style="display: flex; gap: 10px; margin-top: 12px;">
+                <button class="icon-btn" onclick="showPresencePanel('${className}')" style="flex:1; background:#f0f4f8; border:none; padding:8px; border-radius:8px; cursor:pointer;">
+                    <i class="fas fa-user-check" style="color:#2c3e50; font-size:16px;"></i>
+                    <span style="font-size:11px; display:block;">Présences</span>
+                </button>
+                <button class="icon-btn" onclick="showStatsPanel('${className}')" style="flex:1; background:#f0f4f8; border:none; padding:8px; border-radius:8px; cursor:pointer;">
+                    <i class="fas fa-chart-line" style="color:#2c3e50; font-size:16px;"></i>
+                    <span style="font-size:11px; display:block;">Statistiques</span>
+                </button>
+            </div>
+        `;
+        container.appendChild(classCard);
+    }
+}
 
+      
+     async function showStatsPanel(className) {
+    // Récupérer tous les élèves de la classe
+    const studentsSnapshot = await db.collection('eleves').where('classe', '==', className).get();
+    const students = [];
+    studentsSnapshot.forEach(doc => students.push({ id: doc.id, ...doc.data() }));
+    
+    // Récupérer toutes les notes pour chaque élève
+    const studentsData = [];
+    for (const student of students) {
+        const notesQuery = await db.collection('notes')
+            .where('eleveId', '==', student.matricule)
+            .where('matiere', '==', currentProf.matiere)
+            .get();
+        
+        let notes = { CC1: null, CC2: null, Composition: null };
+        notesQuery.forEach(doc => {
+            const data = doc.data();
+            if (data.type === 'CC1') notes.CC1 = data.note;
+            if (data.type === 'CC2') notes.CC2 = data.note;
+            if (data.type === 'Composition') notes.Composition = data.note;
+        });
+        
+        // Calculer la moyenne
+        let moyenne = null;
+        if (notes.CC1 !== null && notes.CC2 !== null && notes.Composition !== null) {
+            const moyCC = (notes.CC1 + notes.CC2) / 2;
+            moyenne = (moyCC + notes.Composition) / 2;
+        }
+        
+        studentsData.push({
+            ...student,
+            notes: notes,
+            moyenne: moyenne
+        });
+    }
+    
+    // Calculer les statistiques
+    totalNotes = 0;
+    notesPlus10 = 0;
+    notesMoins10 = 0;
+    notesPlus15 = 0;
+    sommeNotes = 0;
+    
+    studentsData.forEach(student => {
+        if (student.moyenne !== null) {
+            totalNotes++;
+            sommeNotes += student.moyenne;
+            if (student.moyenne >= 10) notesPlus10++;
+            if (student.moyenne < 10) notesMoins10++;
+            if (student.moyenne >= 15) notesPlus15++;
+        }
+    });
+    
+    const moyenneGenerale = totalNotes > 0 ? (sommeNotes / totalNotes).toFixed(2) : 0;
+    const pourcentageReussite = totalNotes > 0 ? ((notesPlus10 / totalNotes) * 100).toFixed(1) : 0;
+    
+    const container = document.getElementById('classesList');
+    container.innerHTML = `
+        <button class="back-link" onclick="loadMyClasses()" style="margin-bottom:20px;">
+            <i class="fas fa-arrow-left"></i> Retour aux classes
+        </button>
+        
+        <div style="background:white; border-radius:16px; padding:24px; border:1px solid #edf2f7;">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+                <div style="width:48px; height:48px; background:#f0f4f8; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+                    <i class="fas fa-chart-line" style="font-size:24px; color:#2c3e50;"></i>
+                </div>
+                <div>
+                    <h3 style="font-size:18px; margin-bottom:4px;">${className}</h3>
+                    <p style="font-size:13px; color:#6c757d;">${currentProf.matiere} - Statistiques des notes</p>
+                </div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:16px; margin-bottom:24px;">
+                <div class="stat-card" onclick="showStudentsByCategory('${className}', 'all')" style="background:#f8fafc; border-radius:12px; padding:16px; text-align:center; cursor:pointer; transition:all 0.2s;">
+                    <i class="fas fa-users" style="font-size:24px; color:#2c3e50; margin-bottom:8px;"></i>
+                    <div style="font-size:28px; font-weight:700; color:#1a1a2e;">${totalNotes}</div>
+                    <div style="font-size:12px; color:#6c757d;">Total des notes</div>
+                </div>
+                <div class="stat-card" onclick="showStudentsByCategory('${className}', 'success')" style="background:#f0fdf4; border-radius:12px; padding:16px; text-align:center; cursor:pointer; transition:all 0.2s;">
+                    <i class="fas fa-check-circle" style="font-size:24px; color:#10b981; margin-bottom:8px;"></i>
+                    <div style="font-size:28px; font-weight:700; color:#10b981;">${pourcentageReussite}%</div>
+                    <div style="font-size:12px; color:#6c757d;">Taux de réussite (≥10/20)</div>
+                </div>
+                <div class="stat-card" onclick="showStudentsByCategory('${className}', 'difficulty')" style="background:#fef2f2; border-radius:12px; padding:16px; text-align:center; cursor:pointer; transition:all 0.2s;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:24px; color:#ef4444; margin-bottom:8px;"></i>
+                    <div style="font-size:28px; font-weight:700; color:#ef4444;">${notesMoins10}</div>
+                    <div style="font-size:12px; color:#6c757d;">Élèves en difficulté (&lt;10/20)</div>
+                </div>
+                <div class="stat-card" onclick="showStudentsByCategory('${className}', 'excellent')" style="background:#fff7ed; border-radius:12px; padding:16px; text-align:center; cursor:pointer; transition:all 0.2s;">
+                    <i class="fas fa-star" style="font-size:24px; color:#f59e0b; margin-bottom:8px;"></i>
+                    <div style="font-size:28px; font-weight:700; color:#f59e0b;">${notesPlus15}</div>
+                    <div style="font-size:12px; color:#6c757d;">Excellents (≥15/20)</div>
+                </div>
+            </div>
+            
+            <div style="margin-top:20px;">
+                <div style="background:#f8fafc; border-radius:12px; padding:16px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="font-size:13px; font-weight:500;">Moyenne générale de la classe</span>
+                        <span style="font-size:20px; font-weight:700; color:#2c3e50;">${moyenneGenerale}/20</span>
+                    </div>
+                    <div style="background:#e9ecef; border-radius:10px; height:8px; overflow:hidden;">
+                        <div style="background:#10b981; width:${(moyenneGenerale/20)*100}%; height:100%; border-radius:10px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Stocker les données pour utilisation ultérieure
+    window.currentStatsData = { studentsData, className };
+    showPanel('classesPanel');
+}
+
+// Nouvelle fonction pour afficher les élèves par catégorie
+async function showStudentsByCategory(className, category) {
+    const studentsData = window.currentStatsData?.studentsData || [];
+    let filteredStudents = [];
+    let title = '';
+    
+    switch(category) {
+        case 'all':
+            filteredStudents = studentsData.filter(s => s.moyenne !== null);
+            title = 'Tous les élèves avec notes';
+            break;
+        case 'success':
+            filteredStudents = studentsData.filter(s => s.moyenne !== null && s.moyenne >= 10);
+            title = 'Élèves en réussite (≥10/20)';
+            break;
+        case 'difficulty':
+            filteredStudents = studentsData.filter(s => s.moyenne !== null && s.moyenne < 10);
+            title = 'Élèves en difficulté (<10/20)';
+            break;
+        case 'excellent':
+            filteredStudents = studentsData.filter(s => s.moyenne !== null && s.moyenne >= 15);
+            title = 'Élèves excellents (≥15/20)';
+            break;
+    }
+    
+    const container = document.getElementById('classesList');
+    container.innerHTML = `
+        <button class="back-link" onclick="showStatsPanel('${className}')" style="margin-bottom:20px;">
+            <i class="fas fa-arrow-left"></i> Retour aux statistiques
+        </button>
+        
+        <div style="background:white; border-radius:16px; padding:24px; border:1px solid #edf2f7;">
+            <div style="margin-bottom:24px;">
+                <h3 style="font-size:18px; margin-bottom:8px;">${title}</h3>
+                <p style="font-size:13px; color:#6c757d;">${className} - ${currentProf.matiere}</p>
+            </div>
+            
+            <div class="students-table-wrapper">
+                <table class="students-table" style="min-width:800px;">
+                    <thead>
+                        <tr>
+                            <th>Matricule</th>
+                            <th>Nom de l'élève</th>
+                            <th>CC1 /20</th>
+                            <th>CC2 /20</th>
+                            <th>Composition /20</th>
+                            <th>Moyenne /20</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredStudents.map(student => `
+                            <tr style="${student.moyenne >= 15 ? 'background:#fff7ed' : student.moyenne < 10 ? 'background:#fef2f2' : 'background:#f0fdf4'}">
+                                <td>${student.matricule}</td>
+                                <td><strong>${student.nom}</strong></td>
+                                <td style="font-weight:600; color:${student.notes.CC1 !== null ? (student.notes.CC1 >= 10 ? '#10b981' : '#ef4444') : '#6c757d'}">
+                                    ${student.notes.CC1 !== null ? student.notes.CC1.toFixed(2) : '-'}
+                                </td>
+                                <td style="font-weight:600; color:${student.notes.CC2 !== null ? (student.notes.CC2 >= 10 ? '#10b981' : '#ef4444') : '#6c757d'}">
+                                    ${student.notes.CC2 !== null ? student.notes.CC2.toFixed(2) : '-'}
+                                </td>
+                                <td style="font-weight:600; color:${student.notes.Composition !== null ? (student.notes.Composition >= 10 ? '#10b981' : '#ef4444') : '#6c757d'}">
+                                    ${student.notes.Composition !== null ? student.notes.Composition.toFixed(2) : '-'}
+                                </td>
+                                <td style="font-weight:700; font-size:16px; color:${student.moyenne !== null ? (student.moyenne >= 10 ? '#10b981' : '#ef4444') : '#6c757d'}">
+                                    ${student.moyenne !== null ? student.moyenne.toFixed(2) : '-'}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top:20px; padding:16px; background:#f8fafc; border-radius:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div>
+                        <span style="font-size:12px; color:#6c757d;">Nombre d'élèves</span>
+                        <div style="font-size:24px; font-weight:700;">${filteredStudents.length}</div>
+                    </div>
+                    <div>
+                        <span style="font-size:12px; color:#6c757d;">Moyenne du groupe</span>
+                        <div style="font-size:24px; font-weight:700; color:${filteredStudents.reduce((sum, s) => sum + (s.moyenne || 0), 0) / filteredStudents.length >= 10 ? '#10b981' : '#ef4444'}">
+                            ${(filteredStudents.reduce((sum, s) => sum + (s.moyenne || 0), 0) / filteredStudents.length).toFixed(2)}/20
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    showPanel('classesPanel');
+}
         async function showPresencePanel(className) {
-            // Charger les élèves
             const studentsSnapshot = await db.collection('eleves').where('classe', '==', className).get();
             currentStudents = [];
             studentsSnapshot.forEach(doc => currentStudents.push({ id: doc.id, ...doc.data() }));
             
-            // Initialiser la date du jour
             const today = new Date().toISOString().split('T')[0];
             
             const container = document.getElementById('presenceContent');
             container.innerHTML = `
-                <div class="students-table-container">
-                    <div class="header-actions">
-                        <button class="back-btn" onclick="showPanel('classesPanel')">← Retour aux classes</button>
-                        <h3>${className} - ${currentProf.matiere}</h3>
-                    </div>
-                    
-                    <div class="date-time-selector">
-                        <div class="date-group">
-                            <label>📅 Date du cours</label>
+                <button class="back-link" onclick="showPanel('classesPanel')"><i class="fas fa-arrow-left"></i> Retour aux classes</button>
+                
+                <div class="filters-bar">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label>Date</label>
                             <input type="date" id="presenceDate" value="${today}" onchange="loadExistingPresences()">
                         </div>
-                        <div class="time-group">
-                            <label>⏰ Horaire du cours</label>
-                            <select id="presenceTime">
+                        <div class="filter-group">
+                            <label>Horaires (sélection multiple)</label>
+                            <select id="presenceTime" multiple size="3" style="height: auto; min-height: 80px;">
                                 ${timeSlots.map(slot => `<option value="${slot}">${slot}</option>`).join('')}
                             </select>
+                            <small style="color:#6c757d;">Ctrl/Cmd pour sélectionner plusieurs</small>
                         </div>
                     </div>
-                    
-                    <div class="students-table-container">
-                        <table class="students-table">
-                            <thead>
-                                <tr>
-                                    <th>Photo</th>
-                                    <th>Matricule</th>
-                                    <th>Nom complet</th>
-                                    <th>Statut</th>
-                                </tr>
-                            </thead>
-                            <tbody id="studentsTableBody">
-                                ${currentStudents.map(student => `
-                                    <tr>
-                                        <td><img src="${student.photoUrl}" class="student-photo" onerror="this.src='https://via.placeholder.com/45'"></td>
-                                        <td>${student.matricule}</td>
-                                        <td><strong>${student.nom}</strong></td>
-                                        <td>
-                                            <div class="status-buttons">
-                                                <button class="status-btn present" onclick="setStatus('${student.matricule}', 'Présent')">✅ Présent</button>
-                                                <button class="status-btn absent" onclick="setStatus('${student.matricule}', 'Absent')">❌ Absent</button>
-                                                <button class="status-btn retard" onclick="setStatus('${student.matricule}', 'Retard')">⏰ Retard</button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <button class="save-all-btn" onclick="saveAllPresences('${className}')">💾 Enregistrer toutes les présences</button>
                 </div>
+                
+                <div class="students-table-wrapper">
+                    <table class="students-table">
+                        <thead>
+                            <tr><th>Photo</th><th>Matricule</th><th>Nom</th><th>Statut</th></tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            ${currentStudents.map(student => `
+                                <tr id="row_${student.matricule}" class="present-row">
+                                    <td><img src="${student.photoUrl}" class="student-avatar" onerror="this.src='https://via.placeholder.com/36'"></td>
+                                    <td>${student.matricule}</td>
+                                    <td><strong>${student.nom}</strong></td>
+                                    <td>
+                                        <div class="status-btns">
+                                            <button class="status-btn present" onclick="setStatus('${student.matricule}', 'Présent')">Présent</button>
+                                            <button class="status-btn absent" onclick="setStatus('${student.matricule}', 'Absent')">Absent</button>
+                                            <button class="status-btn retard" onclick="setStatus('${student.matricule}', 'Retard')">Retard</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <button class="save-btn" onclick="saveAllPresences('${className}')"><i class="fas fa-save"></i> Enregistrer toutes les présences</button>
             `;
             
             currentPresences = {};
+            currentStudents.forEach(s => currentPresences[s.matricule] = 'Présent');
             await loadExistingPresences();
+            updateRowsColor();
             showPanel('presencePanel');
         }
 
         function setStatus(matricule, status) {
             currentPresences[matricule] = status;
-            // Mettre à jour l'affichage des boutons
-            const row = document.querySelector(`tr:has(button[onclick*="${matricule}"])`);
-            if (row) {
-                const buttons = row.querySelectorAll('.status-btn');
-                buttons.forEach(btn => {
-                    btn.classList.remove('active');
-                    if ((status === 'Présent' && btn.classList.contains('present')) ||
-                        (status === 'Absent' && btn.classList.contains('absent')) ||
-                        (status === 'Retard' && btn.classList.contains('retard'))) {
-                        btn.classList.add('active');
-                    }
-                });
-            }
+            updateRowsColor();
+        }
+
+        function updateRowsColor() {
+            currentStudents.forEach(student => {
+                const row = document.getElementById(`row_${student.matricule}`);
+                if (row) {
+                    row.className = '';
+                    const status = currentPresences[student.matricule];
+                    if (status === 'Présent') row.classList.add('present-row');
+                    else if (status === 'Absent') row.classList.add('absent-row');
+                    else if (status === 'Retard') row.classList.add('retard-row');
+                    
+                    const btns = row.querySelectorAll('.status-btn');
+                    btns.forEach(btn => {
+                        btn.classList.remove('active');
+                        if ((status === 'Présent' && btn.classList.contains('present')) ||
+                            (status === 'Absent' && btn.classList.contains('absent')) ||
+                            (status === 'Retard' && btn.classList.contains('retard'))) {
+                            btn.classList.add('active');
+                        }
+                    });
+                }
+            });
         }
 
         async function loadExistingPresences() {
             const date = document.getElementById('presenceDate').value;
-            const timeSlot = document.getElementById('presenceTime').value;
+            const timeSelect = document.getElementById('presenceTime');
+            const selectedTimes = Array.from(timeSelect.selectedOptions).map(opt => opt.value);
+            
+            if (selectedTimes.length === 0) return;
             
             for (const student of currentStudents) {
-                const presenceId = `${student.matricule}_${date}_${timeSlot}`;
-                const presenceDoc = await db.collection('presences').doc(presenceId).get();
-                if (presenceDoc.exists) {
-                    currentPresences[student.matricule] = presenceDoc.data().statut;
-                    const row = document.querySelector(`tr:has(button[onclick*="${student.matricule}"])`);
-                    if (row) {
-                        const buttons = row.querySelectorAll('.status-btn');
-                        buttons.forEach(btn => {
-                            btn.classList.remove('active');
-                            if ((presenceDoc.data().statut === 'Présent' && btn.classList.contains('present')) ||
-                                (presenceDoc.data().statut === 'Absent' && btn.classList.contains('absent')) ||
-                                (presenceDoc.data().statut === 'Retard' && btn.classList.contains('retard'))) {
-                                btn.classList.add('active');
-                            }
-                        });
+                let hasAnyPresence = false;
+                for (const timeSlot of selectedTimes) {
+                    const presenceId = `${student.matricule}_${date}_${timeSlot}`;
+                    const presenceDoc = await db.collection('presences').doc(presenceId).get();
+                    if (presenceDoc.exists) {
+                        currentPresences[student.matricule] = presenceDoc.data().statut;
+                        hasAnyPresence = true;
+                        break;
                     }
                 }
+                if (!hasAnyPresence) {
+                    currentPresences[student.matricule] = 'Présent';
+                }
             }
+            updateRowsColor();
         }
 
         async function saveAllPresences(className) {
             const date = document.getElementById('presenceDate').value;
-            const timeSlot = document.getElementById('presenceTime').value;
+            const timeSelect = document.getElementById('presenceTime');
+            const selectedTimes = Array.from(timeSelect.selectedOptions).map(opt => opt.value);
             
-            for (const student of currentStudents) {
-                const status = currentPresences[student.matricule] || 'Présent'; // Par défaut présent
-                const presenceId = `${student.matricule}_${date}_${timeSlot}`;
-                
-                await db.collection('presences').doc(presenceId).set({
-                    matricule: student.matricule,
-                    nom: student.nom,
-                    classe: className,
-                    date: date,
-                    horaire: timeSlot,
-                    statut: status,
-                    matiere: currentProf.matiere,
-                    professeur: currentProf.nom,
-                    timestamp: new Date().toISOString()
-                });
+            if (selectedTimes.length === 0) {
+                alert('Veuillez sélectionner au moins un horaire');
+                return;
             }
             
-            alert('✅ Toutes les présences ont été enregistrées avec succès !');
+            for (const student of currentStudents) {
+                const status = currentPresences[student.matricule] || 'Présent';
+                for (const timeSlot of selectedTimes) {
+                    const presenceId = `${student.matricule}_${date}_${timeSlot}`;
+                    await db.collection('presences').doc(presenceId).set({
+                        matricule: student.matricule,
+                        nom: student.nom,
+                        classe: className,
+                        date: date,
+                        horaire: timeSlot,
+                        statut: status,
+                        matiere: currentProf.matiere,
+                        professeur: currentProf.nom,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            }
+            alert('Présences enregistrées avec succès !');
             await loadExistingPresences();
         }
 
@@ -823,42 +1164,35 @@
             
             const container = document.getElementById('notesBulkList');
             container.innerHTML = `
-                <table class="notes-table">
-                    <thead>
-                        <tr>
-                            <th>Matricule</th>
-                            <th>Nom de l'élève</th>
-                            <th>Note /20</th>
-                            <th>Appréciation</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${students.map(student => `
-                            <tr>
-                                <td>${student.matricule}</td>
-                                <td><strong>${student.nom}</strong></td>
-                                <td>
-                                    <input type="number" class="note-input" id="note_${student.matricule}" 
-                                           step="0.25" min="0" max="20" placeholder="Note">
-                                </td>
-                                <td>
-                                    <input type="text" class="appreciation-input" id="appreciation_${student.matricule}" 
-                                           placeholder="Appréciation">
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-                <button class="save-notes-btn" onclick="saveAllNotes('${classe}')">💾 Enregistrer toutes les notes</button>
+                <div class="notes-table-wrapper">
+                    <table class="notes-table">
+                        <thead><tr><th>Matricule</th><th>Nom</th><th>Note /20</th><th>Appréciation</th></tr></thead>
+                        <tbody>
+                            ${students.map(student => `
+                                <tr>
+                                    <td>${student.matricule}</td>
+                                    <td><strong>${student.nom}</strong></td>
+                                    <td><input type="number" class="note-field" id="note_${student.matricule}" step="0.25" min="0" max="20" placeholder="Note"></td>
+                                    <td><input type="text" class="appreciation-field" id="appreciation_${student.matricule}" placeholder="Appréciation"></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <button class="save-btn" onclick="saveAllNotes('${classe}')"><i class="fas fa-save"></i> Enregistrer toutes les notes</button>
             `;
             
-            // Charger les notes existantes
             for (const student of students) {
                 const noteId = `${student.matricule}_${currentProf.matiere}_${semestre}_${noteType}`;
                 const noteDoc = await db.collection('notes').doc(noteId).get();
                 if (noteDoc.exists) {
                     document.getElementById(`note_${student.matricule}`).value = noteDoc.data().note;
                     document.getElementById(`appreciation_${student.matricule}`).value = noteDoc.data().appreciation || '';
+                } else {
+                    if(document.getElementById(`note_${student.matricule}`)) 
+                        document.getElementById(`note_${student.matricule}`).value = '';
+                    if(document.getElementById(`appreciation_${student.matricule}`))
+                        document.getElementById(`appreciation_${student.matricule}`).value = '';
                 }
             }
         }
@@ -891,8 +1225,8 @@
                     });
                 }
             }
-            
-            alert('✅ Toutes les notes ont été enregistrées avec succès !');
+            alert('Notes enregistrées !');
+            loadElevesForNotes();
         }
 
         async function loadHistory() {
@@ -901,13 +1235,8 @@
             const studentName = document.getElementById('historyStudentName').value.toLowerCase();
             
             let query = db.collection('presences');
-            
-            if (startDate) {
-                query = query.where('date', '>=', startDate);
-            }
-            if (endDate) {
-                query = query.where('date', '<=', endDate);
-            }
+            if (startDate) query = query.where('date', '>=', startDate);
+            if (endDate) query = query.where('date', '<=', endDate);
             
             const snapshot = await query.get();
             let presences = [];
@@ -919,20 +1248,17 @@
             
             const container = document.getElementById('historyList');
             if (presences.length === 0) {
-                container.innerHTML = '<p style="text-align: center; padding: 40px;">Aucun enregistrement trouvé</p>';
+                container.innerHTML = '<div style="padding:40px; text-align:center; color:#6c757d;">Aucun enregistrement</div>';
                 return;
             }
             
             container.innerHTML = presences.map(p => `
                 <div class="history-item">
-                    <strong>📅 ${p.date}</strong> - ${p.horaire || 'Horaire non spécifié'}<br>
-                    <strong>👨‍🎓 ${p.nom}</strong> (${p.matricule})<br>
-                    <strong>📚 ${p.classe}</strong> - ${p.matiere || currentProf.matiere}<br>
-                    <strong>Statut:</strong> 
-                    <span style="color: ${p.statut === 'Présent' ? '#4CAF50' : p.statut === 'Absent' ? '#f44336' : '#ff9800'}">
-                        ${p.statut === 'Présent' ? '✅' : p.statut === 'Absent' ? '❌' : '⏰'} ${p.statut}
-                    </span><br>
-                    <strong>Professeur:</strong> ${p.professeur}
+                    <div class="history-info">
+                        <strong>${p.nom}</strong> <span style="font-size:12px; color:#6c757d;">(${p.matricule})</span>
+                        <p><i class="far fa-calendar-alt"></i> ${p.date} | <i class="far fa-clock"></i> ${p.horaire} | ${p.classe}</p>
+                    </div>
+                    <span class="history-status status-${p.statut === 'Présent' ? 'present' : p.statut === 'Absent' ? 'absent' : 'retard'}">${p.statut}</span>
                 </div>
             `).join('');
         }
@@ -940,10 +1266,8 @@
         async function updateProfile() {
             const newPassword = document.getElementById('newPassword').value;
             if (newPassword) {
-                await db.collection('professeurs').doc(currentProf.id).update({
-                    password: newPassword
-                });
-                alert('✅ Mot de passe mis à jour');
+                await db.collection('professeurs').doc(currentProf.id).update({ password: newPassword });
+                alert('Mot de passe mis à jour');
                 document.getElementById('newPassword').value = '';
             }
         }
@@ -953,27 +1277,18 @@
             document.getElementById('loginSection').style.display = 'block';
             document.getElementById('mainSection').style.display = 'none';
             document.getElementById('bottomNav').style.display = 'none';
-            document.getElementById('loginId').value = '';
-            document.getElementById('loginPassword').value = '';
         }
 
         function showPanel(panelId) {
-            document.querySelectorAll('.content-panel').forEach(panel => {
-                panel.classList.remove('active');
-            });
+            document.querySelectorAll('.content-panel').forEach(panel => panel.classList.remove('active'));
             document.getElementById(panelId).classList.add('active');
-            
-            if (panelId === 'historyPanel') {
-                loadHistory();
-            }
+            if (panelId === 'historyPanel') loadHistory();
         }
 
-        // Initialiser la date du jour par défaut
-        window.onload = function() {
+        window.onload = () => {
             const today = new Date().toISOString().split('T')[0];
-            if (document.getElementById('historyStartDate')) {
+            if(document.getElementById('historyStartDate')) 
                 document.getElementById('historyStartDate').value = today;
-            }
         };
     </script>
 </body>
