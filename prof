@@ -587,6 +587,33 @@
     background: #e9ecef !important;
     transform: translateY(-2px);
 }
+      .history-date-header:hover {
+    background: #f1f5f9 !important;
+}
+
+.date-group-content {
+    animation: fadeIn 0.3s ease;
+}
+
+.history-date-group:last-child {
+    border-bottom: none;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #2c3e50;
+    background: none;
+    padding: 0;
+    width: auto;
+}
+
+.back-link:hover {
+    background: none;
+    transform: none;
+    color: #1a252f;
+}
     </style>
 </head>
 <body>
@@ -1229,39 +1256,225 @@ async function showStudentsByCategory(className, category) {
             loadElevesForNotes();
         }
 
-        async function loadHistory() {
-            const startDate = document.getElementById('historyStartDate').value;
-            const endDate = document.getElementById('historyEndDate').value;
-            const studentName = document.getElementById('historyStudentName').value.toLowerCase();
-            
-            let query = db.collection('presences');
-            if (startDate) query = query.where('date', '>=', startDate);
-            if (endDate) query = query.where('date', '<=', endDate);
-            
-            const snapshot = await query.get();
-            let presences = [];
-            snapshot.forEach(doc => presences.push(doc.data()));
-            
-            if (studentName) {
-                presences = presences.filter(p => p.nom.toLowerCase().includes(studentName));
-            }
-            
-            const container = document.getElementById('historyList');
-            if (presences.length === 0) {
-                container.innerHTML = '<div style="padding:40px; text-align:center; color:#6c757d;">Aucun enregistrement</div>';
-                return;
-            }
-            
-            container.innerHTML = presences.map(p => `
-                <div class="history-item">
-                    <div class="history-info">
-                        <strong>${p.nom}</strong> <span style="font-size:12px; color:#6c757d;">(${p.matricule})</span>
-                        <p><i class="far fa-calendar-alt"></i> ${p.date} | <i class="far fa-clock"></i> ${p.horaire} | ${p.classe}</p>
-                    </div>
-                    <span class="history-status status-${p.statut === 'Présent' ? 'present' : p.statut === 'Absent' ? 'absent' : 'retard'}">${p.statut}</span>
-                </div>
-            `).join('');
+       async function loadHistory() {
+    const startDate = document.getElementById('historyStartDate').value;
+    const endDate = document.getElementById('historyEndDate').value;
+    
+    let query = db.collection('presences');
+    if (startDate) query = query.where('date', '>=', startDate);
+    if (endDate) query = query.where('date', '<=', endDate);
+    
+    const snapshot = await query.get();
+    let presences = [];
+    snapshot.forEach(doc => presences.push(doc.data()));
+    
+    // Grouper par date
+    const groupedByDate = {};
+    presences.forEach(p => {
+        if (!groupedByDate[p.date]) {
+            groupedByDate[p.date] = [];
         }
+        groupedByDate[p.date].push(p);
+    });
+    
+    // Trier les dates
+    const sortedDates = Object.keys(groupedByDate).sort().reverse();
+    
+    const container = document.getElementById('historyList');
+    if (sortedDates.length === 0) {
+        container.innerHTML = '<div style="padding:40px; text-align:center; color:#6c757d;">Aucun enregistrement trouvé</div>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <div style="background:white; border-radius:16px; border:1px solid #edf2f7; overflow:hidden;">
+            ${sortedDates.map(date => {
+                const dayPresences = groupedByDate[date];
+                // Extraire les absents et retardataires
+                const absents = dayPresences.filter(p => p.statut === 'Absent');
+                const retards = dayPresences.filter(p => p.statut === 'Retard');
+                const presents = dayPresences.filter(p => p.statut === 'Présent');
+                
+                // Formater la date
+                const dateObj = new Date(date);
+                const formattedDate = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                
+                return `
+                    <div class="history-date-group" style="border-bottom:1px solid #edf2f7;">
+                        <div class="history-date-header" onclick="toggleDateGroup('${date}')" style="background:#f8fafc; padding:16px 20px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; transition:all 0.2s;">
+                            <div>
+                                <i class="fas fa-calendar-alt" style="color:#2c3e50; margin-right:12px;"></i>
+                                <strong style="font-size:15px;">${formattedDate}</strong>
+                                <span style="margin-left:12px; font-size:12px; color:#6c757d;">${dayPresences.length} enregistrements</span>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                ${absents.length > 0 ? `<span style="background:#fef2f2; color:#ef4444; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600;">⚠️ ${absents.length} absent(s)</span>` : ''}
+                                ${retards.length > 0 ? `<span style="background:#fff7ed; color:#f59e0b; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600;">⏰ ${retards.length} retard(s)</span>` : ''}
+                                <i class="fas fa-chevron-down" style="color:#6c757d; transition:transform 0.2s;"></i>
+                            </div>
+                        </div>
+                        <div id="date-group-${date}" class="date-group-content" style="display:none; padding:0 20px 20px 20px;">
+                            ${absents.length > 0 ? `
+                                <div style="margin-top:20px;">
+                                    <div style="background:#fef2f2; border-radius:12px; padding:16px; margin-bottom:16px;">
+                                        <h4 style="font-size:14px; color:#ef4444; margin-bottom:12px;">
+                                            <i class="fas fa-user-slash"></i> Absents (${absents.length})
+                                        </h4>
+                                        <div style="display:flex; flex-direction:column; gap:8px;">
+                                            ${absents.map(a => `
+                                                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:white; border-radius:8px;">
+                                                    <div>
+                                                        <strong>${a.nom}</strong>
+                                                        <span style="font-size:11px; color:#6c757d; margin-left:8px;">${a.horaire || 'Horaire inconnu'}</span>
+                                                    </div>
+                                                    <span style="background:#fef2f2; color:#ef4444; padding:2px 8px; border-radius:12px; font-size:11px;">Absent</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${retards.length > 0 ? `
+                                <div style="margin-top:16px;">
+                                    <div style="background:#fff7ed; border-radius:12px; padding:16px; margin-bottom:16px;">
+                                        <h4 style="font-size:14px; color:#f59e0b; margin-bottom:12px;">
+                                            <i class="fas fa-clock"></i> Retards (${retards.length})
+                                        </h4>
+                                        <div style="display:flex; flex-direction:column; gap:8px;">
+                                            ${retards.map(r => `
+                                                <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:white; border-radius:8px;">
+                                                    <div>
+                                                        <strong>${r.nom}</strong>
+                                                        <span style="font-size:11px; color:#6c757d; margin-left:8px;">${r.horaire || 'Horaire inconnu'}</span>
+                                                    </div>
+                                                    <span style="background:#fff7ed; color:#f59e0b; padding:2px 8px; border-radius:12px; font-size:11px;">Retard</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            ${absents.length === 0 && retards.length === 0 ? `
+                                <div style="margin-top:20px; padding:20px; text-align:center; background:#f0fdf4; border-radius:12px;">
+                                    <i class="fas fa-check-circle" style="color:#10b981; font-size:32px; margin-bottom:8px;"></i>
+                                    <p style="color:#10b981; font-weight:500;">✅ Tous les élèves étaient présents aujourd'hui !</p>
+                                </div>
+                            ` : ''}
+                            
+                            <div style="margin-top:12px; text-align:center;">
+                                <button onclick="viewFullDayHistory('${date}')" style="background:#f0f4f8; color:#2c3e50; padding:8px 16px; font-size:12px; width:auto;">
+                                    <i class="fas fa-eye"></i> Voir tous les détails
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
+
+// Fonction pour afficher tous les détails d'une journée
+async function viewFullDayHistory(date) {
+    const snapshot = await db.collection('presences').where('date', '==', date).get();
+    let presences = [];
+    snapshot.forEach(doc => presences.push(doc.data()));
+    
+    // Grouper par élève
+    const studentsMap = {};
+    presences.forEach(p => {
+        if (!studentsMap[p.matricule]) {
+            studentsMap[p.matricule] = {
+                nom: p.nom,
+                matricule: p.matricule,
+                presences: []
+            };
+        }
+        studentsMap[p.matricule].presences.push({
+            horaire: p.horaire,
+            statut: p.statut
+        });
+    });
+    
+    const studentsList = Object.values(studentsMap);
+    const dateObj = new Date(date);
+    const formattedDate = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    
+    const container = document.getElementById('historyList');
+    container.innerHTML = `
+        <button class="back-link" onclick="loadHistory()" style="margin-bottom:20px;">
+            <i class="fas fa-arrow-left"></i> Retour à l'historique
+        </button>
+        
+        <div style="background:white; border-radius:16px; border:1px solid #edf2f7; padding:24px;">
+            <div style="margin-bottom:24px;">
+                <h3 style="font-size:18px; margin-bottom:4px;">${formattedDate}</h3>
+                <p style="font-size:13px; color:#6c757d;">Détail complet des présences</p>
+            </div>
+            
+            <div class="students-table-wrapper">
+                <table class="students-table" style="min-width:800px;">
+                    <thead>
+                        <tr>
+                            <th>Matricule</th>
+                            <th>Nom de l'élève</th>
+                            <th>Statut général</th>
+                            <th>Détails par horaire</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${studentsList.map(student => {
+                            const hasAbsence = student.presences.some(p => p.statut === 'Absent');
+                            const hasRetard = student.presences.some(p => p.statut === 'Retard');
+                            const statutGeneral = hasAbsence ? 'Absent' : (hasRetard ? 'Retard' : 'Présent');
+                            const statutColor = hasAbsence ? '#ef4444' : (hasRetard ? '#f59e0b' : '#10b981');
+                            
+                            return `
+                                <tr style="${hasAbsence ? 'background:#fef2f2' : (hasRetard ? 'background:#fff7ed' : 'background:#f0fdf4')}">
+                                    <td>${student.matricule}</td>
+                                    <td><strong>${student.nom}</strong></td>
+                                    <td>
+                                        <span style="background:${statutColor}20; color:${statutColor}; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;">
+                                            ${statutGeneral}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                                            ${student.presences.map(p => `
+                                                <span style="background:${p.statut === 'Présent' ? '#f0fdf4' : (p.statut === 'Absent' ? '#fef2f2' : '#fff7ed')}; 
+                                                             color:${p.statut === 'Présent' ? '#10b981' : (p.statut === 'Absent' ? '#ef4444' : '#f59e0b')}; 
+                                                             padding:4px 8px; border-radius:8px; font-size:11px;">
+                                                    ${p.horaire || '?'}: ${p.statut}
+                                                </span>
+                                            `).join('')}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+}
+
+// Fonction pour afficher/masquer les détails d'une date
+function toggleDateGroup(date) {
+    const content = document.getElementById(`date-group-${date}`);
+    const header = content.previousElementSibling;
+    const icon = header.querySelector('.fa-chevron-down');
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        if (icon) icon.style.transform = 'rotate(180deg)';
+    } else {
+        content.style.display = 'none';
+        if (icon) icon.style.transform = 'rotate(0deg)';
+    }
+}
 
         async function updateProfile() {
             const newPassword = document.getElementById('newPassword').value;
