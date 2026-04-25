@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Administration - Système Scolaire</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 1.8em;
+        }
+
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-success { background: linear-gradient(135deg, #84fab0, #8fd3f4); color: #333; }
+        .btn-info { background: linear-gradient(135deg, #a8edea, #fed6e3); color: #333; }
+        .btn-warning { background: linear-gradient(135deg, #f6d365, #fda085); color: #333; }
+        .btn-danger { background: linear-gradient(135deg, #ff9a9e, #fecfef); color: #333; }
+
+        .panel {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f5f5f5;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+        }
+
+        .edit-btn {
+            background: #ffa502;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .grid-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                padding: 15px;
+                font-size: 1em;
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Administration - Système Scolaire</h1>
+        </div>
+
+        <div class="grid-buttons">
+            <button class="btn btn-primary" onclick="showPanel('classes')">🏫 Gérer les Classes</button>
+            <button class="btn btn-success" onclick="showPanel('eleves')">👨‍🎓 Gérer les Élèves</button>
+            <button class="btn btn-info" onclick="showPanel('profs')">👨‍🏫 Gérer les Professeurs</button>
+            <button class="btn btn-warning" onclick="showPanel('bulletins')">📊 Gérer les Bulletins</button>
+            <button class="btn btn-danger" onclick="showPanel('documents')">📄 Demandes Documents</button>
+            <button class="btn btn-primary" onclick="showPanel('presences')">✅ Gérer Présences</button>
+        </div>
+
+        <!-- Panel Classes -->
+        <div id="classes" class="panel">
+            <h2>Gestion des Classes</h2>
+            <div class="form-group">
+                <label>Nom de la classe</label>
+                <input type="text" id="className" placeholder="Ex: 3ème A">
+            </div>
+            <button onclick="addClass()">Ajouter une classe</button>
+            <div class="table-container">
+                <table id="classesTable">
+                    <thead>
+                        <tr><th>Nom</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Panel Élèves -->
+        <div id="eleves" class="panel">
+            <h2>Gestion des Élèves</h2>
+            <div class="form-group">
+                <label>Matricule</label>
+                <input type="text" id="matricule" placeholder="Matricule unique">
+            </div>
+            <div class="form-group">
+                <label>Nom complet</label>
+                <input type="text" id="nomEleve" placeholder="Nom et prénom">
+            </div>
+            <div class="form-group">
+                <label>Date de naissance</label>
+                <input type="date" id="dateNaissance">
+            </div>
+            <div class="form-group">
+                <label>Téléphone</label>
+                <input type="tel" id="telephone" placeholder="Numéro de téléphone">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="emailEleve" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label>Classe</label>
+                <select id="classeEleve"></select>
+            </div>
+            <div class="form-group">
+                <label>Photo URL</label>
+                <input type="text" id="photoUrl" placeholder="URL de la photo">
+            </div>
+            <button onclick="addEleve()">Ajouter l'élève</button>
+            <div class="table-container">
+                <table id="elevesTable">
+                    <thead><tr><th>Matricule</th><th>Nom</th><th>Classe</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Panel Professeurs -->
+        <div id="profs" class="panel">
+            <h2>Gestion des Professeurs</h2>
+            <div class="form-group">
+                <label>Identifiant</label>
+                <input type="text" id="profId" placeholder="Identifiant unique">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="profPassword" placeholder="Mot de passe">
+            </div>
+            <div class="form-group">
+                <label>Nom complet</label>
+                <input type="text" id="profNom" placeholder="Nom et prénom">
+            </div>
+            <div class="form-group">
+                <label>Matière enseignée</label>
+                <input type="text" id="profMatiere" placeholder="Ex: Mathématiques">
+            </div>
+            <div class="form-group">
+                <label>Classes assignées</label>
+                <select id="profClasses" multiple></select>
+                <small>Maintenez Ctrl pour sélectionner plusieurs classes</small>
+            </div>
+            <button onclick="addProfesseur()">Ajouter le professeur</button>
+            <div class="table-container">
+                <table id="profsTable">
+                    <thead><tr><th>Identifiant</th><th>Nom</th><th>Matière</th><th>Classes</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Panel Bulletins -->
+        <div id="bulletins" class="panel">
+            <h2>Gestion des Bulletins</h2>
+            <div class="form-group">
+                <label>Choisir un élève</label>
+                <select id="bulletinEleve"></select>
+            </div>
+            <div class="form-group">
+                <label>Semestre</label>
+                <select id="bulletinSemestre">
+                    <option value="1">Semestre 1</option>
+                    <option value="2">Semestre 2</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Matière</label>
+                <input type="text" id="bulletinMatiere" placeholder="Matière">
+            </div>
+            <div class="form-group">
+                <label>Note CC1</label>
+                <input type="number" id="noteCC1" step="0.01" min="0" max="20">
+            </div>
+            <div class="form-group">
+                <label>Note CC2</label>
+                <input type="number" id="noteCC2" step="0.01" min="0" max="20">
+            </div>
+            <div class="form-group">
+                <label>Note Composition</label>
+                <input type="number" id="noteCompo" step="0.01" min="0" max="20">
+            </div>
+            <div class="form-group">
+                <label>Appréciation</label>
+                <textarea id="appreciation" rows="3" placeholder="Appréciation du professeur"></textarea>
+            </div>
+            <button onclick="ajouterNote()">Ajouter/Modifier la note</button>
+            <div class="table-container">
+                <table id="bulletinsTable">
+                    <thead><tr><th>Élève</th><th>Matière</th><th>Semestre</th><th>Note Semestrielle</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Panel Demandes Documents -->
+        <div id="documents" class="panel">
+            <h2>Demandes de Documents</h2>
+            <div class="table-container">
+                <table id="demandesTable">
+                    <thead><tr><th>Demandeur</th><th>Document</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Panel Présences -->
+        <div id="presences" class="panel">
+            <h2>Gestion des Présences</h2>
+            <div class="form-group">
+                <label>Choisir une classe</label>
+                <select id="presenceClasse" onchange="loadPresences()"></select>
+            </div>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="presenceDate" onchange="loadPresences()">
+            </div>
+            <div class="table-container">
+                <table id="presencesTable">
+                    <thead><tr><th>Élève</th><th>Statut</th><th>Action</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg",
+            authDomain: "teste-saldia.firebaseapp.com",
+            projectId: "teste-saldia",
+            storageBucket: "teste-saldia.firebasestorage.app",
+            messagingSenderId: "620601259237",
+            appId: "1:620601259237:web:57795c7a64082399d0d00c",
+            measurementId: "G-Q13XDEE9RJ"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentPanel = null;
+
+        function showPanel(panelName) {
+            if (currentPanel) {
+                document.getElementById(currentPanel).classList.remove('active');
+            }
+            document.getElementById(panelName).classList.add('active');
+            currentPanel = panelName;
+            
+            if (panelName === 'classes') loadClasses();
+            else if (panelName === 'eleves') loadEleves();
+            else if (panelName === 'profs') loadProfs();
+            else if (panelName === 'bulletins') { loadElevesForBulletin(); loadBulletins(); }
+            else if (panelName === 'documents') loadDemandes();
+            else if (panelName === 'presences') { loadClassesForPresence(); }
+        }
+
+        // Gestion des classes
+        async function addClass() {
+            const name = document.getElementById('className').value;
+            if (!name) return alert('Veuillez entrer un nom de classe');
+            
+            await db.collection('classes').add({ name });
+            document.getElementById('className').value = '';
+            loadClasses();
+            updateClassSelectors();
+        }
+
+        async function loadClasses() {
+            const snapshot = await db.collection('classes').get();
+            const tbody = document.querySelector('#classesTable tbody');
+            tbody.innerHTML = '';
+            snapshot.forEach(doc => {
+                const classe = doc.data();
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = classe.name;
+                const actions = row.insertCell(1);
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Supprimer';
+                deleteBtn.className = 'action-btn delete-btn';
+                deleteBtn.onclick = () => deleteClass(doc.id);
+                actions.appendChild(deleteBtn);
+            });
+        }
+
+        async function deleteClass(id) {
+            if (confirm('Supprimer cette classe ?')) {
+                await db.collection('classes').doc(id).delete();
+                loadClasses();
+                updateClassSelectors();
+            }
+        }
+
+        // Gestion des élèves
+        async function addEleve() {
+            const eleve = {
+                matricule: document.getElementById('matricule').value,
+                nom: document.getElementById('nomEleve').value,
+                dateNaissance: document.getElementById('dateNaissance').value,
+                telephone: document.getElementById('telephone').value,
+                email: document.getElementById('emailEleve').value,
+                classe: document.getElementById('classeEleve').value,
+                photoUrl: document.getElementById('photoUrl').value || 'https://via.placeholder.com/100'
+            };
+            
+            if (!eleve.matricule || !eleve.nom) return alert('Matricule et nom requis');
+            
+            await db.collection('eleves').doc(eleve.matricule).set(eleve);
+            document.getElementById('matricule').value = '';
+            document.getElementById('nomEleve').value = '';
+            document.getElementById('dateNaissance').value = '';
+            document.getElementById('telephone').value = '';
+            document.getElementById('emailEleve').value = '';
+            document.getElementById('photoUrl').value = '';
+            loadEleves();
+            updateEleveSelectors();
+        }
+
+        async function loadEleves() {
+            const snapshot = await db.collection('eleves').get();
+            const tbody = document.querySelector('#elevesTable tbody');
+            tbody.innerHTML = '';
+            snapshot.forEach(doc => {
+                const eleve = doc.data();
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = eleve.matricule;
+                row.insertCell(1).textContent = eleve.nom;
+                row.insertCell(2).textContent = eleve.classe;
+                const actions = row.insertCell(3);
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Supprimer';
+                deleteBtn.className = 'action-btn delete-btn';
+                deleteBtn.onclick = () => deleteEleve(doc.id);
+                actions.appendChild(deleteBtn);
+            });
+        }
+
+        async function deleteEleve(id) {
+            if (confirm('Supprimer cet élève ?')) {
+                await db.collection('eleves').doc(id).delete();
+                loadEleves();
+                updateEleveSelectors();
+            }
+        }
+
+        // Gestion des professeurs
+        async function addProfesseur() {
+            const selectedClasses = Array.from(document.getElementById('profClasses').selectedOptions).map(opt => opt.value);
+            const prof = {
+                identifiant: document.getElementById('profId').value,
+                password: document.getElementById('profPassword').value,
+                nom: document.getElementById('profNom').value,
+                matiere: document.getElementById('profMatiere').value,
+                classes: selectedClasses
+            };
+            
+            if (!prof.identifiant || !prof.password || !prof.nom) return alert('Champs requis');
+            
+            await db.collection('professeurs').doc(prof.identifiant).set(prof);
+            document.getElementById('profId').value = '';
+            document.getElementById('profPassword').value = '';
+            document.getElementById('profNom').value = '';
+            document.getElementById('profMatiere').value = '';
+            loadProfs();
+        }
+
+        async function loadProfs() {
+            const snapshot = await db.collection('professeurs').get();
+            const tbody = document.querySelector('#profsTable tbody');
+            tbody.innerHTML = '';
+            snapshot.forEach(doc => {
+                const prof = doc.data();
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = prof.identifiant;
+                row.insertCell(1).textContent = prof.nom;
+                row.insertCell(2).textContent = prof.matiere;
+                row.insertCell(3).textContent = prof.classes.join(', ');
+                const actions = row.insertCell(4);
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Supprimer';
+                deleteBtn.className = 'action-btn delete-btn';
+                deleteBtn.onclick = () => deleteProfesseur(doc.id);
+                actions.appendChild(deleteBtn);
+            });
+        }
+
+        async function deleteProfesseur(id) {
+            if (confirm('Supprimer ce professeur ?')) {
+                await db.collection('professeurs').doc(id).delete();
+                loadProfs();
+            }
+        }
+
+        // Gestion des bulletins/notes
+        async function ajouterNote() {
+            const eleveId = document.getElementById('bulletinEleve').value;
+            const semestre = document.getElementById('bulletinSemestre').value;
+            const matiere = document.getElementById('bulletinMatiere').value;
+            const cc1 = parseFloat(document.getElementById('noteCC1').value);
+            const cc2 = parseFloat(document.getElementById('noteCC2').value);
+            const compo = parseFloat(document.getElementById('noteCompo').value);
+            const appreciation = document.getElementById('appreciation').value;
+            
+            if (!eleveId || !matiere) return alert('Veuillez remplir tous les champs');
+            
+            const noteCC = (cc1 + cc2) / 2;
+            const noteSemestrielle = (noteCC + compo) / 2;
+            
+            const noteData = {
+                eleveId,
+                semestre,
+                matiere,
+                cc1,
+                cc2,
+                compo,
+                noteCC,
+                noteSemestrielle,
+                appreciation,
+                date: new Date().toISOString()
+            };
+            
+            const noteId = `${eleveId}_${matiere}_${semestre}`;
+            await db.collection('notes').doc(noteId).set(noteData);
+            
+            document.getElementById('bulletinMatiere').value = '';
+            document.getElementById('noteCC1').value = '';
+            document.getElementById('noteCC2').value = '';
+            document.getElementById('noteCompo').value = '';
+            document.getElementById('appreciation').value = '';
+            loadBulletins();
+        }
+        
+        async function loadBulletins() {
+            const snapshot = await db.collection('notes').get();
+            const tbody = document.querySelector('#bulletinsTable tbody');
+            tbody.innerHTML = '';
+            for (const doc of snapshot.docs) {
+                const note = doc.data();
+                const eleve = await db.collection('eleves').doc(note.eleveId).get();
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = eleve.exists ? eleve.data().nom : note.eleveId;
+                row.insertCell(1).textContent = note.matiere;
+                row.insertCell(2).textContent = `Semestre ${note.semestre}`;
+                row.insertCell(3).textContent = note.noteSemestrielle.toFixed(2);
+                const actions = row.insertCell(4);
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Supprimer';
+                deleteBtn.className = 'action-btn delete-btn';
+                deleteBtn.onclick = () => deleteNote(doc.id);
+                actions.appendChild(deleteBtn);
+            }
+        }
+        
+        async function deleteNote(id) {
+            if (confirm('Supprimer cette note ?')) {
+                await db.collection('notes').doc(id).delete();
+                loadBulletins();
+            }
+        }
+
+        // Gestion des présences
+        async function loadPresences() {
+            const classe = document.getElementById('presenceClasse').value;
+            const date = document.getElementById('presenceDate').value;
+            if (!classe || !date) return;
+            
+            const elevesSnapshot = await db.collection('eleves').where('classe', '==', classe).get();
+            const tbody = document.querySelector('#presencesTable tbody');
+            tbody.innerHTML = '';
+            
+            for (const eleveDoc of elevesSnapshot.docs) {
+                const eleve = eleveDoc.data();
+                const presenceId = `${eleve.matricule}_${date}`;
+                const presenceDoc = await db.collection('presences').doc(presenceId).get();
+                const statut = presenceDoc.exists ? presenceDoc.data().statut : 'non renseigné';
+                
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = eleve.nom;
+                row.insertCell(1).textContent = statut;
+                const actions = row.insertCell(2);
+                
+                const select = document.createElement('select');
+                select.innerHTML = `
+                    <option value="present" ${statut === 'present' ? 'selected' : ''}>Présent</option>
+                    <option value="absent" ${statut === 'absent' ? 'selected' : ''}>Absent</option>
+                    <option value="retard" ${statut === 'retard' ? 'selected' : ''}>Retard</option>
+                `;
+                const saveBtn = document.createElement('button');
+                saveBtn.textContent = 'Enregistrer';
+                saveBtn.className = 'action-btn edit-btn';
+                saveBtn.onclick = async () => {
+                    await db.collection('presences').doc(presenceId).set({
+                        matricule: eleve.matricule,
+                        nom: eleve.nom,
+                        classe,
+                        date,
+                        statut: select.value
+                    });
+                    loadPresences();
+                };
+                actions.appendChild(select);
+                actions.appendChild(saveBtn);
+            }
+        }
+
+        // Gestion des demandes de documents
+        async function loadDemandes() {
+            const snapshot = await db.collection('demandes').orderBy('date', 'desc').get();
+            const tbody = document.querySelector('#demandesTable tbody');
+            tbody.innerHTML = '';
+            snapshot.forEach(doc => {
+                const demande = doc.data();
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = demande.nomComplet;
+                row.insertCell(1).textContent = demande.typeDocument;
+                row.insertCell(2).textContent = new Date(demande.date).toLocaleDateString();
+                row.insertCell(3).textContent = demande.statut;
+                const actions = row.insertCell(4);
+                const traiterBtn = document.createElement('button');
+                traiterBtn.textContent = 'Traiter';
+                traiterBtn.className = 'action-btn edit-btn';
+                traiterBtn.onclick = async () => {
+                    await db.collection('demandes').doc(doc.id).update({ statut: 'Traité' });
+                    loadDemandes();
+                };
+                actions.appendChild(traiterBtn);
+            });
+        }
+
+        // Fonctions utilitaires
+        async function updateClassSelectors() {
+            const snapshot = await db.collection('classes').get();
+            const classes = [];
+            snapshot.forEach(doc => classes.push(doc.data().name));
+            
+            const eleveClasse = document.getElementById('classeEleve');
+            const profClasses = document.getElementById('profClasses');
+            const presenceClasse = document.getElementById('presenceClasse');
+            
+            [eleveClasse, presenceClasse].forEach(select => {
+                if (select) {
+                    select.innerHTML = '<option value="">Sélectionner une classe</option>' + 
+                        classes.map(c => `<option value="${c}">${c}</option>`).join('');
+                }
+            });
+            
+            if (profClasses) {
+                profClasses.innerHTML = classes.map(c => `<option value="${c}">${c}</option>`).join('');
+            }
+        }
+        
+        async function updateEleveSelectors() {
+            const snapshot = await db.collection('eleves').get();
+            const bulletinEleve = document.getElementById('bulletinEleve');
+            bulletinEleve.innerHTML = '<option value="">Sélectionner un élève</option>';
+            snapshot.forEach(doc => {
+                const eleve = doc.data();
+                bulletinEleve.innerHTML += `<option value="${eleve.matricule}">${eleve.nom} (${eleve.matricule})</option>`;
+            });
+        }
+        
+        async function loadClassesForPresence() {
+            await updateClassSelectors();
+            document.getElementById('presenceDate').value = new Date().toISOString().split('T')[0];
+        }
+        
+        async function loadElevesForBulletin() {
+            await updateEleveSelectors();
+        }
+        
+        // Initialisation
+        updateClassSelectors();
+        updateEleveSelectors();
+    </script>
+</body>
+</html>
