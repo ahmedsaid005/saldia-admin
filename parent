@@ -2,8 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Espace Parent/Élève</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -12,32 +13,44 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f5f7fa;
             min-height: 100vh;
+            font-size: 14px;
+            color: #1a1a2e;
             padding-bottom: 70px;
         }
 
-        .container {
+        .app-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 20px 20px 80px 20px;
         }
 
-        .header {
+        /* Header */
+        .dashboard-header {
             background: white;
             border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #edf2f7;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        .header h1 {
-            color: #667eea;
-            font-size: 1.5em;
+        .dashboard-header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 4px;
         }
 
+        .dashboard-header p {
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+        /* Navigation Bottom */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -46,32 +59,43 @@
             background: white;
             display: flex;
             justify-content: space-around;
-            padding: 10px;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            padding: 12px 16px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
             z-index: 1000;
+            border-top: 1px solid #edf2f7;
         }
 
         .nav-btn {
             flex: 1;
-            margin: 0 5px;
-            padding: 12px;
-            background: #f5f5f5;
-            color: #667eea;
+            margin: 0 4px;
+            padding: 10px 8px;
+            background: transparent;
+            color: #6c757d;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-btn i {
+            font-size: 20px;
         }
 
         .nav-btn.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
+            background: #f0f4f8;
+            color: #2c3e50;
         }
 
+        /* Content Panels */
         .content-panel {
             display: none;
-            animation: fadeIn 0.5s;
+            animation: fadeIn 0.3s ease;
         }
 
         .content-panel.active {
@@ -79,120 +103,268 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Cards */
         .info-card {
             background: white;
-            border-radius: 15px;
+            border-radius: 16px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #edf2f7;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         .info-card h3 {
-            color: #667eea;
-            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .statut-present { color: #4CAF50; font-weight: bold; }
-        .statut-absent { color: #f44336; font-weight: bold; }
-        .statut-retard { color: #ff9800; font-weight: bold; }
+        .info-card h3 i {
+            color: #2c3e50;
+            font-size: 18px;
+        }
 
-        .bulletin-item {
-            background: #f9f9f9;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
+        /* Formulaire */
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .login-card h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #1a1a2e;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 13px;
         }
 
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
+            padding: 10px 12px;
+            border: 1.5px solid #e9ecef;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #2c3e50;
         }
 
         button {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: #2c3e50;
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-size: 1em;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s;
             width: 100%;
         }
 
-        .login-form {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-top: 20px;
+        button:hover {
+            background: #1a252f;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        /* Tableaux */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .info-table td {
+            padding: 10px 0;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 13px;
+        }
+
+        .info-table td:first-child {
+            font-weight: 500;
+            color: #2c3e50;
+            width: 40%;
+        }
+
+        .presence-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .presence-table th, .presence-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 13px;
+        }
+
+        .presence-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .statut-present {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .statut-absent {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .statut-retard {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .bulletin-item {
+            background: #f8fafc;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            border-left: 3px solid #2c3e50;
+        }
+
+        .bulletin-item strong {
+            color: #2c3e50;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #edf2f7;
+            margin: 12px 0;
+        }
+
+        .actualite-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .actualite-item:last-child {
+            border-bottom: none;
+        }
+
+        .actualite-date {
+            font-size: 11px;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .demande-message {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .message-success {
+            background: #f0fdf4;
+            color: #10b981;
+        }
+
+        .message-error {
+            background: #fef2f2;
+            color: #ef4444;
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
+            .app-container {
+                padding: 12px 12px 70px 12px;
             }
             
-            .nav-btn {
-                font-size: 12px;
-                padding: 10px;
+            .bottom-nav {
+                padding: 8px 12px;
+            }
+            
+            .nav-btn span {
+                display: inline;
+                font-size: 10px;
+            }
+            
+            .nav-btn i {
+                font-size: 18px;
             }
             
             .info-card {
                 padding: 15px;
             }
+            
+            .presence-table th, .presence-table td {
+                padding: 8px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏫 Espace Parent/Élève</h1>
+    <div class="app-container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-school"></i> Espace Parent/Élève</h1>
+            <p>Consultez les résultats et suivez la scolarité</p>
         </div>
 
-        <div class="bottom-nav">
-            <button class="nav-btn active" onclick="showPanel('accueil')">🏠 Accueil</button>
-            <button class="nav-btn" onclick="showPanel('connexion')">🔐 Connexion</button>
-            <button class="nav-btn" onclick="showPanel('demande')">📄 Demande document</button>
-            <button class="nav-btn" onclick="showPanel('contact')">📞 Contact</button>
-        </div>
+        <!-- Bottom Navigation -->
+      <!-- Bottom Navigation -->
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <button class="nav-btn active" onclick="showPanel('accueil')"><i class="fas fa-home"></i><span>Accueil</span></button>
+    <button class="nav-btn" onclick="showPanel('connexion')"><i class="fas fa-lock"></i><span>Connexion</span></button>
+    <button class="nav-btn" onclick="showPanel('presenceStats')"><i class="fas fa-calendar-week"></i><span>Présences</span></button>
+    <button class="nav-btn" onclick="showPanel('support')"><i class="fas fa-headset"></i><span>Support</span></button>
+</div>
 
         <!-- Panel Accueil -->
         <div id="accueil" class="content-panel active">
             <div class="info-card">
-                <h3>📢 Dernières informations</h3>
+                <h3><i class="fas fa-newspaper"></i> Dernières informations</h3>
                 <div id="actualites"></div>
             </div>
             <div class="info-card">
-                <h3>🎓 À propos de l'école</h3>
-                <p>Bienvenue sur la plateforme scolaire. Connectez-vous pour accéder à toutes les informations concernant votre enfant.</p>
+                <h3><i class="fas fa-info-circle"></i> À propos de l'école</h3>
+                <p>Bienvenue sur la plateforme scolaire. Connectez-vous pour accéder à toutes les informations concernant votre enfant : relevé de présences, bulletins de notes, et demandes de documents officiels.</p>
             </div>
         </div>
 
         <!-- Panel Connexion -->
         <div id="connexion" class="content-panel">
-            <div class="login-form" id="loginFormParent">
-                <h3>Connexion élève/parent</h3>
+            <div class="login-card" id="loginFormParent">
+                <h3><i class="fas fa-key"></i> Connexion élève/parent</h3>
                 <div class="form-group">
                     <label>Matricule</label>
-                    <input type="text" id="matriculeLogin" placeholder="Votre matricule">
+                    <input type="text" id="matriculeLogin" placeholder="Entrez votre matricule">
                 </div>
                 <div class="form-group">
                     <label>Date de naissance</label>
@@ -215,51 +387,82 @@
             
             <div id="eleveInfo" style="display:none;">
                 <div class="info-card">
-                    <h3>👤 Informations personnelles</h3>
+                    <h3><i class="fas fa-user-circle"></i> Informations personnelles</h3>
                     <div id="infoPersonnelles"></div>
                 </div>
                 <div class="info-card">
-                    <h3>📊 Relevé des présences</h3>
+                    <h3><i class="fas fa-calendar-check"></i> Relevé des présences</h3>
                     <div id="presencesEleve"></div>
                 </div>
                 <div class="info-card">
-                    <h3>📚 Bulletins scolaires</h3>
+                    <h3><i class="fas fa-graduation-cap"></i> Bulletins scolaires</h3>
                     <div id="bulletinsEleve"></div>
                 </div>
-                <button onclick="logoutParent()" style="background: #f44336;">Se déconnecter</button>
+                <button class="btn-danger" onclick="logoutParent()">Se déconnecter</button>
             </div>
         </div>
 
         <!-- Panel Demande document -->
-        <div id="demande" class="content-panel">
-            <div class="info-card">
-                <h3>📄 Faire une demande de document</h3>
-                <div class="form-group">
-                    <label>Type de document</label>
-                    <select id="typeDocument">
-                        <option value="Certificat de scolarité">Certificat de scolarité</option>
-                        <option value="Relevé de notes">Relevé de notes</option>
-                        <option value="Attestation de réussite">Attestation de réussite</option>
-                        <option value="Document officiel">Document officiel</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Motif de la demande</label>
-                    <textarea id="motifDemande" rows="4" placeholder="Précisez votre motif..."></textarea>
-                </div>
-                <div id="demandeMessage"></div>
-                <button onclick="soumettreDemande()">Soumettre la demande</button>
-            </div>
+       <!-- Panel Support (anciennement Demande) -->
+<div id="support" class="content-panel">
+    <div class="info-card">
+        <h3><i class="fas fa-file-pdf"></i> Faire une demande de document</h3>
+        <div class="form-group">
+            <label>Type de document</label>
+            <select id="typeDocument">
+                <option value="Certificat de scolarité">Certificat de scolarité</option>
+                <option value="Relevé de notes">Relevé de notes</option>
+                <option value="Attestation de réussite">Attestation de réussite</option>
+                <option value="Document officiel">Document officiel</option>
+            </select>
         </div>
+        <div class="form-group">
+            <label>Motif de la demande</label>
+            <textarea id="motifDemande" rows="4" placeholder="Précisez votre motif..."></textarea>
+        </div>
+        <div id="demandeMessage"></div>
+        <button onclick="soumettreDemande()">Soumettre la demande</button>
+    </div>
+    
+    <div class="info-card">
+        <h3><i class="fas fa-question-circle"></i> Assistance</h3>
+        <p>Si vous rencontrez des difficultés, veuillez nous contacter :</p>
+        <table class="info-table">
+            <tr><td><i class="fas fa-phone"></i> Téléphone</td><td>+225 05 05 05 05 05</td></tr>
+            <tr><td><i class="fas fa-envelope"></i> Email</td><td>support@ecole.ci</td></tr>
+            <tr><td><i class="fas fa-clock"></i> Horaires</td><td>Lundi - Vendredi: 8h00 - 17h00</td></tr>
+        </table>
+    </div>
+</div>
+      
+      
+      <!-- Panel Présences -->
+<div id="presenceStats" class="content-panel">
+    <div class="info-card">
+        <h3><i class="fas fa-chart-line"></i> Récapitulatif des présences</h3>
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label>Période</label>
+            <select id="periodePresence" onchange="loadPresenceStats()">
+                <option value="all">Toutes les dates</option>
+                <option value="week">Cette semaine</option>
+                <option value="month">Ce mois</option>
+                <option value="semester">Ce semestre</option>
+            </select>
+        </div>
+        <div id="presenceStatsContainer"></div>
+    </div>
+</div>
 
         <!-- Panel Contact -->
         <div id="contact" class="content-panel">
             <div class="info-card">
-                <h3>📞 Nous contacter</h3>
-                <p><strong>Téléphone:</strong> +225 05 05 05 05 05</p>
-                <p><strong>Email:</strong> contact@ecole.ci</p>
-                <p><strong>Adresse:</strong> Abidjan, Côte d'Ivoire</p>
-                <p><strong>Horaires:</strong> Lundi - Vendredi: 8h00 - 17h00</p>
+                <h3><i class="fas fa-headset"></i> Nous contacter</h3>
+                <table class="info-table">
+                    <tr><td><i class="fas fa-phone"></i> Téléphone</td><td>+225 05 05 05 05 05</td></tr>
+                    <tr><td><i class="fas fa-envelope"></i> Email</td><td>contact@ecole.ci</td></tr>
+                    <tr><td><i class="fas fa-map-marker-alt"></i> Adresse</td><td>Abidjan, Côte d'Ivoire</td></tr>
+                    <tr><td><i class="fas fa-clock"></i> Horaires</td><td>Lundi - Vendredi: 8h00 - 17h00</td></tr>
+                </table>
             </div>
         </div>
     </div>
@@ -281,33 +484,37 @@
 
         let currentEleve = null;
 
-        function showPanel(panelId) {
-            document.querySelectorAll('.content-panel').forEach(panel => {
-                panel.classList.remove('active');
-            });
-            document.getElementById(panelId).classList.add('active');
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            if (panelId === 'accueil') {
-                loadActualites();
-            }
-        }
+       function showPanel(panelId) {
+    document.querySelectorAll('.content-panel').forEach(panel => {
+        panel.classList.remove('active');
+    });
+    document.getElementById(panelId).classList.add('active');
+    
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    if (panelId === 'accueil') {
+        loadActualites();
+    } else if (panelId === 'presenceStats') {
+        loadPresenceStats();
+    }
+}
 
         async function loadActualites() {
             const container = document.getElementById('actualites');
             const actualites = [
-                { date: '2024-01-15', texte: '📚 Rentrée scolaire prévue le 15 Septembre 2024' },
-                { date: '2024-01-10', texte: '🎓 Inscriptions toujours en cours pour l\'année académique' },
-                { date: '2024-01-05', texte: '📝 Les cours de soutien commencent cette semaine' }
+                { date: '2026-04-20', texte: '📚 Les examens du premier semestre débutent le 15 mai 2026' },
+                { date: '2026-04-15', texte: '🎓 Réunion parents-professeurs le 25 avril 2026' },
+                { date: '2026-04-10', texte: '📝 Les cours de soutien sont disponibles tous les samedis' }
             ];
             
             container.innerHTML = actualites.map(act => `
-                <p><strong>${act.date}:</strong> ${act.texte}</p>
-                <hr>
+                <div class="actualite-item">
+                    <div class="actualite-date"><i class="far fa-calendar-alt"></i> ${act.date}</div>
+                    <div>${act.texte}</div>
+                </div>
             `).join('');
         }
 
@@ -340,100 +547,252 @@
             }
         }
 
-        async function loadEleveInfo() {
-            if (!currentEleve) return;
-            
-            // Informations personnelles
-            const infoContainer = document.getElementById('infoPersonnelles');
-            infoContainer.innerHTML = `
-                <p><strong>Nom complet:</strong> ${currentEleve.nom}</p>
-                <p><strong>Matricule:</strong> ${currentEleve.matricule}</p>
-                <p><strong>Date de naissance:</strong> ${currentEleve.dateNaissance}</p>
-                <p><strong>Classe:</strong> ${currentEleve.classe}</p>
-                <p><strong>Téléphone:</strong> ${currentEleve.telephone}</p>
-                <p><strong>Email:</strong> ${currentEleve.email}</p>
-            `;
-            
-            // Présences
-            const presencesSnapshot = await db.collection('presences')
-                .where('matricule', '==', currentEleve.matricule)
-                .orderBy('date', 'desc')
-                .limit(30)
-                .get();
-            
-            const presencesContainer = document.getElementById('presencesEleve');
-            if (presencesSnapshot.empty) {
-                presencesContainer.innerHTML = '<p>Aucun enregistrement de présence</p>';
-            } else {
-                presencesContainer.innerHTML = '<table style="width:100%"><tr><th>Date</th><th>Statut</th></tr>';
-                presencesSnapshot.forEach(doc => {
-                    const presence = doc.data();
-                    let statutClass = '';
-                    if (presence.statut === 'present') statutClass = 'statut-present';
-                    else if (presence.statut === 'absent') statutClass = 'statut-absent';
-                    else if (presence.statut === 'retard') statutClass = 'statut-retard';
-                    
-                    presencesContainer.innerHTML += `
-                        <tr>
-                            <td>${presence.date}</td>
-                            <td class="${statutClass}">${presence.statut.toUpperCase()}</td>
-                        </tr>
-                    `;
-                });
-                presencesContainer.innerHTML += '</table>';
+      async function loadEleveInfo() {
+    if (!currentEleve) return;
+    
+    // Informations personnelles
+    const infoContainer = document.getElementById('infoPersonnelles');
+    infoContainer.innerHTML = `
+        <table class="info-table">
+            <tr><td><i class="fas fa-user"></i> Nom complet</td><td>${currentEleve.nom}</td></tr>
+            <tr><td><i class="fas fa-id-card"></i> Matricule</td><td>${currentEleve.matricule}</td></tr>
+            <tr><td><i class="fas fa-calendar"></i> Date de naissance</td><td>${currentEleve.dateNaissance}</td></tr>
+            <tr><td><i class="fas fa-chalkboard"></i> Classe</td><td>${currentEleve.classe}</td></tr>
+            <tr><td><i class="fas fa-phone"></i> Téléphone</td><td>${currentEleve.telephone}</td></tr>
+            <tr><td><i class="fas fa-envelope"></i> Email</td><td>${currentEleve.email}</td></tr>
+        </table>
+    `;
+    
+    // Bulletins
+    const notesSnapshot = await db.collection('notes')
+        .where('eleveId', '==', currentEleve.matricule)
+        .get();
+    
+    const bulletinsContainer = document.getElementById('bulletinsEleve');
+    if (notesSnapshot.empty) {
+        bulletinsContainer.innerHTML = '<p style="color:#6c757d;">Aucun bulletin disponible</p>';
+    } else {
+        const notesBySemestre = {};
+        notesSnapshot.forEach(doc => {
+            const note = doc.data();
+            if (!notesBySemestre[note.semestre]) {
+                notesBySemestre[note.semestre] = [];
             }
+            notesBySemestre[note.semestre].push(note);
+        });
+        
+        bulletinsContainer.innerHTML = '';
+        for (const [semestre, notes] of Object.entries(notesBySemestre)) {
+            let totalNotes = 0;
+            let matieres = '';
+            notes.forEach(note => {
+                const noteValue = note.noteSemestrielle || note.note || 0;
+                totalNotes += noteValue;
+                matieres += `
+                    <div class="bulletin-item">
+                        <strong><i class="fas fa-book"></i> ${note.matiere}</strong><br>
+                        Note: ${noteValue.toFixed(2)}/20<br>
+                        ${note.cc1 ? `CC1: ${note.cc1} | ` : ''}${note.cc2 ? `CC2: ${note.cc2} | ` : ''}${note.compo ? `Comp: ${note.compo}` : ''}
+                        ${note.appreciation ? `<br><em>📝 ${note.appreciation}</em>` : ''}
+                    </div>
+                `;
+            });
             
-            // Bulletins
-            const notesSnapshot = await db.collection('notes')
-                .where('eleveId', '==', currentEleve.matricule)
-                .get();
-            
-            const bulletinsContainer = document.getElementById('bulletinsEleve');
-            if (notesSnapshot.empty) {
-                bulletinsContainer.innerHTML = '<p>Aucun bulletin disponible</p>';
-            } else {
-                const notesBySemestre = {};
-                notesSnapshot.forEach(doc => {
-                    const note = doc.data();
-                    if (!notesBySemestre[note.semestre]) {
-                        notesBySemestre[note.semestre] = [];
-                    }
-                    notesBySemestre[note.semestre].push(note);
-                });
-                
-                bulletinsContainer.innerHTML = '';
-                for (const [semestre, notes] of Object.entries(notesBySemestre)) {
-                    let totalNotes = 0;
-                    let matieres = '';
-                    notes.forEach(note => {
-                        totalNotes += note.noteSemestrielle;
-                        matieres += `
-                            <div class="bulletin-item">
-                                <strong>${note.matiere}</strong><br>
-                                Note: ${note.noteSemestrielle.toFixed(2)}/20<br>
-                                CC1: ${note.cc1} | CC2: ${note.cc2} | Comp: ${note.compo}<br>
-                                <em>Appréciation: ${note.appreciation || 'Non spécifiée'}</em>
+            const moyenneSemestrielle = totalNotes / notes.length;
+            bulletinsContainer.innerHTML += `
+                <h4 style="margin: 16px 0 8px 0; color:#2c3e50;"><i class="fas fa-chart-simple"></i> Semestre ${semestre}</h4>
+                ${matieres}
+                <div style="background:#f0f4f8; padding:12px; border-radius:10px; margin-top:8px;">
+                    <strong>Moyenne du semestre: ${moyenneSemestrielle.toFixed(2)}/20</strong>
+                </div>
+                <hr>
+            `;
+        }
+    }
+}
+
+      
+      async function loadPresenceStats() {
+    if (!currentEleve) {
+        document.getElementById('presenceStatsContainer').innerHTML = '<p style="color:#6c757d;">Veuillez vous connecter d\'abord</p>';
+        return;
+    }
+    
+    const periode = document.getElementById('periodePresence').value;
+    let query = db.collection('presences').where('matricule', '==', currentEleve.matricule);
+    
+    const today = new Date();
+    let startDate = null;
+    
+    if (periode === 'week') {
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay());
+        startDate = startOfWeek.toISOString().split('T')[0];
+        query = query.where('date', '>=', startDate);
+    } else if (periode === 'month') {
+        startDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
+        query = query.where('date', '>=', startDate);
+    }
+    
+    const snapshot = await query.get();
+    const presences = [];
+    snapshot.forEach(doc => presences.push(doc.data()));
+    
+    // Grouper par date
+    const groupedByDate = {};
+    presences.forEach(p => {
+        if (!groupedByDate[p.date]) {
+            groupedByDate[p.date] = [];
+        }
+        groupedByDate[p.date].push(p);
+    });
+    
+    // Trier les dates du plus récent au plus ancien
+    const sortedDates = Object.keys(groupedByDate).sort().reverse();
+    
+    const container = document.getElementById('presenceStatsContainer');
+    
+    if (sortedDates.length === 0) {
+        container.innerHTML = '<p style="color:#6c757d; text-align:center; padding:40px;">Aucun enregistrement de présence</p>';
+        return;
+    }
+    
+    // Statistiques globales
+    let totalAbsences = 0;
+    let totalRetards = 0;
+    let joursAvecAbsence = 0;
+    
+    sortedDates.forEach(date => {
+        const dayPresences = groupedByDate[date];
+        const absents = dayPresences.filter(p => p.statut === 'Absent');
+        const retards = dayPresences.filter(p => p.statut === 'Retard');
+        totalAbsences += absents.length;
+        totalRetards += retards.length;
+        if (absents.length > 0 || retards.length > 0) joursAvecAbsence++;
+    });
+    
+    container.innerHTML = `
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:16px; margin-bottom:24px;">
+            <div style="background:#f8fafc; border-radius:12px; padding:16px; text-align:center;">
+                <div style="font-size:28px; font-weight:700; color:#2c3e50;">${sortedDates.length}</div>
+                <div style="font-size:12px; color:#6c757d;">Jours enregistrés</div>
+            </div>
+            <div style="background:#fef2f2; border-radius:12px; padding:16px; text-align:center;">
+                <div style="font-size:28px; font-weight:700; color:#ef4444;">${totalAbsences}</div>
+                <div style="font-size:12px; color:#6c757d;">Total absences</div>
+            </div>
+            <div style="background:#fff7ed; border-radius:12px; padding:16px; text-align:center;">
+                <div style="font-size:28px; font-weight:700; color:#f59e0b;">${totalRetards}</div>
+                <div style="font-size:12px; color:#6c757d;">Total retards</div>
+            </div>
+            <div style="background:#f0fdf4; border-radius:12px; padding:16px; text-align:center;">
+                <div style="font-size:28px; font-weight:700; color:#10b981;">${sortedDates.length - joursAvecAbsence}</div>
+                <div style="font-size:12px; color:#6c757d;">Jours parfaits</div>
+            </div>
+        </div>
+        
+        <div style="margin-top:20px;">
+            <h4 style="margin-bottom:16px; color:#2c3e50;"><i class="fas fa-list"></i> Détail par jour</h4>
+            <div style="background:white; border-radius:16px; border:1px solid #edf2f7; overflow:hidden;">
+                ${sortedDates.map(date => {
+                    const dayPresences = groupedByDate[date];
+                    const absents = dayPresences.filter(p => p.statut === 'Absent');
+                    const retards = dayPresences.filter(p => p.statut === 'Retard');
+                    
+                    const dateObj = new Date(date);
+                    const formattedDate = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    
+                    const aDesAbsences = absents.length > 0;
+                    const aDesRetards = retards.length > 0;
+                    
+                    if (!aDesAbsences && !aDesRetards) {
+                        return `
+                            <div style="border-bottom:1px solid #edf2f7; background:#f0fdf4;">
+                                <div style="padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
+                                    <div>
+                                        <i class="fas fa-calendar-day" style="color:#10b981; margin-right:12px;"></i>
+                                        <strong>${formattedDate}</strong>
+                                    </div>
+                                    <span style="background:#f0fdf4; color:#10b981; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;">
+                                        <i class="fas fa-check-circle"></i> Journée complète ✅
+                                    </span>
+                                </div>
                             </div>
                         `;
-                    });
+                    }
                     
-                    const moyenneSemestrielle = totalNotes / notes.length;
-                    bulletinsContainer.innerHTML += `
-                        <h4>Semestre ${semestre}</h4>
-                        ${matieres}
-                        <p><strong>Moyenne du semestre: ${moyenneSemestrielle.toFixed(2)}/20</strong></p>
-                        <hr>
+                    return `
+                        <div style="border-bottom:1px solid #edf2f7;">
+                            <div class="presence-day-header" onclick="togglePresenceDay('${date}')" style="padding:16px 20px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; background:${aDesAbsences ? '#fef2f2' : '#fff7ed'}; transition:all 0.2s;">
+                                <div>
+                                    <i class="fas fa-calendar-day" style="color:${aDesAbsences ? '#ef4444' : '#f59e0b'}; margin-right:12px;"></i>
+                                    <strong>${formattedDate}</strong>
+                                    <div style="margin-top:6px;">
+                                        ${aDesAbsences ? `<span style="background:#fef2f2; color:#ef4444; padding:2px 8px; border-radius:12px; font-size:11px; margin-right:8px;"><i class="fas fa-user-slash"></i> ${absents.length} absence(s)</span>` : ''}
+                                        ${aDesRetards ? `<span style="background:#fff7ed; color:#f59e0b; padding:2px 8px; border-radius:12px; font-size:11px;"><i class="fas fa-clock"></i> ${retards.length} retard(s)</span>` : ''}
+                                    </div>
+                                </div>
+                                <div>
+                                    <i class="fas fa-chevron-down" id="chevron-${date}" style="transition:transform 0.2s; color:#6c757d;"></i>
+                                </div>
+                            </div>
+                            <div id="day-detail-${date}" style="display:none; padding:0 20px 20px 20px; background:white;">
+                                ${aDesAbsences ? `
+                                    <div style="margin-top:16px; background:#fef2f2; border-radius:12px; padding:16px;">
+                                        <h5 style="font-size:13px; color:#ef4444; margin-bottom:12px;"><i class="fas fa-user-slash"></i> Absences</h5>
+                                        ${absents.map(a => `
+                                            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #fef2f2;">
+                                                <div>
+                                                    <i class="fas fa-hourglass-half"></i> ${a.horaire || 'Horaire non précisé'}
+                                                </div>
+                                                <span style="background:#fef2f2; color:#ef4444; padding:2px 8px; border-radius:12px; font-size:11px;">Absent</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                                
+                                ${aDesRetards ? `
+                                    <div style="margin-top:16px; background:#fff7ed; border-radius:12px; padding:16px;">
+                                        <h5 style="font-size:13px; color:#f59e0b; margin-bottom:12px;"><i class="fas fa-clock"></i> Retards</h5>
+                                        ${retards.map(r => `
+                                            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #fff7ed;">
+                                                <div>
+                                                    <i class="fas fa-hourglass-start"></i> ${r.horaire || 'Horaire non précisé'}
+                                                </div>
+                                                <span style="background:#fff7ed; color:#f59e0b; padding:2px 8px; border-radius:12px; font-size:11px;">Retard</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
                     `;
-                }
-            }
-        }
+                }).join('')}
+            </div>
+        </div>
+    `;
+}
 
+// Fonction pour afficher/masquer les détails d'un jour
+function togglePresenceDay(date) {
+    const detail = document.getElementById(`day-detail-${date}`);
+    const chevron = document.getElementById(`chevron-${date}`);
+    
+    if (detail.style.display === 'none') {
+        detail.style.display = 'block';
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+    } else {
+        detail.style.display = 'none';
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+}
         async function soumettreDemande() {
             const typeDocument = document.getElementById('typeDocument').value;
             const motif = document.getElementById('motifDemande').value;
+            const messageDiv = document.getElementById('demandeMessage');
             
             if (!motif) {
-                document.getElementById('demandeMessage').innerHTML = '<p style="color: red;">Veuillez entrer un motif</p>';
+                messageDiv.innerHTML = '<div class="demande-message message-error">❌ Veuillez entrer un motif</div>';
                 return;
             }
             
@@ -447,11 +806,11 @@
             };
             
             await db.collection('demandes').add(demandeData);
-            document.getElementById('demandeMessage').innerHTML = '<p style="color: green;">✅ Demande soumise avec succès!</p>';
+            messageDiv.innerHTML = '<div class="demande-message message-success">✅ Demande soumise avec succès!</div>';
             document.getElementById('motifDemande').value = '';
             
             setTimeout(() => {
-                document.getElementById('demandeMessage').innerHTML = '';
+                messageDiv.innerHTML = '';
             }, 3000);
         }
 
