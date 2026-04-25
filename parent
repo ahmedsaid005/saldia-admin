@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Espace Parent/Élève</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 70px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 1.5em;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            flex: 1;
+            margin: 0 5px;
+            padding: 12px;
+            background: #f5f5f5;
+            color: #667eea;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .content-panel {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .content-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .info-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .statut-present { color: #4CAF50; font-weight: bold; }
+        .statut-absent { color: #f44336; font-weight: bold; }
+        .statut-retard { color: #ff9800; font-weight: bold; }
+
+        .bulletin-item {
+            background: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .login-form {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .nav-btn {
+                font-size: 12px;
+                padding: 10px;
+            }
+            
+            .info-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏫 Espace Parent/Élève</h1>
+        </div>
+
+        <div class="bottom-nav">
+            <button class="nav-btn active" onclick="showPanel('accueil')">🏠 Accueil</button>
+            <button class="nav-btn" onclick="showPanel('connexion')">🔐 Connexion</button>
+            <button class="nav-btn" onclick="showPanel('demande')">📄 Demande document</button>
+            <button class="nav-btn" onclick="showPanel('contact')">📞 Contact</button>
+        </div>
+
+        <!-- Panel Accueil -->
+        <div id="accueil" class="content-panel active">
+            <div class="info-card">
+                <h3>📢 Dernières informations</h3>
+                <div id="actualites"></div>
+            </div>
+            <div class="info-card">
+                <h3>🎓 À propos de l'école</h3>
+                <p>Bienvenue sur la plateforme scolaire. Connectez-vous pour accéder à toutes les informations concernant votre enfant.</p>
+            </div>
+        </div>
+
+        <!-- Panel Connexion -->
+        <div id="connexion" class="content-panel">
+            <div class="login-form" id="loginFormParent">
+                <h3>Connexion élève/parent</h3>
+                <div class="form-group">
+                    <label>Matricule</label>
+                    <input type="text" id="matriculeLogin" placeholder="Votre matricule">
+                </div>
+                <div class="form-group">
+                    <label>Date de naissance</label>
+                    <input type="date" id="dateNaissanceLogin">
+                </div>
+                <div class="form-group">
+                    <label>Nom complet</label>
+                    <input type="text" id="nomLogin" placeholder="Nom et prénom">
+                </div>
+                <div class="form-group">
+                    <label>Téléphone</label>
+                    <input type="tel" id="telephoneLogin" placeholder="Numéro de téléphone">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="emailLogin" placeholder="Email">
+                </div>
+                <button onclick="loginParent()">Se connecter</button>
+            </div>
+            
+            <div id="eleveInfo" style="display:none;">
+                <div class="info-card">
+                    <h3>👤 Informations personnelles</h3>
+                    <div id="infoPersonnelles"></div>
+                </div>
+                <div class="info-card">
+                    <h3>📊 Relevé des présences</h3>
+                    <div id="presencesEleve"></div>
+                </div>
+                <div class="info-card">
+                    <h3>📚 Bulletins scolaires</h3>
+                    <div id="bulletinsEleve"></div>
+                </div>
+                <button onclick="logoutParent()" style="background: #f44336;">Se déconnecter</button>
+            </div>
+        </div>
+
+        <!-- Panel Demande document -->
+        <div id="demande" class="content-panel">
+            <div class="info-card">
+                <h3>📄 Faire une demande de document</h3>
+                <div class="form-group">
+                    <label>Type de document</label>
+                    <select id="typeDocument">
+                        <option value="Certificat de scolarité">Certificat de scolarité</option>
+                        <option value="Relevé de notes">Relevé de notes</option>
+                        <option value="Attestation de réussite">Attestation de réussite</option>
+                        <option value="Document officiel">Document officiel</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Motif de la demande</label>
+                    <textarea id="motifDemande" rows="4" placeholder="Précisez votre motif..."></textarea>
+                </div>
+                <div id="demandeMessage"></div>
+                <button onclick="soumettreDemande()">Soumettre la demande</button>
+            </div>
+        </div>
+
+        <!-- Panel Contact -->
+        <div id="contact" class="content-panel">
+            <div class="info-card">
+                <h3>📞 Nous contacter</h3>
+                <p><strong>Téléphone:</strong> +225 05 05 05 05 05</p>
+                <p><strong>Email:</strong> contact@ecole.ci</p>
+                <p><strong>Adresse:</strong> Abidjan, Côte d'Ivoire</p>
+                <p><strong>Horaires:</strong> Lundi - Vendredi: 8h00 - 17h00</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg",
+            authDomain: "teste-saldia.firebaseapp.com",
+            projectId: "teste-saldia",
+            storageBucket: "teste-saldia.firebasestorage.app",
+            messagingSenderId: "620601259237",
+            appId: "1:620601259237:web:57795c7a64082399d0d00c"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentEleve = null;
+
+        function showPanel(panelId) {
+            document.querySelectorAll('.content-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.getElementById(panelId).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (panelId === 'accueil') {
+                loadActualites();
+            }
+        }
+
+        async function loadActualites() {
+            const container = document.getElementById('actualites');
+            const actualites = [
+                { date: '2024-01-15', texte: '📚 Rentrée scolaire prévue le 15 Septembre 2024' },
+                { date: '2024-01-10', texte: '🎓 Inscriptions toujours en cours pour l\'année académique' },
+                { date: '2024-01-05', texte: '📝 Les cours de soutien commencent cette semaine' }
+            ];
+            
+            container.innerHTML = actualites.map(act => `
+                <p><strong>${act.date}:</strong> ${act.texte}</p>
+                <hr>
+            `).join('');
+        }
+
+        async function loginParent() {
+            const matricule = document.getElementById('matriculeLogin').value;
+            const dateNaissance = document.getElementById('dateNaissanceLogin').value;
+            const nom = document.getElementById('nomLogin').value;
+            const telephone = document.getElementById('telephoneLogin').value;
+            const email = document.getElementById('emailLogin').value;
+            
+            const eleveDoc = await db.collection('eleves').doc(matricule).get();
+            
+            if (eleveDoc.exists) {
+                const eleve = eleveDoc.data();
+                if (eleve.dateNaissance === dateNaissance && 
+                    eleve.nom.toLowerCase() === nom.toLowerCase() &&
+                    eleve.telephone === telephone &&
+                    eleve.email === email) {
+                    
+                    currentEleve = { matricule, ...eleve };
+                    document.getElementById('loginFormParent').style.display = 'none';
+                    document.getElementById('eleveInfo').style.display = 'block';
+                    
+                    loadEleveInfo();
+                } else {
+                    alert('Informations incorrectes');
+                }
+            } else {
+                alert('Matricule non trouvé');
+            }
+        }
+
+        async function loadEleveInfo() {
+            if (!currentEleve) return;
+            
+            // Informations personnelles
+            const infoContainer = document.getElementById('infoPersonnelles');
+            infoContainer.innerHTML = `
+                <p><strong>Nom complet:</strong> ${currentEleve.nom}</p>
+                <p><strong>Matricule:</strong> ${currentEleve.matricule}</p>
+                <p><strong>Date de naissance:</strong> ${currentEleve.dateNaissance}</p>
+                <p><strong>Classe:</strong> ${currentEleve.classe}</p>
+                <p><strong>Téléphone:</strong> ${currentEleve.telephone}</p>
+                <p><strong>Email:</strong> ${currentEleve.email}</p>
+            `;
+            
+            // Présences
+            const presencesSnapshot = await db.collection('presences')
+                .where('matricule', '==', currentEleve.matricule)
+                .orderBy('date', 'desc')
+                .limit(30)
+                .get();
+            
+            const presencesContainer = document.getElementById('presencesEleve');
+            if (presencesSnapshot.empty) {
+                presencesContainer.innerHTML = '<p>Aucun enregistrement de présence</p>';
+            } else {
+                presencesContainer.innerHTML = '<table style="width:100%"><tr><th>Date</th><th>Statut</th></tr>';
+                presencesSnapshot.forEach(doc => {
+                    const presence = doc.data();
+                    let statutClass = '';
+                    if (presence.statut === 'present') statutClass = 'statut-present';
+                    else if (presence.statut === 'absent') statutClass = 'statut-absent';
+                    else if (presence.statut === 'retard') statutClass = 'statut-retard';
+                    
+                    presencesContainer.innerHTML += `
+                        <tr>
+                            <td>${presence.date}</td>
+                            <td class="${statutClass}">${presence.statut.toUpperCase()}</td>
+                        </tr>
+                    `;
+                });
+                presencesContainer.innerHTML += '</table>';
+            }
+            
+            // Bulletins
+            const notesSnapshot = await db.collection('notes')
+                .where('eleveId', '==', currentEleve.matricule)
+                .get();
+            
+            const bulletinsContainer = document.getElementById('bulletinsEleve');
+            if (notesSnapshot.empty) {
+                bulletinsContainer.innerHTML = '<p>Aucun bulletin disponible</p>';
+            } else {
+                const notesBySemestre = {};
+                notesSnapshot.forEach(doc => {
+                    const note = doc.data();
+                    if (!notesBySemestre[note.semestre]) {
+                        notesBySemestre[note.semestre] = [];
+                    }
+                    notesBySemestre[note.semestre].push(note);
+                });
+                
+                bulletinsContainer.innerHTML = '';
+                for (const [semestre, notes] of Object.entries(notesBySemestre)) {
+                    let totalNotes = 0;
+                    let matieres = '';
+                    notes.forEach(note => {
+                        totalNotes += note.noteSemestrielle;
+                        matieres += `
+                            <div class="bulletin-item">
+                                <strong>${note.matiere}</strong><br>
+                                Note: ${note.noteSemestrielle.toFixed(2)}/20<br>
+                                CC1: ${note.cc1} | CC2: ${note.cc2} | Comp: ${note.compo}<br>
+                                <em>Appréciation: ${note.appreciation || 'Non spécifiée'}</em>
+                            </div>
+                        `;
+                    });
+                    
+                    const moyenneSemestrielle = totalNotes / notes.length;
+                    bulletinsContainer.innerHTML += `
+                        <h4>Semestre ${semestre}</h4>
+                        ${matieres}
+                        <p><strong>Moyenne du semestre: ${moyenneSemestrielle.toFixed(2)}/20</strong></p>
+                        <hr>
+                    `;
+                }
+            }
+        }
+
+        async function soumettreDemande() {
+            const typeDocument = document.getElementById('typeDocument').value;
+            const motif = document.getElementById('motifDemande').value;
+            
+            if (!motif) {
+                document.getElementById('demandeMessage').innerHTML = '<p style="color: red;">Veuillez entrer un motif</p>';
+                return;
+            }
+            
+            const demandeData = {
+                typeDocument,
+                motif,
+                date: new Date().toISOString(),
+                statut: 'En attente',
+                nomComplet: currentEleve ? currentEleve.nom : 'Non connecté',
+                matricule: currentEleve ? currentEleve.matricule : 'Non connecté'
+            };
+            
+            await db.collection('demandes').add(demandeData);
+            document.getElementById('demandeMessage').innerHTML = '<p style="color: green;">✅ Demande soumise avec succès!</p>';
+            document.getElementById('motifDemande').value = '';
+            
+            setTimeout(() => {
+                document.getElementById('demandeMessage').innerHTML = '';
+            }, 3000);
+        }
+
+        function logoutParent() {
+            currentEleve = null;
+            document.getElementById('loginFormParent').style.display = 'block';
+            document.getElementById('eleveInfo').style.display = 'none';
+            document.getElementById('matriculeLogin').value = '';
+            document.getElementById('dateNaissanceLogin').value = '';
+            document.getElementById('nomLogin').value = '';
+            document.getElementById('telephoneLogin').value = '';
+            document.getElementById('emailLogin').value = '';
+        }
+
+        // Initialisation
+        loadActualites();
+    </script>
+</body>
+</html>
