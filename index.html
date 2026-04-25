@@ -2,8 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Administration - Système Scolaire</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -12,216 +13,280 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f5f7fa;
             min-height: 100vh;
+            font-size: 14px;
+            color: #1a1a2e;
             padding: 20px;
         }
 
-        .container {
-            max-width: 1200px;
+        .app-container {
+            max-width: 1400px;
             margin: 0 auto;
         }
 
-        .header {
+        /* Header */
+        .dashboard-header {
             background: white;
             border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #edf2f7;
             text-align: center;
         }
 
-        .header h1 {
-            color: #667eea;
-            font-size: 1.8em;
+        .dashboard-header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 4px;
         }
 
+        .dashboard-header p {
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+        /* Grille des boutons */
         .grid-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         .btn {
             background: white;
-            border: none;
-            padding: 20px;
-            border-radius: 15px;
-            font-size: 1.1em;
-            font-weight: bold;
+            border: 1px solid #edf2f7;
+            padding: 16px 12px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            color: #2c3e50;
+        }
+
+        .btn i {
+            font-size: 18px;
         }
 
         .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #2c3e50;
         }
 
-        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
-        .btn-success { background: linear-gradient(135deg, #84fab0, #8fd3f4); color: #333; }
-        .btn-info { background: linear-gradient(135deg, #a8edea, #fed6e3); color: #333; }
-        .btn-warning { background: linear-gradient(135deg, #f6d365, #fda085); color: #333; }
-        .btn-danger { background: linear-gradient(135deg, #ff9a9e, #fecfef); color: #333; }
-
+        /* Panels */
         .panel {
             background: white;
             border-radius: 20px;
-            padding: 20px;
+            padding: 24px;
             margin-top: 20px;
             display: none;
-            animation: slideIn 0.5s ease;
+            animation: fadeIn 0.3s ease;
+            border: 1px solid #edf2f7;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         .panel.active {
             display: block;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
+        .panel h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel h2 i {
+            color: #2c3e50;
+        }
+
+        /* Formulaires */
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 13px;
         }
 
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
+            padding: 10px 12px;
+            border: 1.5px solid #e9ecef;
             border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
+            font-size: 14px;
+            transition: all 0.2s;
+            background: white;
         }
 
-        .form-group input:focus, .form-group select:focus {
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #2c3e50;
         }
 
-        button[type="submit"] {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        button[type="submit"], button:not(.action-btn) {
+            background: #2c3e50;
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-size: 1em;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s;
             width: 100%;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
 
+        button[type="submit"]:hover, button:not(.action-btn):hover {
+            background: #1a252f;
+            transform: translateY(-1px);
+        }
+
+        /* Tableaux */
         .table-container {
             overflow-x: auto;
+            margin-top: 20px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
         }
 
         th, td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 13px;
         }
 
         th {
-            background: #f5f5f5;
-            font-weight: bold;
-            color: #667eea;
+            background: #f8fafc;
+            font-weight: 600;
+            color: #2c3e50;
         }
 
         .action-btn {
-            padding: 5px 10px;
-            margin: 0 5px;
+            padding: 6px 12px;
+            margin: 0 4px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            width: auto;
+            display: inline-block;
         }
 
         .delete-btn {
-            background: #ff4757;
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .delete-btn:hover {
+            background: #ef4444;
             color: white;
         }
 
         .edit-btn {
-            background: #ffa502;
+            background: #f0f4f8;
+            color: #2c3e50;
+        }
+
+        .edit-btn:hover {
+            background: #2c3e50;
             color: white;
+        }
+
+        small {
+            font-size: 11px;
+            color: #6c757d;
+            display: block;
+            margin-top: 4px;
         }
 
         @media (max-width: 768px) {
             body {
-                padding: 10px;
+                padding: 12px;
             }
             
             .grid-buttons {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
             }
             
             .btn {
-                padding: 15px;
-                font-size: 1em;
+                padding: 12px 8px;
+                font-size: 11px;
+            }
+            
+            .btn i {
+                font-size: 14px;
+            }
+            
+            .panel {
+                padding: 16px;
             }
             
             th, td {
                 padding: 8px;
-                font-size: 0.9em;
+                font-size: 12px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📚 Administration - Système Scolaire</h1>
+    <div class="app-container">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-shield-alt"></i> Administration</h1>
+            <p>Gestion complète du système scolaire</p>
         </div>
 
         <div class="grid-buttons">
-            <button class="btn btn-primary" onclick="showPanel('classes')">🏫 Gérer les Classes</button>
-            <button class="btn btn-success" onclick="showPanel('eleves')">👨‍🎓 Gérer les Élèves</button>
-            <button class="btn btn-info" onclick="showPanel('profs')">👨‍🏫 Gérer les Professeurs</button>
-            <button class="btn btn-warning" onclick="showPanel('bulletins')">📊 Gérer les Bulletins</button>
-            <button class="btn btn-danger" onclick="showPanel('documents')">📄 Demandes Documents</button>
-            <button class="btn btn-primary" onclick="showPanel('presences')">✅ Gérer Présences</button>
+            <button class="btn" onclick="showPanel('classes')"><i class="fas fa-chalkboard"></i> Classes</button>
+            <button class="btn" onclick="showPanel('eleves')"><i class="fas fa-user-graduate"></i> Élèves</button>
+            <button class="btn" onclick="showPanel('profs')"><i class="fas fa-chalkboard-user"></i> Professeurs</button>
+            <button class="btn" onclick="showPanel('bulletins')"><i class="fas fa-chart-line"></i> Bulletins</button>
+            <button class="btn" onclick="showPanel('documents')"><i class="fas fa-file-alt"></i> Documents</button>
+            <button class="btn" onclick="showPanel('presences')"><i class="fas fa-calendar-check"></i> Présences</button>
         </div>
 
         <!-- Panel Classes -->
         <div id="classes" class="panel">
-            <h2>Gestion des Classes</h2>
+            <h2><i class="fas fa-chalkboard"></i> Gestion des classes</h2>
             <div class="form-group">
                 <label>Nom de la classe</label>
                 <input type="text" id="className" placeholder="Ex: 3ème A">
             </div>
-            <button onclick="addClass()">Ajouter une classe</button>
+            <button onclick="addClass()"><i class="fas fa-plus"></i> Ajouter une classe</button>
             <div class="table-container">
                 <table id="classesTable">
-                    <thead>
-                        <tr><th>Nom</th><th>Actions</th></tr>
-                    </thead>
+                    <thead><tr><th>Nom</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -229,36 +294,15 @@
 
         <!-- Panel Élèves -->
         <div id="eleves" class="panel">
-            <h2>Gestion des Élèves</h2>
-            <div class="form-group">
-                <label>Matricule</label>
-                <input type="text" id="matricule" placeholder="Matricule unique">
-            </div>
-            <div class="form-group">
-                <label>Nom complet</label>
-                <input type="text" id="nomEleve" placeholder="Nom et prénom">
-            </div>
-            <div class="form-group">
-                <label>Date de naissance</label>
-                <input type="date" id="dateNaissance">
-            </div>
-            <div class="form-group">
-                <label>Téléphone</label>
-                <input type="tel" id="telephone" placeholder="Numéro de téléphone">
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="emailEleve" placeholder="Email">
-            </div>
-            <div class="form-group">
-                <label>Classe</label>
-                <select id="classeEleve"></select>
-            </div>
-            <div class="form-group">
-                <label>Photo URL</label>
-                <input type="text" id="photoUrl" placeholder="URL de la photo">
-            </div>
-            <button onclick="addEleve()">Ajouter l'élève</button>
+            <h2><i class="fas fa-user-graduate"></i> Gestion des élèves</h2>
+            <div class="form-group"><label>Matricule</label><input type="text" id="matricule" placeholder="Matricule unique"></div>
+            <div class="form-group"><label>Nom complet</label><input type="text" id="nomEleve" placeholder="Nom et prénom"></div>
+            <div class="form-group"><label>Date de naissance</label><input type="date" id="dateNaissance"></div>
+            <div class="form-group"><label>Téléphone</label><input type="tel" id="telephone" placeholder="Numéro de téléphone"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="emailEleve" placeholder="Email"></div>
+            <div class="form-group"><label>Classe</label><select id="classeEleve"></select></div>
+            <div class="form-group"><label>Photo URL</label><input type="text" id="photoUrl" placeholder="URL de la photo"></div>
+            <button onclick="addEleve()"><i class="fas fa-plus"></i> Ajouter l'élève</button>
             <div class="table-container">
                 <table id="elevesTable">
                     <thead><tr><th>Matricule</th><th>Nom</th><th>Classe</th><th>Actions</th></tr></thead>
@@ -269,29 +313,13 @@
 
         <!-- Panel Professeurs -->
         <div id="profs" class="panel">
-            <h2>Gestion des Professeurs</h2>
-            <div class="form-group">
-                <label>Identifiant</label>
-                <input type="text" id="profId" placeholder="Identifiant unique">
-            </div>
-            <div class="form-group">
-                <label>Mot de passe</label>
-                <input type="password" id="profPassword" placeholder="Mot de passe">
-            </div>
-            <div class="form-group">
-                <label>Nom complet</label>
-                <input type="text" id="profNom" placeholder="Nom et prénom">
-            </div>
-            <div class="form-group">
-                <label>Matière enseignée</label>
-                <input type="text" id="profMatiere" placeholder="Ex: Mathématiques">
-            </div>
-            <div class="form-group">
-                <label>Classes assignées</label>
-                <select id="profClasses" multiple></select>
-                <small>Maintenez Ctrl pour sélectionner plusieurs classes</small>
-            </div>
-            <button onclick="addProfesseur()">Ajouter le professeur</button>
+            <h2><i class="fas fa-chalkboard-user"></i> Gestion des professeurs</h2>
+            <div class="form-group"><label>Identifiant</label><input type="text" id="profId" placeholder="Identifiant unique"></div>
+            <div class="form-group"><label>Mot de passe</label><input type="password" id="profPassword" placeholder="Mot de passe"></div>
+            <div class="form-group"><label>Nom complet</label><input type="text" id="profNom" placeholder="Nom et prénom"></div>
+            <div class="form-group"><label>Matière enseignée</label><input type="text" id="profMatiere" placeholder="Ex: Mathématiques"></div>
+            <div class="form-group"><label>Classes assignées</label><select id="profClasses" multiple></select><small>Ctrl pour sélectionner plusieurs</small></div>
+            <button onclick="addProfesseur()"><i class="fas fa-plus"></i> Ajouter le professeur</button>
             <div class="table-container">
                 <table id="profsTable">
                     <thead><tr><th>Identifiant</th><th>Nom</th><th>Matière</th><th>Classes</th><th>Actions</th></tr></thead>
@@ -302,42 +330,18 @@
 
         <!-- Panel Bulletins -->
         <div id="bulletins" class="panel">
-            <h2>Gestion des Bulletins</h2>
-            <div class="form-group">
-                <label>Choisir un élève</label>
-                <select id="bulletinEleve"></select>
-            </div>
-            <div class="form-group">
-                <label>Semestre</label>
-                <select id="bulletinSemestre">
-                    <option value="1">Semestre 1</option>
-                    <option value="2">Semestre 2</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Matière</label>
-                <input type="text" id="bulletinMatiere" placeholder="Matière">
-            </div>
-            <div class="form-group">
-                <label>Note CC1</label>
-                <input type="number" id="noteCC1" step="0.01" min="0" max="20">
-            </div>
-            <div class="form-group">
-                <label>Note CC2</label>
-                <input type="number" id="noteCC2" step="0.01" min="0" max="20">
-            </div>
-            <div class="form-group">
-                <label>Note Composition</label>
-                <input type="number" id="noteCompo" step="0.01" min="0" max="20">
-            </div>
-            <div class="form-group">
-                <label>Appréciation</label>
-                <textarea id="appreciation" rows="3" placeholder="Appréciation du professeur"></textarea>
-            </div>
-            <button onclick="ajouterNote()">Ajouter/Modifier la note</button>
+            <h2><i class="fas fa-chart-line"></i> Gestion des bulletins</h2>
+            <div class="form-group"><label>Choisir un élève</label><select id="bulletinEleve"></select></div>
+            <div class="form-group"><label>Semestre</label><select id="bulletinSemestre"><option value="1">Semestre 1</option><option value="2">Semestre 2</option></select></div>
+            <div class="form-group"><label>Matière</label><input type="text" id="bulletinMatiere" placeholder="Matière"></div>
+            <div class="form-group"><label>Note CC1</label><input type="number" id="noteCC1" step="0.01" min="0" max="20"></div>
+            <div class="form-group"><label>Note CC2</label><input type="number" id="noteCC2" step="0.01" min="0" max="20"></div>
+            <div class="form-group"><label>Note Composition</label><input type="number" id="noteCompo" step="0.01" min="0" max="20"></div>
+            <div class="form-group"><label>Appréciation</label><textarea id="appreciation" rows="3" placeholder="Appréciation du professeur"></textarea></div>
+            <button onclick="ajouterNote()"><i class="fas fa-save"></i> Ajouter/Modifier la note</button>
             <div class="table-container">
                 <table id="bulletinsTable">
-                    <thead><tr><th>Élève</th><th>Matière</th><th>Semestre</th><th>Note Semestrielle</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Élève</th><th>Matière</th><th>Semestre</th><th>Note</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -345,7 +349,7 @@
 
         <!-- Panel Demandes Documents -->
         <div id="documents" class="panel">
-            <h2>Demandes de Documents</h2>
+            <h2><i class="fas fa-file-alt"></i> Demandes de documents</h2>
             <div class="table-container">
                 <table id="demandesTable">
                     <thead><tr><th>Demandeur</th><th>Document</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
@@ -356,18 +360,12 @@
 
         <!-- Panel Présences -->
         <div id="presences" class="panel">
-            <h2>Gestion des Présences</h2>
-            <div class="form-group">
-                <label>Choisir une classe</label>
-                <select id="presenceClasse" onchange="loadPresences()"></select>
-            </div>
-            <div class="form-group">
-                <label>Date</label>
-                <input type="date" id="presenceDate" onchange="loadPresences()">
-            </div>
+            <h2><i class="fas fa-calendar-check"></i> Gestion des présences</h2>
+            <div class="form-group"><label>Choisir une classe</label><select id="presenceClasse" onchange="loadPresences()"></select></div>
+            <div class="form-group"><label>Date</label><input type="date" id="presenceDate" onchange="loadPresences()"></div>
             <div class="table-container">
                 <table id="presencesTable">
-                    <thead><tr><th>Élève</th><th>Statut</th><th>Action</th></tr></thead>
+                    <thead><tr><th>Élève</th><th>Statut actuel</th><th>Action</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -376,17 +374,14 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script>
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg",
             authDomain: "teste-saldia.firebaseapp.com",
             projectId: "teste-saldia",
             storageBucket: "teste-saldia.firebasestorage.app",
             messagingSenderId: "620601259237",
-            appId: "1:620601259237:web:57795c7a64082399d0d00c",
-            measurementId: "G-Q13XDEE9RJ"
+            appId: "1:620601259237:web:57795c7a64082399d0d00c"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -395,9 +390,7 @@
         let currentPanel = null;
 
         function showPanel(panelName) {
-            if (currentPanel) {
-                document.getElementById(currentPanel).classList.remove('active');
-            }
+            if (currentPanel) document.getElementById(currentPanel).classList.remove('active');
             document.getElementById(panelName).classList.add('active');
             currentPanel = panelName;
             
@@ -409,11 +402,9 @@
             else if (panelName === 'presences') { loadClassesForPresence(); }
         }
 
-        // Gestion des classes
         async function addClass() {
             const name = document.getElementById('className').value;
             if (!name) return alert('Veuillez entrer un nom de classe');
-            
             await db.collection('classes').add({ name });
             document.getElementById('className').value = '';
             loadClasses();
@@ -445,7 +436,6 @@
             }
         }
 
-        // Gestion des élèves
         async function addEleve() {
             const eleve = {
                 matricule: document.getElementById('matricule').value,
@@ -456,9 +446,7 @@
                 classe: document.getElementById('classeEleve').value,
                 photoUrl: document.getElementById('photoUrl').value || 'https://via.placeholder.com/100'
             };
-            
             if (!eleve.matricule || !eleve.nom) return alert('Matricule et nom requis');
-            
             await db.collection('eleves').doc(eleve.matricule).set(eleve);
             document.getElementById('matricule').value = '';
             document.getElementById('nomEleve').value = '';
@@ -497,7 +485,6 @@
             }
         }
 
-        // Gestion des professeurs
         async function addProfesseur() {
             const selectedClasses = Array.from(document.getElementById('profClasses').selectedOptions).map(opt => opt.value);
             const prof = {
@@ -507,9 +494,7 @@
                 matiere: document.getElementById('profMatiere').value,
                 classes: selectedClasses
             };
-            
             if (!prof.identifiant || !prof.password || !prof.nom) return alert('Champs requis');
-            
             await db.collection('professeurs').doc(prof.identifiant).set(prof);
             document.getElementById('profId').value = '';
             document.getElementById('profPassword').value = '';
@@ -545,7 +530,6 @@
             }
         }
 
-        // Gestion des bulletins/notes
         async function ajouterNote() {
             const eleveId = document.getElementById('bulletinEleve').value;
             const semestre = document.getElementById('bulletinSemestre').value;
@@ -554,28 +538,12 @@
             const cc2 = parseFloat(document.getElementById('noteCC2').value);
             const compo = parseFloat(document.getElementById('noteCompo').value);
             const appreciation = document.getElementById('appreciation').value;
-            
             if (!eleveId || !matiere) return alert('Veuillez remplir tous les champs');
-            
             const noteCC = (cc1 + cc2) / 2;
             const noteSemestrielle = (noteCC + compo) / 2;
-            
-            const noteData = {
-                eleveId,
-                semestre,
-                matiere,
-                cc1,
-                cc2,
-                compo,
-                noteCC,
-                noteSemestrielle,
-                appreciation,
-                date: new Date().toISOString()
-            };
-            
+            const noteData = { eleveId, semestre, matiere, cc1, cc2, compo, noteCC, noteSemestrielle, appreciation, date: new Date().toISOString() };
             const noteId = `${eleveId}_${matiere}_${semestre}`;
             await db.collection('notes').doc(noteId).set(noteData);
-            
             document.getElementById('bulletinMatiere').value = '';
             document.getElementById('noteCC1').value = '';
             document.getElementById('noteCC2').value = '';
@@ -612,43 +580,32 @@
             }
         }
 
-        // Gestion des présences
         async function loadPresences() {
             const classe = document.getElementById('presenceClasse').value;
             const date = document.getElementById('presenceDate').value;
             if (!classe || !date) return;
-            
             const elevesSnapshot = await db.collection('eleves').where('classe', '==', classe).get();
             const tbody = document.querySelector('#presencesTable tbody');
             tbody.innerHTML = '';
-            
             for (const eleveDoc of elevesSnapshot.docs) {
                 const eleve = eleveDoc.data();
                 const presenceId = `${eleve.matricule}_${date}`;
                 const presenceDoc = await db.collection('presences').doc(presenceId).get();
                 const statut = presenceDoc.exists ? presenceDoc.data().statut : 'non renseigné';
-                
                 const row = tbody.insertRow();
                 row.insertCell(0).textContent = eleve.nom;
                 row.insertCell(1).textContent = statut;
                 const actions = row.insertCell(2);
-                
                 const select = document.createElement('select');
-                select.innerHTML = `
-                    <option value="present" ${statut === 'present' ? 'selected' : ''}>Présent</option>
-                    <option value="absent" ${statut === 'absent' ? 'selected' : ''}>Absent</option>
-                    <option value="retard" ${statut === 'retard' ? 'selected' : ''}>Retard</option>
-                `;
+                select.innerHTML = `<option value="Présent" ${statut === 'Présent' ? 'selected' : ''}>Présent</option>
+                                    <option value="Absent" ${statut === 'Absent' ? 'selected' : ''}>Absent</option>
+                                    <option value="Retard" ${statut === 'Retard' ? 'selected' : ''}>Retard</option>`;
                 const saveBtn = document.createElement('button');
                 saveBtn.textContent = 'Enregistrer';
                 saveBtn.className = 'action-btn edit-btn';
                 saveBtn.onclick = async () => {
                     await db.collection('presences').doc(presenceId).set({
-                        matricule: eleve.matricule,
-                        nom: eleve.nom,
-                        classe,
-                        date,
-                        statut: select.value
+                        matricule: eleve.matricule, nom: eleve.nom, classe, date, statut: select.value
                     });
                     loadPresences();
                 };
@@ -657,7 +614,6 @@
             }
         }
 
-        // Gestion des demandes de documents
         async function loadDemandes() {
             const snapshot = await db.collection('demandes').orderBy('date', 'desc').get();
             const tbody = document.querySelector('#demandesTable tbody');
@@ -681,26 +637,17 @@
             });
         }
 
-        // Fonctions utilitaires
         async function updateClassSelectors() {
             const snapshot = await db.collection('classes').get();
             const classes = [];
             snapshot.forEach(doc => classes.push(doc.data().name));
-            
             const eleveClasse = document.getElementById('classeEleve');
             const profClasses = document.getElementById('profClasses');
             const presenceClasse = document.getElementById('presenceClasse');
-            
             [eleveClasse, presenceClasse].forEach(select => {
-                if (select) {
-                    select.innerHTML = '<option value="">Sélectionner une classe</option>' + 
-                        classes.map(c => `<option value="${c}">${c}</option>`).join('');
-                }
+                if (select) select.innerHTML = '<option value="">Sélectionner une classe</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
             });
-            
-            if (profClasses) {
-                profClasses.innerHTML = classes.map(c => `<option value="${c}">${c}</option>`).join('');
-            }
+            if (profClasses) profClasses.innerHTML = classes.map(c => `<option value="${c}">${c}</option>`).join('');
         }
         
         async function updateEleveSelectors() {
@@ -722,7 +669,6 @@
             await updateEleveSelectors();
         }
         
-        // Initialisation
         updateClassSelectors();
         updateEleveSelectors();
     </script>
