@@ -487,55 +487,219 @@
                 <div class="page-container"><div class="page-card">
                     ${renderBackButton('Gestion des Professeurs', 'fa-chalkboard-user')}
                     <div class="form-card">
-                        <div class="form-grid">
-                            <div class="form-group"><label>Identifiant *</label><input id="profId" placeholder="Ex: P001"></div>
-                            <div class="form-group"><label>Nom complet *</label><input id="profNom" placeholder="Nom et prénom"></div>
-                            <div class="form-group"><label>Matière</label><input id="profMatiere" placeholder="Mathématiques, Physique..."></div>
-                        </div>
+                       <div class="form-grid">
+    <div class="form-group"><label>Identifiant *</label><input id="profId" placeholder="Ex: P001"></div>
+    <div class="form-group"><label>Mot de passe *</label><input type="password" id="profPassword" placeholder="Mot de passe pour l'espace professeur"></div>
+    <div class="form-group"><label>Confirmer mot de passe *</label><input type="password" id="profPasswordConfirm" placeholder="Retapez le mot de passe"></div>
+    <div class="form-group"><label>Nom complet *</label><input id="profNom" placeholder="Nom et prénom"></div>
+    <div class="form-group"><label>Matière</label><input id="profMatiere" placeholder="Mathématiques, Physique..."></div>
+</div>
                         <button class="primary-btn" onclick="addProfesseur()"><i class="fas fa-user-plus"></i> Ajouter</button>
                     </div>
-                    <div class="table-container"><table id="profsTable"><thead><tr><th>ID</th><th>Nom</th><th>Matière</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+                    <div class="table-container"><table id="profsTable"><thead>
+    <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Matière</th>
+        <th>Mot de passe</th>
+        <th>Actions</th>
+    </tr>
+</thead><tbody></tbody></table></div>
                 </div></div>
             `;
             await loadProfsTable();
         }
 
-        window.addProfesseur = async function() {
-            let id = document.getElementById('profId').value.trim();
-            let nom = document.getElementById('profNom').value.trim();
-            let matiere = document.getElementById('profMatiere').value;
-            if (!id || !nom) return alert('ID et nom requis');
-            await db.collection('professeurs').doc(id).set({ identifiant: id, nom, matiere: matiere || '' });
-            document.getElementById('profId').value = '';
-            document.getElementById('profNom').value = '';
-            document.getElementById('profMatiere').value = '';
-            await loadProfsTable();
-            showAlert('Professeur ajouté', 'success');
+      window.addProfesseur = async function() {
+    let id = document.getElementById('profId').value.trim();
+    let password = document.getElementById('profPassword').value;
+    let passwordConfirm = document.getElementById('profPasswordConfirm').value;
+    let nom = document.getElementById('profNom').value.trim();
+    let matiere = document.getElementById('profMatiere').value;
+    
+    if (!id || !nom) return alert('ID et nom requis');
+    if (!password) return alert('Veuillez saisir un mot de passe');
+    if (password !== passwordConfirm) return alert('Les mots de passe ne correspondent pas');
+    if (password.length < 4) return alert('Le mot de passe doit contenir au moins 4 caractères');
+    
+    // Hashage simple (pour la démo - en production utilisez bcrypt côté serveur)
+    // Ici on stocke en Base64 pour simuler un hash
+    let hashedPassword = btoa(password);
+    
+    await db.collection('professeurs').doc(id).set({ 
+        identifiant: id, 
+        password: hashedPassword,
+        nom: nom, 
+        matiere: matiere || '' 
+    });
+    
+    document.getElementById('profId').value = '';
+    document.getElementById('profPassword').value = '';
+    document.getElementById('profPasswordConfirm').value = '';
+    document.getElementById('profNom').value = '';
+    document.getElementById('profMatiere').value = '';
+    await loadProfsTable();
+    showAlert('Professeur ajouté avec succès !', 'success');
+};
+
+      async function loadProfsTable() {
+    let snap = await db.collection('professeurs').get();
+    let tbody = document.querySelector('#profsTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    for (let doc of snap.docs) {
+        let p = doc.data();
+        let row = tbody.insertRow();
+        row.insertCell(0).innerText = p.identifiant;
+        row.insertCell(1).innerText = p.nom;
+        row.insertCell(2).innerText = p.matiere || '-';
+        let passStatus = p.password ? '<i class="fas fa-lock" style="color:#10b981"></i> Défini' : '<i class="fas fa-lock-open" style="color:#f59e0b"></i> Non défini';
+        row.insertCell(3).innerHTML = passStatus;
+        
+        // Cellule des actions avec 2 boutons : Modifier et Supprimer
+        let actionsCell = row.insertCell(4);
+        
+        // Bouton Modifier
+        let editBtn = document.createElement('button');
+        editBtn.innerHTML = '<i class="fas fa-edit"></i> Modifier';
+        editBtn.className = 'secondary-btn';
+        editBtn.style.marginRight = '8px';
+        editBtn.style.background = '#e0e7ff';
+        editBtn.style.borderColor = '#0f2b5c';
+        editBtn.style.color = '#0f2b5c';
+        editBtn.onclick = () => {
+            openEditProfModal(p.identifiant, p.nom, p.matiere, p.password);
         };
+        
+        // Bouton Supprimer
+        let delBtn = document.createElement('button');
+        delBtn.innerHTML = '<i class="fas fa-trash"></i> Supprimer';
+        delBtn.className = 'secondary-btn';
+        delBtn.style.background = '#fee2e2';
+        delBtn.onclick = async () => { 
+            if (confirm('Supprimer définitivement ce professeur ?')) {
+                await db.collection('professeurs').doc(p.identifiant).delete(); 
+                await loadProfsTable();
+                showAlert('Professeur supprimé', 'success');
+            }
+        };
+        
+        actionsCell.appendChild(editBtn);
+        actionsCell.appendChild(delBtn);
+    }
+}
 
-        async function loadProfsTable() {
-            let snap = await db.collection('professeurs').get();
-            let tbody = document.querySelector('#profsTable tbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            snap.forEach(d => {
-                let p = d.data();
-                let row = tbody.insertRow();
-                row.insertCell(0).innerText = p.identifiant;
-                row.insertCell(1).innerText = p.nom;
-                row.insertCell(2).innerText = p.matiere || '-';
-                let delBtn = document.createElement('button');
-                delBtn.innerText = 'Supprimer';
-                delBtn.className = 'secondary-btn';
-                delBtn.onclick = async () => { 
-                    await db.collection('professeurs').doc(p.identifiant).delete(); 
-                    await loadProfsTable();
-                    showAlert('Professeur supprimé', 'success');
-                };
-                row.insertCell(3).appendChild(delBtn);
-            });
+      // Fonction pour ouvrir la modal de modification d'un professeur
+function openEditProfModal(id, nom, matiere, currentPassword) {
+    // Créer la modal
+    let modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    modal.style.zIndex = '2000';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 500px; background: white; border-radius: 24px; padding: 2rem; position: relative; animation: modalIn 0.3s ease;">
+            <button class="modal-close" onclick="this.closest('.modal').remove()" style="position: absolute; top: 1rem; right: 1rem; background: #fee2e2; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer;">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-header" style="margin-bottom: 1.5rem; text-align: center;">
+                <i class="fas fa-chalkboard-user" style="font-size: 3rem; color: #0f2b5c;"></i>
+                <h2 style="margin-top: 0.5rem;">Modifier le professeur</h2>
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label>ID (non modifiable)</label>
+                <input type="text" id="editProfId" value="${id}" disabled style="background: #f1f5f9;">
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label>Nom complet *</label>
+                <input type="text" id="editProfNom" value="${nom.replace(/"/g, '&quot;')}" placeholder="Nom et prénom">
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label>Matière</label>
+                <input type="text" id="editProfMatiere" value="${matiere || ''}" placeholder="Ex: Mathématiques">
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label>Nouveau mot de passe</label>
+                <input type="password" id="editProfPassword" placeholder="Laisser vide pour garder l'ancien">
+            </div>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label>Confirmer le mot de passe</label>
+                <input type="password" id="editProfPasswordConfirm" placeholder="Retapez le nouveau mot de passe">
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="secondary-btn" onclick="this.closest('.modal').remove()" style="flex: 1;">Annuler</button>
+                <button class="primary-btn" onclick="updateProfesseur('${id}', this)" style="flex: 1;"><i class="fas fa-save"></i> Enregistrer</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+}
+
+// Fonction pour mettre à jour le professeur
+window.updateProfesseur = async function(id, btn) {
+    let modal = btn.closest('.modal');
+    let nom = document.getElementById('editProfNom').value.trim();
+    let matiere = document.getElementById('editProfMatiere').value;
+    let newPassword = document.getElementById('editProfPassword').value;
+    let newPasswordConfirm = document.getElementById('editProfPasswordConfirm').value;
+    
+    if (!nom) {
+        alert('Le nom est requis');
+        return;
+    }
+    
+    // Vérifier les mots de passe si un nouveau est fourni
+    let passwordToSave = null;
+    if (newPassword) {
+        if (newPassword !== newPasswordConfirm) {
+            alert('Les mots de passe ne correspondent pas');
+            return;
         }
-
+        if (newPassword.length < 4) {
+            alert('Le mot de passe doit contenir au moins 4 caractères');
+            return;
+        }
+        passwordToSave = btoa(newPassword);
+    }
+    
+    try {
+        // Récupérer le professeur existant
+        let doc = await db.collection('professeurs').doc(id).get();
+        let existingData = doc.data();
+        
+        // Préparer les données mises à jour
+        let updatedData = {
+            identifiant: id,
+            nom: nom,
+            matiere: matiere || '',
+            password: passwordToSave !== null ? passwordToSave : existingData.password
+        };
+        
+        // Sauvegarder les modifications
+        await db.collection('professeurs').doc(id).set(updatedData);
+        
+        // Fermer la modal
+        modal.remove();
+        
+        // Recharger le tableau
+        await loadProfsTable();
+        
+        showAlert('Professeur modifié avec succès !', 'success');
+    } catch (error) {
+        console.error('Erreur lors de la modification:', error);
+        alert('Erreur lors de la modification');
+    }
+};
         // ==================== AUTRES PAGES ====================
    function renderEmploiPage() {
     document.getElementById('app').innerHTML = `
