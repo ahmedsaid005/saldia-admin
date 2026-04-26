@@ -342,12 +342,14 @@
                 </div>
                 <div id="eleveSimpleTab" class="tab-content active">
                     <div class="form-card">
-                        <div class="form-grid">
+                                                <div class="form-grid">
                             <div class="form-group"><label>Matricule *</label><input id="matricule" placeholder="Ex: E001"></div>
                             <div class="form-group"><label>Nom complet *</label><input id="nomEleve" placeholder="Nom et prénom"></div>
                             <div class="form-group"><label>Date naissance</label><input type="date" id="dateNaissance"></div>
                             <div class="form-group"><label>Téléphone</label><input id="telephone" placeholder="+221 ..."></div>
                             <div class="form-group"><label>Email</label><input id="emailEleve" placeholder="email@exemple.com"></div>
+                            <div class="form-group"><label>Mot de passe *</label><input type="password" id="motDePasse" placeholder="Mot de passe pour la connexion"></div>
+                            <div class="form-group"><label>Confirmer mot de passe *</label><input type="password" id="confirmMotDePasse" placeholder="Retapez le mot de passe"></div>
                             <div class="form-group"><label>Photo URL</label><input id="photoUrl" placeholder="https://..."></div>
                         </div>
                         <div class="form-group"><label>Classe</label>
@@ -363,8 +365,8 @@
                         <div class="form-group">
                             <label>Ajout multiple d'élèves (un élève par ligne)</label>
                             <textarea id="batchEleves" class="batch-textarea" placeholder="Format : matricule | nom complet | date naissance | téléphone | email | photo URL&#10;Exemple :&#10;E001|Dupont Jean|2005-06-15|771234567|jean@email.com|&#10;E002|Martin Marie|2006-03-22|778765432|marie@email.com|"></textarea>
-                            <small><i class="fas fa-info-circle"></i> Format : Matricule | Nom | Date naissance | Téléphone | Email | Photo<br>
-                            <strong>La classe sera automatiquement : ${currentClasseName}</strong></small>
+                           <small><i class="fas fa-info-circle"></i> Format : Matricule | Nom | Mot de passe | Date naissance | Téléphone | Email | Photo<br>
+<strong>La classe sera automatiquement : ${currentClasseName}</strong></small>
                         </div>
                         <button class="primary-btn" onclick="addBatchEleves()"><i class="fas fa-layer-group"></i> Ajouter tous les élèves</button>
                     </div>
@@ -380,14 +382,22 @@
             event.target.classList.add('active');
         };
 
-        window.addSingleEleve = async function() {
+             window.addSingleEleve = async function() {
             let selectedClasse = document.getElementById('classeSelectForEleve') ? document.getElementById('classeSelectForEleve').value : currentClasseName;
+            let password = document.getElementById('motDePasse').value;
+            let confirmPassword = document.getElementById('confirmMotDePasse').value;
+            
+            if (!password) return alert('Veuillez saisir un mot de passe');
+            if (password !== confirmPassword) return alert('Les mots de passe ne correspondent pas');
+            if (password.length < 4) return alert('Le mot de passe doit contenir au moins 4 caractères');
+            
             let data = {
                 matricule: document.getElementById('matricule').value.trim(),
                 nom: document.getElementById('nomEleve').value.trim(),
                 dateNaissance: document.getElementById('dateNaissance').value,
                 telephone: document.getElementById('telephone').value,
                 email: document.getElementById('emailEleve').value,
+                motDePasse: btoa(password),
                 classe: selectedClasse,
                 photoUrl: document.getElementById('photoUrl').value || 'https://via.placeholder.com/100'
             };
@@ -398,12 +408,14 @@
             document.getElementById('dateNaissance').value = '';
             document.getElementById('telephone').value = '';
             document.getElementById('emailEleve').value = '';
+            document.getElementById('motDePasse').value = '';
+            document.getElementById('confirmMotDePasse').value = '';
             document.getElementById('photoUrl').value = '';
             showAlert('Élève ajouté avec succès !', 'success');
             showClasseEleves(currentClasseId, currentClasseName);
         };
 
-        window.addBatchEleves = async function() {
+              window.addBatchEleves = async function() {
             let textarea = document.getElementById('batchEleves');
             let lines = textarea.value.split('\n').filter(l => l.trim().length > 0);
             if (lines.length === 0) return alert('Entrez au moins un élève');
@@ -411,18 +423,23 @@
             let errors = [];
             for (let line of lines) {
                 let parts = line.split('|').map(p => p.trim());
-                if (parts.length < 2) {
+                if (parts.length < 3) {
+                    errors.push(line);
+                    continue;
+                }
+                if (!parts[2]) {
                     errors.push(line);
                     continue;
                 }
                 let data = {
                     matricule: parts[0],
                     nom: parts[1],
-                    dateNaissance: parts[2] || '',
-                    telephone: parts[3] || '',
-                    email: parts[4] || '',
+                    motDePasse: btoa(parts[2]),
+                    dateNaissance: parts[3] || '',
+                    telephone: parts[4] || '',
+                    email: parts[5] || '',
                     classe: currentClasseName,
-                    photoUrl: parts[5] || 'https://via.placeholder.com/100'
+                    photoUrl: parts[6] || 'https://via.placeholder.com/100'
                 };
                 if (data.matricule && data.nom) {
                     await db.collection('eleves').doc(data.matricule).set(data);
@@ -439,6 +456,7 @@
             }
             showClasseEleves(currentClasseId, currentClasseName);
         };
+            
 
         window.showEleveDetails = async function(matricule) {
             let doc = await db.collection('eleves').doc(matricule).get();
