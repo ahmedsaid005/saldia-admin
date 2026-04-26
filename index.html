@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Administration - Système Scolaire</title>
+    <title>Espace Parent/Élève - Emploi du temps</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -13,664 +13,409 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: #f5f7fa;
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
             min-height: 100vh;
             font-size: 14px;
             color: #1a1a2e;
-            padding: 20px;
+            padding-bottom: 70px;
         }
 
         .app-container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 0;
+            position: relative;
         }
 
         /* Header */
-        .dashboard-header {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 1px solid #edf2f7;
-            text-align: center;
+        .custom-header {
+            background: #1a4d3e;
+            border-radius: 0 0 40px 40px;
+            padding: 20px 20px 30px 20px;
+            margin-bottom: 20px;
+            position: relative;
         }
 
-        .dashboard-header h1 {
-            font-size: 22px;
-            font-weight: 600;
-            color: #1a1a2e;
-            margin-bottom: 4px;
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .dashboard-header p {
-            color: #6c757d;
-            font-size: 13px;
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-        /* Grille des boutons */
-        .grid-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
+        .avatar-wrapper {
+            background: #4dc9a0;
+            border-radius: 50%;
+            padding: 3px;
         }
 
-        .btn {
-            background: white;
-            border: 1px solid #edf2f7;
-            padding: 16px 12px;
-            border-radius: 14px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4dc9a0, #2a9d8f);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            color: #2c3e50;
+            font-size: 28px;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .btn i {
-            font-size: 18px;
+        .header-text h4 {
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border-color: #2c3e50;
+        .header-text h1 {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 4px;
         }
 
-        /* Panels */
-        .panel {
-            background: white;
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .header-icon {
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -12px;
+            background: #f4d03f;
+            color: #1a4d3e;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
             border-radius: 20px;
-            padding: 24px;
-            margin-top: 20px;
-            display: none;
-            animation: fadeIn 0.3s ease;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        /* Navigation Bottom */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 16px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+            z-index: 1000;
+            border-top: 1px solid #edf2f7;
+        }
+
+        .nav-btn {
+            flex: 1;
+            margin: 0 4px;
+            padding: 10px 8px;
+            background: transparent;
+            color: #6c757d;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .nav-btn i {
+            font-size: 20px;
+        }
+
+        .nav-btn.active {
+            background: #f0f4f8;
+            color: #1a4d3e;
+        }
+
+        /* Contenu dynamique */
+        .content-frame {
+            width: 100%;
+            border: none;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        /* Cards pour l'accueil */
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px;
             border: 1px solid #edf2f7;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
-        .panel.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .panel h2 {
-            font-size: 18px;
+        .info-card h3 {
+            font-size: 16px;
             font-weight: 600;
             color: #1a1a2e;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .panel h2 i {
-            color: #2c3e50;
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
         }
 
-        /* Formulaires */
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            color: #2c3e50;
-            font-size: 13px;
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1.5px solid #e9ecef;
-            border-radius: 10px;
-            font-size: 14px;
-            transition: all 0.2s;
-            background: white;
-        }
-
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #2c3e50;
-        }
-
-        button[type="submit"], button:not(.action-btn) {
-            background: #2c3e50;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        button[type="submit"]:hover, button:not(.action-btn):hover {
-            background: #1a252f;
-            transform: translateY(-1px);
-        }
-
-        /* Tableaux */
-        .table-container {
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #edf2f7;
-            font-size: 13px;
-        }
-
-        th {
-            background: #f8fafc;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .action-btn {
-            padding: 6px 12px;
-            margin: 0 4px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.2s;
-            width: auto;
-            display: inline-block;
-        }
-
-        .delete-btn {
-            background: #fef2f2;
-            color: #ef4444;
-        }
-
-        .delete-btn:hover {
-            background: #ef4444;
-            color: white;
-        }
-
-        .edit-btn {
+        .quick-btn {
             background: #f0f4f8;
-            color: #2c3e50;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
         }
 
-        .edit-btn:hover {
-            background: #2c3e50;
-            color: white;
-        }
-
-        small {
-            font-size: 11px;
-            color: #6c757d;
-            display: block;
-            margin-top: 4px;
+        .quick-btn:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 12px;
+            .info-card {
+                margin: 12px;
             }
-            
-            .grid-buttons {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
+            .bottom-nav {
+                padding: 8px 12px;
             }
-            
-            .btn {
-                padding: 12px 8px;
-                font-size: 11px;
+            .nav-btn span {
+                font-size: 10px;
             }
-            
-            .btn i {
-                font-size: 14px;
-            }
-            
-            .panel {
-                padding: 16px;
-            }
-            
-            th, td {
-                padding: 8px;
-                font-size: 12px;
+            .nav-btn i {
+                font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <div class="dashboard-header">
-            <h1><i class="fas fa-shield-alt"></i> Administration</h1>
-            <p>Gestion complète du système scolaire</p>
-        </div>
-
-        <div class="grid-buttons">
-            <button class="btn" onclick="showPanel('classes')"><i class="fas fa-chalkboard"></i> Classes</button>
-            <button class="btn" onclick="showPanel('eleves')"><i class="fas fa-user-graduate"></i> Élèves</button>
-            <button class="btn" onclick="showPanel('profs')"><i class="fas fa-chalkboard-user"></i> Professeurs</button>
-            <button class="btn" onclick="showPanel('bulletins')"><i class="fas fa-chart-line"></i> Bulletins</button>
-            <button class="btn" onclick="showPanel('documents')"><i class="fas fa-file-alt"></i> Documents</button>
-            <button class="btn" onclick="showPanel('presences')"><i class="fas fa-calendar-check"></i> Présences</button>
-        </div>
-
-        <!-- Panel Classes -->
-        <div id="classes" class="panel">
-            <h2><i class="fas fa-chalkboard"></i> Gestion des classes</h2>
-            <div class="form-group">
-                <label>Nom de la classe</label>
-                <input type="text" id="className" placeholder="Ex: 3ème A">
-            </div>
-            <button onclick="addClass()"><i class="fas fa-plus"></i> Ajouter une classe</button>
-            <div class="table-container">
-                <table id="classesTable">
-                    <thead><tr><th>Nom</th><th>Actions</th></tr></thead>
-                    <tbody></tbody>
-                </table>
+        <!-- Header visible uniquement sur certaines pages -->
+        <div id="dynamicHeader" style="display: none;">
+            <div class="custom-header">
+                <div class="header-content">
+                    <div class="header-left">
+                        <div class="avatar-wrapper">
+                            <div class="avatar">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                        </div>
+                        <div class="header-text">
+                            <h4 id="studentRole">PARENT</h4>
+                            <h1 id="pageTitle">Accueil</h1>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <i class="fas fa-home header-icon" onclick="showAccueil()"></i>
+                        <div class="header-icon" style="position: relative;">
+                            <i class="fas fa-bars"></i>
+                            <span class="notification-badge">3</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Panel Élèves -->
-        <div id="eleves" class="panel">
-            <h2><i class="fas fa-user-graduate"></i> Gestion des élèves</h2>
-            <div class="form-group"><label>Matricule</label><input type="text" id="matricule" placeholder="Matricule unique"></div>
-            <div class="form-group"><label>Nom complet</label><input type="text" id="nomEleve" placeholder="Nom et prénom"></div>
-            <div class="form-group"><label>Date de naissance</label><input type="date" id="dateNaissance"></div>
-            <div class="form-group"><label>Téléphone</label><input type="tel" id="telephone" placeholder="Numéro de téléphone"></div>
-            <div class="form-group"><label>Email</label><input type="email" id="emailEleve" placeholder="Email"></div>
-            <div class="form-group"><label>Classe</label><select id="classeEleve"></select></div>
-            <div class="form-group"><label>Photo URL</label><input type="text" id="photoUrl" placeholder="URL de la photo"></div>
-            <button onclick="addEleve()"><i class="fas fa-plus"></i> Ajouter l'élève</button>
-            <div class="table-container">
-                <table id="elevesTable">
-                    <thead><tr><th>Matricule</th><th>Nom</th><th>Classe</th><th>Actions</th></tr></thead>
-                    <tbody></tbody>
-                </table>
+        <!-- Zone de contenu dynamique -->
+        <div id="mainContent">
+            <!-- Contenu de l'accueil par défaut -->
+            <div id="accueilContent">
+                <div class="info-card">
+                    <h3><i class="fas fa-school"></i> Bienvenue sur votre espace</h3>
+                    <p>Connectez-vous pour accéder à l'emploi du temps, consulter vos présences et faire des demandes de documents.</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3><i class="fas fa-bolt"></i> Actions rapides</h3>
+                    <div class="quick-actions">
+                        <div class="quick-btn" onclick="showPage('connexion.html')">
+                            <i class="fas fa-sign-in-alt" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
+                            <span>Se connecter</span>
+                        </div>
+                        <div class="quick-btn" onclick="showPage('emploi.html')">
+                            <i class="fas fa-calendar-week" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
+                            <span>Emploi du temps</span>
+                        </div>
+                        <div class="quick-btn" onclick="showPage('presence.html')">
+                            <i class="fas fa-chart-line" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
+                            <span>Présences</span>
+                        </div>
+                        <div class="quick-btn" onclick="showPage('support.html')">
+                            <i class="fas fa-headset" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
+                            <span>Support</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3><i class="fas fa-info-circle"></i> Informations</h3>
+                    <p>• Consultez l'emploi du temps de votre enfant</p>
+                    <p>• Suivez les présences et absences</p>
+                    <p>• Faites des demandes de documents officiels</p>
+                    <p>• Recevez les notifications importantes</p>
+                </div>
             </div>
         </div>
 
-        <!-- Panel Professeurs -->
-        <div id="profs" class="panel">
-            <h2><i class="fas fa-chalkboard-user"></i> Gestion des professeurs</h2>
-            <div class="form-group"><label>Identifiant</label><input type="text" id="profId" placeholder="Identifiant unique"></div>
-            <div class="form-group"><label>Mot de passe</label><input type="password" id="profPassword" placeholder="Mot de passe"></div>
-            <div class="form-group"><label>Nom complet</label><input type="text" id="profNom" placeholder="Nom et prénom"></div>
-            <div class="form-group"><label>Matière enseignée</label><input type="text" id="profMatiere" placeholder="Ex: Mathématiques"></div>
-            <div class="form-group"><label>Classes assignées</label><select id="profClasses" multiple></select><small>Ctrl pour sélectionner plusieurs</small></div>
-            <button onclick="addProfesseur()"><i class="fas fa-plus"></i> Ajouter le professeur</button>
-            <div class="table-container">
-                <table id="profsTable">
-                    <thead><tr><th>Identifiant</th><th>Nom</th><th>Matière</th><th>Classes</th><th>Actions</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Panel Bulletins -->
-        <div id="bulletins" class="panel">
-            <h2><i class="fas fa-chart-line"></i> Gestion des bulletins</h2>
-            <div class="form-group"><label>Choisir un élève</label><select id="bulletinEleve"></select></div>
-            <div class="form-group"><label>Semestre</label><select id="bulletinSemestre"><option value="1">Semestre 1</option><option value="2">Semestre 2</option></select></div>
-            <div class="form-group"><label>Matière</label><input type="text" id="bulletinMatiere" placeholder="Matière"></div>
-            <div class="form-group"><label>Note CC1</label><input type="number" id="noteCC1" step="0.01" min="0" max="20"></div>
-            <div class="form-group"><label>Note CC2</label><input type="number" id="noteCC2" step="0.01" min="0" max="20"></div>
-            <div class="form-group"><label>Note Composition</label><input type="number" id="noteCompo" step="0.01" min="0" max="20"></div>
-            <div class="form-group"><label>Appréciation</label><textarea id="appreciation" rows="3" placeholder="Appréciation du professeur"></textarea></div>
-            <button onclick="ajouterNote()"><i class="fas fa-save"></i> Ajouter/Modifier la note</button>
-            <div class="table-container">
-                <table id="bulletinsTable">
-                    <thead><tr><th>Élève</th><th>Matière</th><th>Semestre</th><th>Note</th><th>Actions</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Panel Demandes Documents -->
-        <div id="documents" class="panel">
-            <h2><i class="fas fa-file-alt"></i> Demandes de documents</h2>
-            <div class="table-container">
-                <table id="demandesTable">
-                    <thead><tr><th>Demandeur</th><th>Document</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Panel Présences -->
-        <div id="presences" class="panel">
-            <h2><i class="fas fa-calendar-check"></i> Gestion des présences</h2>
-            <div class="form-group"><label>Choisir une classe</label><select id="presenceClasse" onchange="loadPresences()"></select></div>
-            <div class="form-group"><label>Date</label><input type="date" id="presenceDate" onchange="loadPresences()"></div>
-            <div class="table-container">
-                <table id="presencesTable">
-                    <thead><tr><th>Élève</th><th>Statut actuel</th><th>Action</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-btn active" onclick="showAccueil(); return false;"><i class="fas fa-home"></i><span>Accueil</span></a>
+            <a href="#" class="nav-btn" onclick="showPage('connexion.html'); return false;"><i class="fas fa-lock"></i><span>Connexion</span></a>
+            <a href="#" class="nav-btn" onclick="showPage('emploi.html'); return false;"><i class="fas fa-calendar-week"></i><span>Emploi du temps</span></a>
+            <a href="#" class="nav-btn" onclick="showPage('support.html'); return false;"><i class="fas fa-headset"></i><span>Support</span></a>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg",
-            authDomain: "teste-saldia.firebaseapp.com",
-            projectId: "teste-saldia",
-            storageBucket: "teste-saldia.firebasestorage.app",
-            messagingSenderId: "620601259237",
-            appId: "1:620601259237:web:57795c7a64082399d0d00c"
-        };
+        // Mettre à jour le bouton actif
+        function updateActiveButton(activeIndex) {
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach((btn, index) => {
+                if (index === activeIndex) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        let currentPanel = null;
-
-        function showPanel(panelName) {
-            if (currentPanel) document.getElementById(currentPanel).classList.remove('active');
-            document.getElementById(panelName).classList.add('active');
-            currentPanel = panelName;
+        // Afficher l'accueil
+        function showAccueil() {
+            const mainContent = document.getElementById('mainContent');
+            const header = document.getElementById('dynamicHeader');
+            header.style.display = 'none';
             
-            if (panelName === 'classes') loadClasses();
-            else if (panelName === 'eleves') loadEleves();
-            else if (panelName === 'profs') loadProfs();
-            else if (panelName === 'bulletins') { loadElevesForBulletin(); loadBulletins(); }
-            else if (panelName === 'documents') loadDemandes();
-            else if (panelName === 'presences') { loadClassesForPresence(); }
+            mainContent.innerHTML = `
+                <div id="accueilContent">
+                    <div class="info-card">
+                        <h3><i class="fas fa-school"></i> Bienvenue sur votre espace</h3>
+                        <p>Connectez-vous pour accéder à l'emploi du temps, consulter vos présences et faire des demandes de documents.</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-bolt"></i> Actions rapides</h3>
+                        <div class="quick-actions">
+                            <div class="quick-btn" onclick="showPage('connexion.html')">
+                                <i class="fas fa-sign-in-alt" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
+                                <span>Se connecter</span>
+                            </div>
+                            <div class="quick-btn" onclick="showPage('emploi.html')">
+                                <i class="fas fa-calendar-week" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
+                                <span>Emploi du temps</span>
+                            </div>
+                            <div class="quick-btn" onclick="showPage('presence.html')">
+                                <i class="fas fa-chart-line" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
+                                <span>Présences</span>
+                            </div>
+                            <div class="quick-btn" onclick="showPage('support.html')">
+                                <i class="fas fa-headset" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
+                                <span>Support</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3><i class="fas fa-info-circle"></i> Informations</h3>
+                        <p>• Consultez l'emploi du temps de votre enfant</p>
+                        <p>• Suivez les présences et absences</p>
+                        <p>• Faites des demandes de documents officiels</p>
+                        <p>• Recevez les notifications importantes</p>
+                    </div>
+                </div>
+            `;
+            updateActiveButton(0);
         }
 
-        async function addClass() {
-            const name = document.getElementById('className').value;
-            if (!name) return alert('Veuillez entrer un nom de classe');
-            await db.collection('classes').add({ name });
-            document.getElementById('className').value = '';
-            loadClasses();
-            updateClassSelectors();
+        // Afficher une page externe dans un iframe
+        function showPage(pageUrl) {
+            const mainContent = document.getElementById('mainContent');
+            const header = document.getElementById('dynamicHeader');
+            
+            // Afficher le header seulement pour certaines pages
+            if (pageUrl === 'emploi.html' || pageUrl === 'presence.html' || pageUrl === 'support.html') {
+                const user = localStorage.getItem('parentConnected');
+                if (user) {
+                    header.style.display = 'block';
+                    const userData = JSON.parse(user);
+                    document.getElementById('studentRole').innerHTML = `PARENT ${userData.nom ? userData.nom.split(' ')[0].toUpperCase() : ''}`;
+                    let title = 'Accueil';
+                    if (pageUrl === 'emploi.html') title = 'Emploi du temps';
+                    else if (pageUrl === 'presence.html') title = 'Présences';
+                    else if (pageUrl === 'support.html') title = 'Support';
+                    document.getElementById('pageTitle').innerHTML = title;
+                } else {
+                    header.style.display = 'none';
+                }
+            } else {
+                header.style.display = 'none';
+            }
+            
+            mainContent.innerHTML = `
+                <iframe src="${pageUrl}" class="content-frame" style="min-height: 600px; height: auto; width: 100%;" onload="resizeIframe(this)"></iframe>
+            `;
+            
+            // Mettre à jour le bouton actif
+            if (pageUrl === 'connexion.html') updateActiveButton(1);
+            else if (pageUrl === 'emploi.html') updateActiveButton(2);
+            else if (pageUrl === 'support.html') updateActiveButton(3);
         }
 
-        async function loadClasses() {
-            const snapshot = await db.collection('classes').get();
-            const tbody = document.querySelector('#classesTable tbody');
-            tbody.innerHTML = '';
-            snapshot.forEach(doc => {
-                const classe = doc.data();
-                const row = tbody.insertRow();
-                row.insertCell(0).textContent = classe.name;
-                const actions = row.insertCell(1);
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Supprimer';
-                deleteBtn.className = 'action-btn delete-btn';
-                deleteBtn.onclick = () => deleteClass(doc.id);
-                actions.appendChild(deleteBtn);
-            });
+        // Redimensionner l'iframe
+        function resizeIframe(iframe) {
+            setTimeout(() => {
+                try {
+                    iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+                } catch(e) {}
+            }, 100);
         }
 
-        async function deleteClass(id) {
-            if (confirm('Supprimer cette classe ?')) {
-                await db.collection('classes').doc(id).delete();
-                loadClasses();
-                updateClassSelectors();
+        // Vérifier la connexion
+        function checkConnectionStatus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('connecte') === 'true') {
+                setTimeout(() => {
+                    const user = localStorage.getItem('parentConnected');
+                    if (user) {
+                        const userData = JSON.parse(user);
+                        alert(`✅ Bienvenue ${userData.nom || 'cher parent'} ! Vous êtes connecté(e).`);
+                    }
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }, 100);
             }
         }
 
-        async function addEleve() {
-            const eleve = {
-                matricule: document.getElementById('matricule').value,
-                nom: document.getElementById('nomEleve').value,
-                dateNaissance: document.getElementById('dateNaissance').value,
-                telephone: document.getElementById('telephone').value,
-                email: document.getElementById('emailEleve').value,
-                classe: document.getElementById('classeEleve').value,
-                photoUrl: document.getElementById('photoUrl').value || 'https://via.placeholder.com/100'
-            };
-            if (!eleve.matricule || !eleve.nom) return alert('Matricule et nom requis');
-            await db.collection('eleves').doc(eleve.matricule).set(eleve);
-            document.getElementById('matricule').value = '';
-            document.getElementById('nomEleve').value = '';
-            document.getElementById('dateNaissance').value = '';
-            document.getElementById('telephone').value = '';
-            document.getElementById('emailEleve').value = '';
-            document.getElementById('photoUrl').value = '';
-            loadEleves();
-            updateEleveSelectors();
-        }
-
-        async function loadEleves() {
-            const snapshot = await db.collection('eleves').get();
-            const tbody = document.querySelector('#elevesTable tbody');
-            tbody.innerHTML = '';
-            snapshot.forEach(doc => {
-                const eleve = doc.data();
-                const row = tbody.insertRow();
-                row.insertCell(0).textContent = eleve.matricule;
-                row.insertCell(1).textContent = eleve.nom;
-                row.insertCell(2).textContent = eleve.classe;
-                const actions = row.insertCell(3);
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Supprimer';
-                deleteBtn.className = 'action-btn delete-btn';
-                deleteBtn.onclick = () => deleteEleve(doc.id);
-                actions.appendChild(deleteBtn);
-            });
-        }
-
-        async function deleteEleve(id) {
-            if (confirm('Supprimer cet élève ?')) {
-                await db.collection('eleves').doc(id).delete();
-                loadEleves();
-                updateEleveSelectors();
-            }
-        }
-
-        async function addProfesseur() {
-            const selectedClasses = Array.from(document.getElementById('profClasses').selectedOptions).map(opt => opt.value);
-            const prof = {
-                identifiant: document.getElementById('profId').value,
-                password: document.getElementById('profPassword').value,
-                nom: document.getElementById('profNom').value,
-                matiere: document.getElementById('profMatiere').value,
-                classes: selectedClasses
-            };
-            if (!prof.identifiant || !prof.password || !prof.nom) return alert('Champs requis');
-            await db.collection('professeurs').doc(prof.identifiant).set(prof);
-            document.getElementById('profId').value = '';
-            document.getElementById('profPassword').value = '';
-            document.getElementById('profNom').value = '';
-            document.getElementById('profMatiere').value = '';
-            loadProfs();
-        }
-
-        async function loadProfs() {
-            const snapshot = await db.collection('professeurs').get();
-            const tbody = document.querySelector('#profsTable tbody');
-            tbody.innerHTML = '';
-            snapshot.forEach(doc => {
-                const prof = doc.data();
-                const row = tbody.insertRow();
-                row.insertCell(0).textContent = prof.identifiant;
-                row.insertCell(1).textContent = prof.nom;
-                row.insertCell(2).textContent = prof.matiere;
-                row.insertCell(3).textContent = prof.classes.join(', ');
-                const actions = row.insertCell(4);
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Supprimer';
-                deleteBtn.className = 'action-btn delete-btn';
-                deleteBtn.onclick = () => deleteProfesseur(doc.id);
-                actions.appendChild(deleteBtn);
-            });
-        }
-
-        async function deleteProfesseur(id) {
-            if (confirm('Supprimer ce professeur ?')) {
-                await db.collection('professeurs').doc(id).delete();
-                loadProfs();
-            }
-        }
-
-        async function ajouterNote() {
-            const eleveId = document.getElementById('bulletinEleve').value;
-            const semestre = document.getElementById('bulletinSemestre').value;
-            const matiere = document.getElementById('bulletinMatiere').value;
-            const cc1 = parseFloat(document.getElementById('noteCC1').value);
-            const cc2 = parseFloat(document.getElementById('noteCC2').value);
-            const compo = parseFloat(document.getElementById('noteCompo').value);
-            const appreciation = document.getElementById('appreciation').value;
-            if (!eleveId || !matiere) return alert('Veuillez remplir tous les champs');
-            const noteCC = (cc1 + cc2) / 2;
-            const noteSemestrielle = (noteCC + compo) / 2;
-            const noteData = { eleveId, semestre, matiere, cc1, cc2, compo, noteCC, noteSemestrielle, appreciation, date: new Date().toISOString() };
-            const noteId = `${eleveId}_${matiere}_${semestre}`;
-            await db.collection('notes').doc(noteId).set(noteData);
-            document.getElementById('bulletinMatiere').value = '';
-            document.getElementById('noteCC1').value = '';
-            document.getElementById('noteCC2').value = '';
-            document.getElementById('noteCompo').value = '';
-            document.getElementById('appreciation').value = '';
-            loadBulletins();
-        }
-        
-        async function loadBulletins() {
-            const snapshot = await db.collection('notes').get();
-            const tbody = document.querySelector('#bulletinsTable tbody');
-            tbody.innerHTML = '';
-            for (const doc of snapshot.docs) {
-                const note = doc.data();
-                const eleve = await db.collection('eleves').doc(note.eleveId).get();
-                const row = tbody.insertRow();
-                row.insertCell(0).textContent = eleve.exists ? eleve.data().nom : note.eleveId;
-                row.insertCell(1).textContent = note.matiere;
-                row.insertCell(2).textContent = `Semestre ${note.semestre}`;
-                row.insertCell(3).textContent = note.noteSemestrielle.toFixed(2);
-                const actions = row.insertCell(4);
-                const deleteBtn = document.createElement('button');
-                deleteBtn.textContent = 'Supprimer';
-                deleteBtn.className = 'action-btn delete-btn';
-                deleteBtn.onclick = () => deleteNote(doc.id);
-                actions.appendChild(deleteBtn);
-            }
-        }
-        
-        async function deleteNote(id) {
-            if (confirm('Supprimer cette note ?')) {
-                await db.collection('notes').doc(id).delete();
-                loadBulletins();
-            }
-        }
-
-        async function loadPresences() {
-            const classe = document.getElementById('presenceClasse').value;
-            const date = document.getElementById('presenceDate').value;
-            if (!classe || !date) return;
-            const elevesSnapshot = await db.collection('eleves').where('classe', '==', classe).get();
-            const tbody = document.querySelector('#presencesTable tbody');
-            tbody.innerHTML = '';
-            for (const eleveDoc of elevesSnapshot.docs) {
-                const eleve = eleveDoc.data();
-                const presenceId = `${eleve.matricule}_${date}`;
-                const presenceDoc = await db.collection('presences').doc(presenceId).get();
-                const statut = presenceDoc.exists ? presenceDoc.data().statut : 'non renseigné';
-                const row = tbody.insertRow();
-                row.insertCell(0).textContent = eleve.nom;
-                row.insertCell(1).textContent = statut;
-                const actions = row.insertCell(2);
-                const select = document.createElement('select');
-                select.innerHTML = `<option value="Présent" ${statut === 'Présent' ? 'selected' : ''}>Présent</option>
-                                    <option value="Absent" ${statut === 'Absent' ? 'selected' : ''}>Absent</option>
-                                    <option value="Retard" ${statut === 'Retard' ? 'selected' : ''}>Retard</option>`;
-                const saveBtn = document.createElement('button');
-                saveBtn.textContent = 'Enregistrer';
-                saveBtn.className = 'action-btn edit-btn';
-                saveBtn.onclick = async () => {
-                    await db.collection('presences').doc(presenceId).set({
-                        matricule: eleve.matricule, nom: eleve.nom, classe, date, statut: select.value
-                    });
-                    loadPresences();
-                };
-                actions.appendChild(select);
-                actions.appendChild(saveBtn);
-            }
-        }
-
-        async function loadDemandes() {
-            const snapshot = await db.collection('demandes').orderBy('date', 'desc').get();
-            const tbody = document.querySelector('#demandesTable tbody');
-            tbody.innerHTML = '';
-            snapshot.forEach(doc => {
-                const demande = doc.data();
-                const row = tbody.insertRow();
-                row.insertCell(0).textContent = demande.nomComplet;
-                row.insertCell(1).textContent = demande.typeDocument;
-                row.insertCell(2).textContent = new Date(demande.date).toLocaleDateString();
-                row.insertCell(3).textContent = demande.statut;
-                const actions = row.insertCell(4);
-                const traiterBtn = document.createElement('button');
-                traiterBtn.textContent = 'Traiter';
-                traiterBtn.className = 'action-btn edit-btn';
-                traiterBtn.onclick = async () => {
-                    await db.collection('demandes').doc(doc.id).update({ statut: 'Traité' });
-                    loadDemandes();
-                };
-                actions.appendChild(traiterBtn);
-            });
-        }
-
-        async function updateClassSelectors() {
-            const snapshot = await db.collection('classes').get();
-            const classes = [];
-            snapshot.forEach(doc => classes.push(doc.data().name));
-            const eleveClasse = document.getElementById('classeEleve');
-            const profClasses = document.getElementById('profClasses');
-            const presenceClasse = document.getElementById('presenceClasse');
-            [eleveClasse, presenceClasse].forEach(select => {
-                if (select) select.innerHTML = '<option value="">Sélectionner une classe</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
-            });
-            if (profClasses) profClasses.innerHTML = classes.map(c => `<option value="${c}">${c}</option>`).join('');
-        }
-        
-        async function updateEleveSelectors() {
-            const snapshot = await db.collection('eleves').get();
-            const bulletinEleve = document.getElementById('bulletinEleve');
-            bulletinEleve.innerHTML = '<option value="">Sélectionner un élève</option>';
-            snapshot.forEach(doc => {
-                const eleve = doc.data();
-                bulletinEleve.innerHTML += `<option value="${eleve.matricule}">${eleve.nom} (${eleve.matricule})</option>`;
-            });
-        }
-        
-        async function loadClassesForPresence() {
-            await updateClassSelectors();
-            document.getElementById('presenceDate').value = new Date().toISOString().split('T')[0];
-        }
-        
-        async function loadElevesForBulletin() {
-            await updateEleveSelectors();
-        }
-        
-        updateClassSelectors();
-        updateEleveSelectors();
+        // Initialisation
+        checkConnectionStatus();
     </script>
 </body>
 </html>
