@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support - Demandes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #edf2f7;
+        }
+        .info-card h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        button {
+            width: 100%;
+            background: #1a4d3e;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button:hover { background: #0f3a2f; }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: #f0f4f8;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a4d3e;
+        }
+        .message-success {
+            background: #f0fdf4;
+            color: #10b981;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 16px;
+            text-align: center;
+        }
+        .message-error {
+            background: #fef2f2;
+            color: #ef4444;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 16px;
+            text-align: center;
+        }
+        .no-connection { text-align: center; padding: 60px 20px; color: #8a9aa8; }
+        .no-connection i { font-size: 48px; margin-bottom: 16px; }
+        .no-connection a { display: inline-block; margin-top: 16px; background: #1a4d3e; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="content">
+            <div class="no-connection">
+                <i class="fas fa-spinner fa-pulse"></i>
+                <p>Chargement...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg",
+            authDomain: "teste-saldia.firebaseapp.com",
+            projectId: "teste-saldia",
+            storageBucket: "teste-saldia.firebasestorage.app",
+            messagingSenderId: "620601259237",
+            appId: "1:620601259237:web:57795c7a64082399d0d00c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentEleve = null;
+
+        function getEleveFromStorage() {
+            const parent = localStorage.getItem('parentConnected');
+            if (parent) {
+                try {
+                    currentEleve = JSON.parse(parent);
+                    return true;
+                } catch(e) { return false; }
+            }
+            return false;
+        }
+
+        async function soumettreDemande() {
+            const typeDocument = document.getElementById('typeDocument').value;
+            const motif = document.getElementById('motifDemande').value;
+            const messageDiv = document.getElementById('demandeMessage');
+            
+            if (!motif.trim()) {
+                messageDiv.innerHTML = '<div class="message-error">❌ Veuillez entrer un motif</div>';
+                setTimeout(() => messageDiv.innerHTML = '', 3000);
+                return;
+            }
+            
+            await db.collection('demandes').add({
+                typeDocument, motif: motif.trim(),
+                date: new Date().toISOString(),
+                statut: 'En attente',
+                nomComplet: currentEleve?.nom || 'Non connecté',
+                matricule: currentEleve?.matricule || 'Non connecté'
+            });
+            
+            messageDiv.innerHTML = '<div class="message-success">✅ Demande soumise avec succès!</div>';
+            document.getElementById('motifDemande').value = '';
+            setTimeout(() => messageDiv.innerHTML = '', 3000);
+        }
+
+        function initSupport() {
+            const container = document.getElementById('content');
+            if (!getEleveFromStorage()) {
+                container.innerHTML = `
+                    <div class="no-connection">
+                        <i class="fas fa-lock"></i>
+                        <p>Veuillez vous connecter pour faire une demande</p>
+                        <a href="connexion.html">Se connecter</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="info-card">
+                    <h3><i class="fas fa-file-pdf"></i> Demande de document</h3>
+                    <div class="form-group">
+                        <label>Type de document</label>
+                        <select id="typeDocument">
+                            <option value="Certificat de scolarité">📄 Certificat de scolarité</option>
+                            <option value="Relevé de notes">📊 Relevé de notes</option>
+                            <option value="Attestation de réussite">🎓 Attestation de réussite</option>
+                            <option value="Document officiel">📑 Document officiel</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Motif</label>
+                        <textarea id="motifDemande" rows="4" placeholder="Précisez votre motif..."></textarea>
+                    </div>
+                    <div id="demandeMessage"></div>
+                    <button onclick="soumettreDemande()">📨 Soumettre la demande</button>
+                </div>
+                
+                <div class="info-card">
+                    <h3><i class="fas fa-headset"></i> Contact support</h3>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                        <div><strong>Téléphone</strong><br>+225 05 05 05 05 05</div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                        <div><strong>Email</strong><br>support@ecole.ci</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        initSupport();
+        window.soumettreDemande = soumettreDemande;
+    </script>
+</body>
+</html>
