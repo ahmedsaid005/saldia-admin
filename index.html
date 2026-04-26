@@ -360,6 +360,8 @@
             <button class="nav-btn active" onclick="showPanel('classes')"><i class="fas fa-school"></i> Classes</button>
             <button class="nav-btn" onclick="showPanel('eleves')"><i class="fas fa-users"></i> Élèves</button>
             <button class="nav-btn" onclick="showPanel('profs')"><i class="fas fa-chalkboard-user"></i> Professeurs</button>
+              <button class="nav-btn" onclick="ouvrirEmploi()"><i class="fas fa-calendar-week"></i> Emploi du temps</button>  <!-- CE BOUTON -->
+
             <button class="nav-btn" onclick="showPanel('bulletins')"><i class="fas fa-file-pdf"></i> Bulletins GLOBAL</button>
             <button class="nav-btn" onclick="showPanel('documents')"><i class="fas fa-file-alt"></i> Demandes</button>
             <button class="nav-btn" onclick="showPanel('presences')"><i class="fas fa-calendar-check"></i> Présences</button>
@@ -452,6 +454,16 @@
     async function loadClassesListPresence(){ let snap=await db.collection('classes').get(); let select=document.getElementById('presenceClasse'); select.innerHTML=''; snap.forEach(d=>{select.innerHTML+=`<option value="${d.data().name}">${d.data().name}</option>`;});}
     async function loadPresences(){ let classe=document.getElementById('presenceClasse').value; let date=document.getElementById('presenceDate').value; if(!classe||!date) return; let eleves=await db.collection('eleves').where('classe','==',classe).get(); let tbody=document.querySelector('#presencesTable tbody'); tbody.innerHTML=''; for(let doc of eleves.docs){ let eleve=doc.data(); let presenceId=`${eleve.matricule}_${date}`; let pDoc=await db.collection('presences').doc(presenceId).get(); let statut=pDoc.exists?pDoc.data().statut:'Présent'; let row=tbody.insertRow(); row.insertCell(0).innerText=eleve.nom; let sel=document.createElement('select'); sel.innerHTML='<option>Présent</option><option>Absent</option><option>Retard</option>'; sel.value=statut; let btn=document.createElement('button'); btn.innerText='Enregistrer'; btn.className='primary-btn'; btn.style.padding='0.3rem 0.8rem'; btn.onclick=async()=>{await db.collection('presences').doc(presenceId).set({matricule:eleve.matricule,nom:eleve.nom,classe,date,statut:sel.value}); loadPresences();}; let cellStatut=row.insertCell(1); let cellAction=row.insertCell(2); cellStatut.appendChild(sel); cellAction.appendChild(btn);} }
     async function loadDemandes(){ let snap=await db.collection('demandes').orderBy('date','desc').get(); let tbody=document.querySelector('#demandesTable tbody'); tbody.innerHTML=''; snap.forEach(d=>{let req=d.data(); let row=tbody.insertRow(); row.insertCell(0).innerText=req.nomComplet; row.insertCell(1).innerText=req.typeDocument; row.insertCell(2).innerText=new Date(req.date).toLocaleDateString(); row.insertCell(3).innerText=req.statut; let btn=document.createElement('button'); btn.innerText='Traiter'; btn.onclick=async()=>{await db.collection('demandes').doc(d.id).update({statut:'Traité'}); loadDemandes();}; row.insertCell(4).appendChild(btn);});}
+  
+  function ouvrirEmploi() {
+    // Crée un nouveau panel ou affiche dans l'iframe
+    let mainContent = document.querySelector('.main-content');
+    mainContent.innerHTML = `
+        <div style="padding: 0;">
+            <iframe src="emploi.html" style="width: 100%; min-height: 80vh; border: none; border-radius: 20px;"></iframe>
+        </div>
+    `;
+}
     // initialisation
     updateAllClassSelectors(); loadClasses(); loadEleves(); loadProfs(); loadDemandes();
 </script>
