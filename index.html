@@ -2,9 +2,12 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Espace Parent/Élève - Emploi du temps</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groupe Scolaire Saldia - Administration</title>
+    <!-- Font Awesome 6 (gratuit) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- jsPDF pour générer les PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,409 +16,444 @@
         }
 
         body {
-            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: white;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f0f2f8;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+
+        /* Layout principal pour grand écran */
+        .admin-wrapper {
+            display: flex;
             min-height: 100vh;
-            font-size: 14px;
-            color: #1a1a2e;
-            padding-bottom: 70px;
         }
 
-        .app-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0;
-            position: relative;
-        }
-
-        /* Header */
-        .custom-header {
-            background: #1a4d3e;
-            border-radius: 0 0 40px 40px;
-            padding: 20px 20px 30px 20px;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .header-content {
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 8px 0 20px rgba(0, 0, 0, 0.02);
+            padding: 2rem 1.5rem;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            transition: all 0.3s;
         }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .avatar-wrapper {
-            background: #4dc9a0;
-            border-radius: 50%;
-            padding: 3px;
-        }
-
-        .avatar {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #4dc9a0, #2a9d8f);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .header-text h4 {
-            color: rgba(255,255,255,0.8);
-            font-size: 12px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        .header-text h1 {
-            color: white;
-            font-size: 24px;
-            font-weight: 700;
-            margin-top: 4px;
-        }
-
-        .header-right {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .header-icon {
-            color: white;
-            font-size: 22px;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -8px;
-            right: -12px;
-            background: #f4d03f;
-            color: #1a4d3e;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-radius: 20px;
-            min-width: 18px;
+        .logo-area {
             text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #eef2ff;
         }
 
-        /* Navigation Bottom */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
+        .logo-area img {
+            max-width: 80px;
+            height: auto;
+            margin-bottom: 0.75rem;
+        }
+
+        .logo-area h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1E3A8A 0%, #DC2626 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .logo-area p {
+            font-size: 0.7rem;
+            color: #64748b;
+            letter-spacing: 1px;
+        }
+
+        .nav-admin {
+            flex: 1;
             display: flex;
-            justify-content: space-around;
-            padding: 12px 16px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
-            z-index: 1000;
-            border-top: 1px solid #edf2f7;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
         .nav-btn {
-            flex: 1;
-            margin: 0 4px;
-            padding: 10px 8px;
             background: transparent;
-            color: #6c757d;
             border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 12px;
+            padding: 0.8rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.95rem;
             font-weight: 500;
-            transition: all 0.2s;
+            text-align: left;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 6px;
-            text-decoration: none;
+            gap: 12px;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .nav-btn i {
-            font-size: 20px;
+            width: 24px;
+            font-size: 1.2rem;
+            color: #5b6e8c;
         }
 
         .nav-btn.active {
-            background: #f0f4f8;
-            color: #1a4d3e;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            color: #1E3A8A;
+            border-left: 4px solid #DC2626;
         }
 
-        /* Contenu dynamique */
-        .content-frame {
-            width: 100%;
-            border: none;
-            background: transparent;
-            transition: all 0.3s ease;
+        .nav-btn.active i {
+            color: #1E3A8A;
         }
 
-        /* Cards pour l'accueil */
-        .info-card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            margin: 20px;
-            border: 1px solid #edf2f7;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        .nav-btn:hover:not(.active) {
+            background: #eef2ff;
+            transform: translateX(4px);
         }
 
-        .info-card h3 {
-            font-size: 16px;
+        /* CONTENU PRINCIPAL */
+        .main-content {
+            flex: 1;
+            padding: 2rem 2.5rem;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1E3A8A, #DC2626);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        /* Cartes et formulaires */
+        .card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.02);
+            border: 1px solid #eef2ff;
+            transition: all 0.2s;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group label {
             font-weight: 600;
-            color: #1a1a2e;
-            margin-bottom: 16px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #475569;
+        }
+
+        input, select, textarea {
+            padding: 0.7rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1E3A8A;
+            box-shadow: 0 0 0 3px rgba(30,58,138,0.1);
+        }
+
+        button.primary-btn {
+            background: linear-gradient(95deg, #1E3A8A 0%, #2563EB 100%);
+            border: none;
+            padding: 0.75rem 1.8rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        button.primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30,58,138,0.3);
+            background: linear-gradient(95deg, #1E3A8A 0%, #1E40AF 100%);
+        }
+
+        button.secondary-btn {
+            background: white;
+            border: 1.5px solid #1E3A8A;
+            color: #1E3A8A;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        /* Tableaux modernes */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 20px;
+            border: 1px solid #edf2f7;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem 1rem;
+            background: #f8fafd;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        /* MULTI SELECT SANS CTRL (portable) */
+        .multi-select-list {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 0.5rem;
+            max-height: 140px;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .multi-select-list label {
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .quick-btn {
-            background: #f0f4f8;
-            border: none;
-            padding: 12px;
-            border-radius: 12px;
+            gap: 0.6rem;
+            padding: 0.5rem 0.6rem;
             cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
+            border-radius: 12px;
+            transition: 0.1s;
+            font-weight: normal;
+            text-transform: none;
+            font-size: 0.85rem;
         }
 
-        .quick-btn:hover {
-            background: #e9ecef;
-            transform: translateY(-2px);
+        .multi-select-list label:hover {
+            background: #eef2ff;
         }
 
-        @media (max-width: 768px) {
-            .info-card {
-                margin: 12px;
+        .multi-select-list input {
+            width: 18px;
+            height: 18px;
+            accent-color: #1E3A8A;
+        }
+
+        /* GRILLE BULLETINS */
+        .bulletins-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .bulletin-card {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 1px solid #eef2ff;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        .bulletin-header {
+            background: linear-gradient(120deg, #1E3A8A, #1e3a8a);
+            color: white;
+            padding: 1rem 1.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .bulletin-body {
+            padding: 1.8rem;
+        }
+
+        .bulletin-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.2rem;
+            padding: 0 1.8rem 1.5rem;
+        }
+
+        .btn-icon {
+            background: #f1f5f9;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        /* impressions */
+        @media print {
+            .sidebar, .bulletin-actions, .page-header, .primary-btn, .secondary-btn, .nav-admin, .table-container, .form-grid {
+                display: none !important;
             }
-            .bottom-nav {
-                padding: 8px 12px;
+            .bulletin-card {
+                break-after: page;
+                box-shadow: none;
+                margin: 0;
+                border: 1px solid #ccc;
             }
-            .nav-btn span {
-                font-size: 10px;
-            }
-            .nav-btn i {
-                font-size: 18px;
+            .main-content {
+                padding: 0;
+                margin: 0;
             }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header visible uniquement sur certaines pages -->
-        <div id="dynamicHeader" style="display: none;">
-            <div class="custom-header">
-                <div class="header-content">
-                    <div class="header-left">
-                        <div class="avatar-wrapper">
-                            <div class="avatar">
-                                <i class="fas fa-user-graduate"></i>
-                            </div>
-                        </div>
-                        <div class="header-text">
-                            <h4 id="studentRole">PARENT</h4>
-                            <h1 id="pageTitle">Accueil</h1>
-                        </div>
-                    </div>
-                    <div class="header-right">
-                        <i class="fas fa-home header-icon" onclick="showAccueil()"></i>
-                        <div class="header-icon" style="position: relative;">
-                            <i class="fas fa-bars"></i>
-                            <span class="notification-badge">3</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="admin-wrapper">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo-area">
+            <!-- Logo avec fallback si l'url ne charge pas -->
+            <img src="https://groupescolairesaldia.com/wp-content/uploads/2022/06/logo.png" alt="Logo Saldia" onerror="this.src='https://via.placeholder.com/80?text=SALDIA'">
+            <h2>GROUPE SCOLAIRE SALDIA</h2>
+            <p>Administration & Excellence</p>
         </div>
-
-        <!-- Zone de contenu dynamique -->
-        <div id="mainContent">
-            <!-- Contenu de l'accueil par défaut -->
-            <div id="accueilContent">
-                <div class="info-card">
-                    <h3><i class="fas fa-school"></i> Bienvenue sur votre espace</h3>
-                    <p>Connectez-vous pour accéder à l'emploi du temps, consulter vos présences et faire des demandes de documents.</p>
-                </div>
-                
-                <div class="info-card">
-                    <h3><i class="fas fa-bolt"></i> Actions rapides</h3>
-                    <div class="quick-actions">
-                        <div class="quick-btn" onclick="showPage('connexion.html')">
-                            <i class="fas fa-sign-in-alt" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
-                            <span>Se connecter</span>
-                        </div>
-                        <div class="quick-btn" onclick="showPage('emploi.html')">
-                            <i class="fas fa-calendar-week" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
-                            <span>Emploi du temps</span>
-                        </div>
-                        <div class="quick-btn" onclick="showPage('presence.html')">
-                            <i class="fas fa-chart-line" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
-                            <span>Présences</span>
-                        </div>
-                        <div class="quick-btn" onclick="showPage('support.html')">
-                            <i class="fas fa-headset" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
-                            <span>Support</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-card">
-                    <h3><i class="fas fa-info-circle"></i> Informations</h3>
-                    <p>• Consultez l'emploi du temps de votre enfant</p>
-                    <p>• Suivez les présences et absences</p>
-                    <p>• Faites des demandes de documents officiels</p>
-                    <p>• Recevez les notifications importantes</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <a href="#" class="nav-btn active" onclick="showAccueil(); return false;"><i class="fas fa-home"></i><span>Accueil</span></a>
-            <a href="#" class="nav-btn" onclick="showPage('connexion.html'); return false;"><i class="fas fa-lock"></i><span>Connexion</span></a>
-            <a href="#" class="nav-btn" onclick="showPage('emploi.html'); return false;"><i class="fas fa-calendar-week"></i><span>Emploi du temps</span></a>
-            <a href="#" class="nav-btn" onclick="showPage('support.html'); return false;"><i class="fas fa-headset"></i><span>Support</span></a>
+        <div class="nav-admin">
+            <button class="nav-btn active" onclick="showPanel('classes')"><i class="fas fa-school"></i> Classes</button>
+            <button class="nav-btn" onclick="showPanel('eleves')"><i class="fas fa-users"></i> Élèves</button>
+            <button class="nav-btn" onclick="showPanel('profs')"><i class="fas fa-chalkboard-user"></i> Professeurs</button>
+            <button class="nav-btn" onclick="showPanel('bulletins')"><i class="fas fa-file-pdf"></i> Bulletins GLOBAL</button>
+            <button class="nav-btn" onclick="showPanel('documents')"><i class="fas fa-file-alt"></i> Demandes</button>
+            <button class="nav-btn" onclick="showPanel('presences')"><i class="fas fa-calendar-check"></i> Présences</button>
         </div>
     </div>
 
-    <script>
-        // Mettre à jour le bouton actif
-        function updateActiveButton(activeIndex) {
-            const buttons = document.querySelectorAll('.nav-btn');
-            buttons.forEach((btn, index) => {
-                if (index === activeIndex) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-        }
+    <div class="main-content">
+        <!-- CONTENUS DES PANNEAUX -->
+        <div id="classes" class="panel active">
+            <div class="page-header"><h1><i class="fas fa-chalkboard"></i> Classes</h1></div>
+            <div class="card"><div class="form-group"><label>Nouvelle classe</label><input type="text" id="className" placeholder="Ex: 3ème A"></div><button class="primary-btn" onclick="addClass()"><i class="fas fa-plus"></i> Ajouter</button></div>
+            <div class="table-container"><table id="classesTable"><thead><tr><th>Nom</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        </div>
 
-        // Afficher l'accueil
-        function showAccueil() {
-            const mainContent = document.getElementById('mainContent');
-            const header = document.getElementById('dynamicHeader');
-            header.style.display = 'none';
-            
-            mainContent.innerHTML = `
-                <div id="accueilContent">
-                    <div class="info-card">
-                        <h3><i class="fas fa-school"></i> Bienvenue sur votre espace</h3>
-                        <p>Connectez-vous pour accéder à l'emploi du temps, consulter vos présences et faire des demandes de documents.</p>
-                    </div>
-                    
-                    <div class="info-card">
-                        <h3><i class="fas fa-bolt"></i> Actions rapides</h3>
-                        <div class="quick-actions">
-                            <div class="quick-btn" onclick="showPage('connexion.html')">
-                                <i class="fas fa-sign-in-alt" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
-                                <span>Se connecter</span>
-                            </div>
-                            <div class="quick-btn" onclick="showPage('emploi.html')">
-                                <i class="fas fa-calendar-week" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
-                                <span>Emploi du temps</span>
-                            </div>
-                            <div class="quick-btn" onclick="showPage('presence.html')">
-                                <i class="fas fa-chart-line" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
-                                <span>Présences</span>
-                            </div>
-                            <div class="quick-btn" onclick="showPage('support.html')">
-                                <i class="fas fa-headset" style="font-size: 20px; margin-bottom: 6px; display: block;"></i>
-                                <span>Support</span>
-                            </div>
-                        </div>
-                    </div>
+        <div id="eleves" class="panel">
+            <div class="page-header"><h1><i class="fas fa-users"></i> Élèves</h1></div>
+            <div class="card">
+                <div class="form-grid"><div class="form-group"><label>Matricule</label><input id="matricule"></div><div class="form-group"><label>Nom complet</label><input id="nomEleve"></div>
+                <div class="form-group"><label>Date naissance</label><input type="date" id="dateNaissance"></div><div class="form-group"><label>Téléphone</label><input id="telephone"></div>
+                <div class="form-group"><label>Email</label><input id="emailEleve"></div><div class="form-group"><label>Classe</label><select id="classeEleve"></select></div>
+                <div class="form-group"><label>Photo URL</label><input id="photoUrl"></div></div>
+                <button class="primary-btn" onclick="addEleve()"><i class="fas fa-save"></i> Enregistrer élève</button>
+            </div>
+            <div class="table-container"><table id="elevesTable"><thead><tr><th>Matricule</th><th>Nom</th><th>Classe</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        </div>
 
-                    <div class="info-card">
-                        <h3><i class="fas fa-info-circle"></i> Informations</h3>
-                        <p>• Consultez l'emploi du temps de votre enfant</p>
-                        <p>• Suivez les présences et absences</p>
-                        <p>• Faites des demandes de documents officiels</p>
-                        <p>• Recevez les notifications importantes</p>
-                    </div>
+        <div id="profs" class="panel">
+            <div class="page-header"><h1><i class="fas fa-chalkboard-user"></i> Professeurs</h1></div>
+            <div class="card">
+                <div class="form-grid"><div class="form-group"><label>Identifiant</label><input id="profId"></div><div class="form-group"><label>Mot de passe</label><input type="password" id="profPassword"></div>
+                <div class="form-group"><label>Nom</label><input id="profNom"></div><div class="form-group"><label>Matière</label><input id="profMatiere"></div></div>
+                <div class="form-group"><label>Classes assignées (sélection multiple sans Ctrl)</label>
+                    <div id="profClassesContainer" class="multi-select-list"></div>
                 </div>
-            `;
-            updateActiveButton(0);
-        }
+                <button class="primary-btn" onclick="addOrUpdateProfesseur()"><i class="fas fa-user-plus"></i> Ajouter / Modifier</button>
+                <div style="margin-top:1rem"><small>Cliquez sur un professeur dans le tableau pour le charger et modifier ses classes</small></div>
+            </div>
+            <div class="table-container"><table id="profsTable"><thead><tr><th>ID</th><th>Nom</th><th>Matière</th><th>Classes</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        </div>
 
-        // Afficher une page externe dans un iframe
-        function showPage(pageUrl) {
-            const mainContent = document.getElementById('mainContent');
-            const header = document.getElementById('dynamicHeader');
-            
-            // Afficher le header seulement pour certaines pages
-            if (pageUrl === 'emploi.html' || pageUrl === 'presence.html' || pageUrl === 'support.html') {
-                const user = localStorage.getItem('parentConnected');
-                if (user) {
-                    header.style.display = 'block';
-                    const userData = JSON.parse(user);
-                    document.getElementById('studentRole').innerHTML = `PARENT ${userData.nom ? userData.nom.split(' ')[0].toUpperCase() : ''}`;
-                    let title = 'Accueil';
-                    if (pageUrl === 'emploi.html') title = 'Emploi du temps';
-                    else if (pageUrl === 'presence.html') title = 'Présences';
-                    else if (pageUrl === 'support.html') title = 'Support';
-                    document.getElementById('pageTitle').innerHTML = title;
-                } else {
-                    header.style.display = 'none';
-                }
-            } else {
-                header.style.display = 'none';
-            }
-            
-            mainContent.innerHTML = `
-                <iframe src="${pageUrl}" class="content-frame" style="min-height: 600px; height: auto; width: 100%;" onload="resizeIframe(this)"></iframe>
-            `;
-            
-            // Mettre à jour le bouton actif
-            if (pageUrl === 'connexion.html') updateActiveButton(1);
-            else if (pageUrl === 'emploi.html') updateActiveButton(2);
-            else if (pageUrl === 'support.html') updateActiveButton(3);
-        }
+        <div id="bulletins" class="panel">
+            <div class="page-header"><h1><i class="fas fa-file-pdf"></i> GÉNÉRATION BULLETINS COMPLETS</h1></div>
+            <div class="card">
+                <div class="form-grid"><div class="form-group"><label>Choisir une classe</label><select id="bulletinClasseSelect"></select></div><div class="form-group"><label>Semestre</label><select id="bulletinSemestreSelect"><option value="1">Semestre 1</option><option value="2">Semestre 2</option></select></div></div>
+                <button class="primary-btn" onclick="genererTousLesBulletins()"><i class="fas fa-print"></i> Générer & Afficher tous les bulletins</button>
+                <div style="margin-top: 1rem; display: flex; gap: 10px;">
+                    <button class="secondary-btn" onclick="imprimerTousLesBulletins()"><i class="fas fa-print"></i> Imprimer tous (PDF navigateur)</button>
+                    <button class="secondary-btn" onclick="telechargerTousLesPDF()"><i class="fas fa-download"></i> Télécharger tous les PDF (Zip)</button>
+                </div>
+            </div>
+            <div id="bulletinsListGlobal" class="bulletins-grid"></div>
+        </div>
 
-        // Redimensionner l'iframe
-        function resizeIframe(iframe) {
-            setTimeout(() => {
-                try {
-                    iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
-                } catch(e) {}
-            }, 100);
-        }
+        <div id="documents" class="panel"><div class="page-header"><h1>Demandes documents</h1></div><div class="table-container"><table id="demandesTable"><thead><tr><th>Demandeur</th><th>Document</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead><tbody></tbody></table></div></div>
+        <div id="presences" class="panel"><div class="page-header"><h1>Présences</h1></div><div class="card"><div class="form-grid"><div class="form-group"><label>Classe</label><select id="presenceClasse"></select></div><div class="form-group"><label>Date</label><input type="date" id="presenceDate"></div></div><button class="primary-btn" onclick="loadPresences()">Charger</button></div><div class="table-container"><table id="presencesTable"><thead><tr><th>Élève</th><th>Statut</th><th>Action</th></tr></thead><tbody></tbody></table></div></div>
+    </div>
+</div>
 
-        // Vérifier la connexion
-        function checkConnectionStatus() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('connecte') === 'true') {
-                setTimeout(() => {
-                    const user = localStorage.getItem('parentConnected');
-                    if (user) {
-                        const userData = JSON.parse(user);
-                        alert(`✅ Bienvenue ${userData.nom || 'cher parent'} ! Vous êtes connecté(e).`);
-                    }
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }, 100);
-            }
-        }
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+    const firebaseConfig = { apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg", authDomain: "teste-saldia.firebaseapp.com", projectId: "teste-saldia", storageBucket: "teste-saldia.firebasestorage.app", messagingSenderId: "620601259237", appId: "1:620601259237:web:57795c7a64082399d0d00c" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    let currentEditProfId = null;
 
-        // Initialisation
-        checkConnectionStatus();
-    </script>
+    function showPanel(panel) { document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); document.getElementById(panel).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active'); if(panel==='classes') loadClasses(); if(panel==='eleves') loadEleves(); if(panel==='profs'){ loadProfs(); loadClassCheckboxes(); } if(panel==='bulletins') loadClasseForBulletin(); if(panel==='documents') loadDemandes(); if(panel==='presences'){ loadClassesListPresence(); document.getElementById('presenceDate').valueAsDate=new Date(); } }
+    // classes
+    async function addClass(){ let name=document.getElementById('className').value; if(!name) return; await db.collection('classes').add({name}); document.getElementById('className').value=''; loadClasses(); updateAllClassSelectors(); }
+    async function loadClasses(){ let snap=await db.collection('classes').get(); let tbody=document.querySelector('#classesTable tbody'); tbody.innerHTML=''; snap.forEach(d=>{let row=tbody.insertRow(); row.insertCell(0).innerText=d.data().name; let btn=document.createElement('button'); btn.innerText='Supprimer'; btn.className='secondary-btn'; btn.style.background='#fee2e2'; btn.onclick=async()=>{await db.collection('classes').doc(d.id).delete(); loadClasses(); updateAllClassSelectors();}; row.insertCell(1).appendChild(btn);});}
+    async function updateAllClassSelectors(){ let snap=await db.collection('classes').get(); let classes=[]; snap.forEach(d=>classes.push(d.data().name)); let eleveClasse=document.getElementById('classeEleve'); let presenceClasse=document.getElementById('presenceClasse'); let bulletinClasse=document.getElementById('bulletinClasseSelect'); if(eleveClasse) eleveClasse.innerHTML='<option value="">Choisir</option>'+classes.map(c=>`<option value="${c}">${c}</option>`).join(''); if(presenceClasse) presenceClasse.innerHTML='<option value="">Choisir</option>'+classes.map(c=>`<option value="${c}">${c}</option>`).join(''); if(bulletinClasse) bulletinClasse.innerHTML='<option value="">Choisir</option>'+classes.map(c=>`<option value="${c}">${c}</option>`).join(''); loadClassCheckboxes(); }
+    async function loadClassCheckboxes(){ let snap=await db.collection('classes').get(); let container=document.getElementById('profClassesContainer'); if(!container) return; container.innerHTML=''; snap.forEach(d=>{ let label=document.createElement('label'); let cb=document.createElement('input'); cb.type='checkbox'; cb.value=d.data().name; label.appendChild(cb); label.appendChild(document.createTextNode(' '+d.data().name)); container.appendChild(label); }); }
+    // élèves
+    async function addEleve(){ let data={matricule:document.getElementById('matricule').value,nom:document.getElementById('nomEleve').value,dateNaissance:document.getElementById('dateNaissance').value,telephone:document.getElementById('telephone').value,email:document.getElementById('emailEleve').value,classe:document.getElementById('classeEleve').value,photoUrl:document.getElementById('photoUrl').value||'https://via.placeholder.com/100'}; if(!data.matricule||!data.nom) return; await db.collection('eleves').doc(data.matricule).set(data); loadEleves();}
+    async function loadEleves(){ let snap=await db.collection('eleves').get(); let tbody=document.querySelector('#elevesTable tbody'); tbody.innerHTML=''; snap.forEach(d=>{ let e=d.data(); let row=tbody.insertRow(); row.insertCell(0).innerText=e.matricule; row.insertCell(1).innerText=e.nom; row.insertCell(2).innerText=e.classe; let btn=document.createElement('button'); btn.innerText='Supprimer'; btn.onclick=async()=>{await db.collection('eleves').doc(d.id).delete(); loadEleves();}; row.insertCell(3).appendChild(btn);});}
+    // professeurs (modifiable + multi-check)
+    async function addOrUpdateProfesseur(){ let id=document.getElementById('profId').value; let password=document.getElementById('profPassword').value; let nom=document.getElementById('profNom').value; let matiere=document.getElementById('profMatiere').value; let checkboxes=document.querySelectorAll('#profClassesContainer input'); let classesSelected=Array.from(checkboxes).filter(cb=>cb.checked).map(cb=>cb.value); if(!id||!nom) return alert('ID et nom requis'); let data={identifiant:id,password:password||'default123',nom:nom,matiere:matiere,classes:classesSelected}; await db.collection('professeurs').doc(id).set(data); currentEditProfId=null; document.getElementById('profId').value=''; document.getElementById('profPassword').value=''; document.getElementById('profNom').value=''; document.getElementById('profMatiere').value=''; document.querySelectorAll('#profClassesContainer input').forEach(cb=>cb.checked=false); loadProfs(); }
+    async function loadProfs(){ let snap=await db.collection('professeurs').get(); let tbody=document.querySelector('#profsTable tbody'); tbody.innerHTML=''; snap.forEach(d=>{ let p=d.data(); let row=tbody.insertRow(); row.insertCell(0).innerText=p.identifiant; row.insertCell(1).innerText=p.nom; row.insertCell(2).innerText=p.matiere; row.insertCell(3).innerText=p.classes.join(', '); let modBtn=document.createElement('button'); modBtn.innerText='Modifier'; modBtn.className='secondary-btn'; modBtn.style.marginRight='8px'; modBtn.onclick=()=>{ currentEditProfId=p.identifiant; document.getElementById('profId').value=p.identifiant; document.getElementById('profPassword').value=p.password; document.getElementById('profNom').value=p.nom; document.getElementById('profMatiere').value=p.matiere; let checkboxes=document.querySelectorAll('#profClassesContainer input'); checkboxes.forEach(cb=>{cb.checked = p.classes.includes(cb.value);}); }; let delBtn=document.createElement('button'); delBtn.innerText='Supprimer'; delBtn.className='secondary-btn'; delBtn.style.background='#fee2e2'; delBtn.onclick=async()=>{await db.collection('professeurs').doc(p.identifiant).delete(); loadProfs();}; let cell=row.insertCell(4); cell.appendChild(modBtn); cell.appendChild(delBtn);});}
+    // BULLETIN : génération complète avec notes
+    async function genererTousLesBulletins(){ let classe=document.getElementById('bulletinClasseSelect').value; let semestre=document.getElementById('bulletinSemestreSelect').value; if(!classe) return alert('Sélectionnez une classe'); let elevesSnap=await db.collection('eleves').where('classe','==',classe).get(); let eleves=[]; elevesSnap.forEach(d=>eleves.push({id:d.id,...d.data()})); let container=document.getElementById('bulletinsListGlobal'); container.innerHTML=''; for(let eleve of eleves){ let notesSnap=await db.collection('notes').where('eleveId','==',eleve.matricule).get(); let notesMatieres=[]; notesSnap.forEach(doc=>{let n=doc.data(); if(n.semestre==semestre) notesMatieres.push(n);}); let html=genererHTMLBulletinIndividuel(eleve,notesMatieres,semestre,classe); let bulletinDiv=document.createElement('div'); bulletinDiv.className='bulletin-card'; bulletinDiv.innerHTML=html; container.appendChild(bulletinDiv); } }
+    function genererHTMLBulletinIndividuel(eleve,notes,semestre,classe){ let moyenneGenerale=0; let total=0; let rows=''; notes.forEach(n=>{let noteFinal=n.noteSemestrielle||((n.cc1+n.cc2)/2+n.compo)/2||0; moyenneGenerale+=noteFinal; total++; rows+=`<tr><td style="border-bottom:1px solid #e2e8f0;padding:8px">${n.matiere}</td><td style="border-bottom:1px solid #e2e8f0">${n.cc1||'-'}</td><td>${n.cc2||'-'}</td><td>${n.compo||'-'}</td><td style="font-weight:bold">${noteFinal.toFixed(2)}</td></tr>`;}); let moyenne=total? (moyenneGenerale/total).toFixed(2):'Non évalué'; return `<div class="bulletin-header"><div><strong>GROUPE SCOLAIRE SALDIA</strong><br>Bulletin semestre ${semestre}</div><div>Date: ${new Date().toLocaleDateString()}</div></div><div class="bulletin-body"><div style="display:flex;justify-content:space-between"><div><strong>Élève :</strong> ${eleve.nom} (${eleve.matricule})</div><div><strong>Classe :</strong> ${classe}</div></div><div style="margin:20px 0"><table style="width:100%;border-collapse:collapse"><thead><tr><th>Matière</th><th>CC1</th><th>CC2</th><th>Composition</th><th>Note</th></tr></thead><tbody>${rows||'<tr><td colspan="5">Aucune note renseignée</td></tr>'}</tbody></table></div><div style="background:#f1f5f9;border-radius:16px;padding:10px;text-align:center"><strong>Moyenne Semestrielle : ${moyenne}/20</strong></div><div><em>Appréciations :</em> ${notes[0]?.appreciation||'Félicitations pour votre travail'}</div></div><div class="bulletin-actions"><button class="btn-icon" onclick="imprimerBulletinUnique(this)"><i class="fas fa-print"></i> Imprimer</button><button class="btn-icon" onclick="telechargerBulletinUnique(this)"><i class="fas fa-download"></i> PDF</button></div>`; }
+    // Impression globale
+    function imprimerTousLesBulletins(){ window.print(); }
+    async function telechargerTousLesPDF(){ let zip=new JSZip(); let bulletins=document.querySelectorAll('.bulletin-card'); for(let i=0;i<bulletins.length;i++){ let clone=bulletins[i].cloneNode(true); let actions=clone.querySelectorAll('.bulletin-actions'); actions.forEach(a=>a.remove()); let htmlContent=`<html><head><style>body{font-family:sans-serif;padding:20px} .bulletin-card{page-break-after:always;border:1px solid #ddd;margin:0}</style></head><body>${clone.outerHTML}</body></html>`; let {jsPDF}=window.jspdf; let doc=new jsPDF(); doc.html(htmlContent,{callback:function(doc){ let pdfBlob=doc.output('blob'); zip.file(`bulletin_${i+1}.pdf`,pdfBlob); if(i===bulletins.length-1) zip.generateAsync({type:"blob"}).then(function(content){ let link=document.createElement('a'); link.href=URL.createObjectURL(content); link.download="bulletins_tous.zip"; link.click(); });}});} }
+    window.imprimerBulletinUnique=(btn)=>{ let card=btn.closest('.bulletin-card'); let clone=card.cloneNode(true); clone.querySelectorAll('.bulletin-actions').forEach(el=>el.remove()); let printWindow=window.open('','_blank'); printWindow.document.write(`<html><head><title>Bulletin</title><style>body{font-family:sans-serif;margin:20px;}</style></head><body>${clone.outerHTML}</body></html>`); printWindow.document.close(); printWindow.print(); };
+    window.telechargerBulletinUnique=async(btn)=>{ let card=btn.closest('.bulletin-card'); let clone=card.cloneNode(true); clone.querySelectorAll('.bulletin-actions').forEach(el=>el.remove()); let html=`<html><head><style>body{font-family:sans-serif}</style></head><body>${clone.outerHTML}</body></html>`; let {jsPDF}=window.jspdf; let doc=new jsPDF(); doc.html(html,{callback:function(doc){doc.save('bulletin.pdf');}}); };
+    // autres utilitaires
+    async function loadClasseForBulletin(){ let snap=await db.collection('classes').get(); let select=document.getElementById('bulletinClasseSelect'); select.innerHTML='<option value="">Choisir</option>'; snap.forEach(d=>{select.innerHTML+=`<option value="${d.data().name}">${d.data().name}</option>`;});}
+    async function loadClassesListPresence(){ let snap=await db.collection('classes').get(); let select=document.getElementById('presenceClasse'); select.innerHTML=''; snap.forEach(d=>{select.innerHTML+=`<option value="${d.data().name}">${d.data().name}</option>`;});}
+    async function loadPresences(){ let classe=document.getElementById('presenceClasse').value; let date=document.getElementById('presenceDate').value; if(!classe||!date) return; let eleves=await db.collection('eleves').where('classe','==',classe).get(); let tbody=document.querySelector('#presencesTable tbody'); tbody.innerHTML=''; for(let doc of eleves.docs){ let eleve=doc.data(); let presenceId=`${eleve.matricule}_${date}`; let pDoc=await db.collection('presences').doc(presenceId).get(); let statut=pDoc.exists?pDoc.data().statut:'Présent'; let row=tbody.insertRow(); row.insertCell(0).innerText=eleve.nom; let sel=document.createElement('select'); sel.innerHTML='<option>Présent</option><option>Absent</option><option>Retard</option>'; sel.value=statut; let btn=document.createElement('button'); btn.innerText='Enregistrer'; btn.className='primary-btn'; btn.style.padding='0.3rem 0.8rem'; btn.onclick=async()=>{await db.collection('presences').doc(presenceId).set({matricule:eleve.matricule,nom:eleve.nom,classe,date,statut:sel.value}); loadPresences();}; let cellStatut=row.insertCell(1); let cellAction=row.insertCell(2); cellStatut.appendChild(sel); cellAction.appendChild(btn);} }
+    async function loadDemandes(){ let snap=await db.collection('demandes').orderBy('date','desc').get(); let tbody=document.querySelector('#demandesTable tbody'); tbody.innerHTML=''; snap.forEach(d=>{let req=d.data(); let row=tbody.insertRow(); row.insertCell(0).innerText=req.nomComplet; row.insertCell(1).innerText=req.typeDocument; row.insertCell(2).innerText=new Date(req.date).toLocaleDateString(); row.insertCell(3).innerText=req.statut; let btn=document.createElement('button'); btn.innerText='Traiter'; btn.onclick=async()=>{await db.collection('demandes').doc(d.id).update({statut:'Traité'}); loadDemandes();}; row.insertCell(4).appendChild(btn);});}
+    // initialisation
+    updateAllClassSelectors(); loadClasses(); loadEleves(); loadProfs(); loadDemandes();
+</script>
 </body>
 </html>
