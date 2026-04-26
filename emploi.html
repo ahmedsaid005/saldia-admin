@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emploi du temps</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            min-height: 100vh;
+            font-size: 14px;
+            color: #1a1a2e;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 20px 20px;
+        }
+        .date-selector {
+            margin-bottom: 10px;
+        }
+        .date-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #e8ecef;
+        }
+        .date-arrow {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #2c3e50;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 50%;
+        }
+        .date-arrow:hover { background: #f0f4f8; }
+        .current-date { font-size: 16px; font-weight: 600; color: #1a3a3a; }
+        .week-info { text-align: center; font-size: 12px; color: #8a9aa8; margin-top: 8px; }
+        .timeline { padding: 10px 0; max-height: calc(100vh - 180px); overflow-y: auto; }
+        .course-item { display: flex; margin-bottom: 28px; }
+        .course-time { width: 70px; font-size: 13px; font-weight: 500; color: #6c7a89; flex-shrink: 0; }
+        .course-indicator { width: 4px; border-radius: 4px; margin-right: 15px; flex-shrink: 0; }
+        .course-content { flex: 1; }
+        .course-title { font-size: 16px; font-weight: 700; color: #1a1a2e; text-transform: uppercase; margin-bottom: 6px; }
+        .course-teacher { font-size: 13px; color: #4a5568; margin-bottom: 4px; }
+        .course-room { font-size: 12px; color: #8a9aa8; }
+        .lunch-item { display: flex; margin-bottom: 28px; }
+        .lunch-time { width: 70px; font-size: 13px; font-weight: 500; color: #6c7a89; flex-shrink: 0; }
+        .lunch-indicator { width: 4px; background: #e2e8f0; border-radius: 4px; margin-right: 15px; flex-shrink: 0; }
+        .lunch-content { flex: 1; display: flex; align-items: center; gap: 12px; color: #8a9aa8; }
+        .no-connection { text-align: center; padding: 60px 20px; color: #8a9aa8; }
+        .no-connection i { font-size: 48px; margin-bottom: 16px; }
+        .no-connection a { display: inline-block; margin-top: 16px; background: #1a4d3e; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; }
+        
+        .color-francais { background: #3b82f6; }
+        .color-histoire { background: #06b6d4; }
+        .color-maths { background: #f97316; }
+        .color-svt { background: #1e293b; }
+        .color-anglais { background: #eab308; }
+        .color-physique { background: #8b5cf6; }
+        .color-eps { background: #10b981; }
+        .color-philo { background: #ec489a; }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 12px 12px 12px; }
+            .course-time { width: 55px; font-size: 12px; }
+            .course-title { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="content">
+            <div class="no-connection">
+                <i class="fas fa-spinner fa-pulse"></i>
+                <p>Chargement...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg",
+            authDomain: "teste-saldia.firebaseapp.com",
+            projectId: "teste-saldia",
+            storageBucket: "teste-saldia.firebasestorage.app",
+            messagingSenderId: "620601259237",
+            appId: "1:620601259237:web:57795c7a64082399d0d00c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentEleve = null;
+        let currentWeekOffset = 0;
+
+        const sampleTimetable = {
+            monday: [
+                { time: '8h00', subject: 'FRANÇAIS', teacher: 'Mme. Diallo', room: '105', color: 'color-francais' },
+                { time: '10h00', subject: 'HISTOIRE-GÉO', teacher: 'M. Kouadio', room: '203', color: 'color-histoire' },
+                { time: '12h00', isLunch: true },
+                { time: '13h30', subject: 'MATHÉMATIQUES', teacher: 'Mme. Bamba', room: '206', color: 'color-maths' },
+                { time: '15h30', subject: 'ANGLAIS', teacher: 'M. Smith', room: '101', color: 'color-anglais' }
+            ],
+            tuesday: [
+                { time: '8h00', subject: 'SVT', teacher: 'M. Koné', room: '304', color: 'color-svt' },
+                { time: '10h00', subject: 'MATHÉMATIQUES', teacher: 'Mme. Bamba', room: '206', color: 'color-maths' },
+                { time: '12h00', isLunch: true },
+                { time: '13h30', subject: 'PHYSIQUE-CHIMIE', teacher: 'M. Touré', room: 'Labo 1', color: 'color-physique' }
+            ],
+            wednesday: [
+                { time: '8h00', subject: 'ANGLAIS', teacher: 'M. Smith', room: '101', color: 'color-anglais' },
+                { time: '10h00', subject: 'FRANÇAIS', teacher: 'Mme. Diallo', room: '105', color: 'color-francais' },
+                { time: '12h00', isLunch: true },
+                { time: '13h30', subject: 'HISTOIRE-GÉO', teacher: 'M. Kouadio', room: '203', color: 'color-histoire' },
+                { time: '15h30', subject: 'EPS', teacher: 'M. Yao', room: 'Gymnase', color: 'color-eps' }
+            ],
+            thursday: [
+                { time: '8h00', subject: 'MATHÉMATIQUES', teacher: 'Mme. Bamba', room: '206', color: 'color-maths' },
+                { time: '10h00', subject: 'SVT', teacher: 'M. Koné', room: '304', color: 'color-svt' },
+                { time: '12h00', isLunch: true },
+                { time: '13h30', subject: 'PHILOSOPHIE', teacher: 'M. N\'Guessan', room: '102', color: 'color-philo' }
+            ],
+            friday: [
+                { time: '8h00', subject: 'FRANÇAIS', teacher: 'Mme. Diallo', room: '105', color: 'color-francais' },
+                { time: '10h00', subject: 'ANGLAIS', teacher: 'M. Smith', room: '101', color: 'color-anglais' },
+                { time: '12h00', isLunch: true },
+                { time: '13h30', subject: 'PHYSIQUE-CHIMIE', teacher: 'M. Touré', room: 'Labo 1', color: 'color-physique' }
+            ]
+        };
+
+        function getEleveFromStorage() {
+            const parent = localStorage.getItem('parentConnected');
+            if (parent) {
+                try {
+                    currentEleve = JSON.parse(parent);
+                    return true;
+                } catch(e) { return false; }
+            }
+            return false;
+        }
+
+        function getWeekDates(offset) {
+            const today = new Date();
+            const currentDay = today.getDay();
+            const monday = new Date(today);
+            const diff = currentDay === 0 ? -6 : 1 - currentDay;
+            monday.setDate(today.getDate() + diff + (offset * 7));
+            const dates = [];
+            for (let i = 0; i < 5; i++) {
+                const date = new Date(monday);
+                date.setDate(monday.getDate() + i);
+                dates.push(date);
+            }
+            return dates;
+        }
+
+        function formatDateLabel(date) {
+            const days = ['lun.', 'mar.', 'mer.', 'jeu.', 'ven.'];
+            return `${days[date.getDay() === 0 ? 4 : date.getDay() - 1]} ${date.getDate()} ${getMonthName(date)}`;
+        }
+
+        function getMonthName(date) {
+            const months = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+            return months[date.getMonth()];
+        }
+
+        function getWeekNumber(date) {
+            const start = new Date(date.getFullYear(), 0, 1);
+            const diff = Math.floor((date - start) / (24 * 60 * 60 * 1000));
+            return Math.ceil((diff + start.getDay() + 1) / 7);
+        }
+
+        function updateDateDisplay() {
+            const dates = getWeekDates(currentWeekOffset);
+            if (dates.length > 0) {
+                const firstDate = dates[0];
+                const lastDate = dates[4];
+                document.getElementById('currentDateLabel').innerHTML = `${formatDateLabel(firstDate)} - ${formatDateLabel(lastDate)}`;
+                const weekNum = getWeekNumber(firstDate);
+                document.getElementById('weekInfo').innerHTML = `Semaine Q${weekNum}`;
+            }
+        }
+
+        function changeWeek(delta) {
+            currentWeekOffset += delta;
+            updateDateDisplay();
+            loadTimetable();
+        }
+
+        function loadTimetable() {
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+            const dayNames = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI'];
+            const dates = getWeekDates(currentWeekOffset);
+            
+            let html = '';
+            for (let i = 0; i < days.length; i++) {
+                const dayData = sampleTimetable[days[i]] || [];
+                const dateStr = dates[i] ? `${formatDateLabel(dates[i])}` : '';
+                
+                html += `<div style="margin-bottom: 24px;">
+                            <div style="display: flex; align-items: baseline; margin-bottom: 12px;">
+                                <h3 style="font-size: 16px; font-weight: 700; color: #1a4d3e;">${dayNames[i]}</h3>
+                                <span style="margin-left: 12px; font-size: 12px; color: #8a9aa8;">${dateStr}</span>
+                            </div>`;
+                
+                for (const course of dayData) {
+                    if (course.isLunch) {
+                        html += `<div class="lunch-item">
+                                    <div class="lunch-time">${course.time}</div>
+                                    <div class="lunch-indicator"></div>
+                                    <div class="lunch-content">
+                                        <i class="fas fa-utensils"></i>
+                                        <span>Pause déjeuner</span>
+                                    </div>
+                                </div>`;
+                    } else {
+                        html += `<div class="course-item">
+                                    <div class="course-time">${course.time}</div>
+                                    <div class="course-indicator ${course.color}"></div>
+                                    <div class="course-content">
+                                        <div class="course-title">${course.subject}</div>
+                                        <div class="course-teacher"><i class="fas fa-chalkboard-user"></i> ${course.teacher}</div>
+                                        <div class="course-room"><i class="fas fa-door-open"></i> Salle ${course.room}</div>
+                                    </div>
+                                </div>`;
+                    }
+                }
+                html += `</div>`;
+            }
+            document.getElementById('timelineContainer').innerHTML = html || '<p style="text-align:center;padding:40px;">Aucun cours pour cette semaine</p>';
+        }
+
+        function initTimetable() {
+            const container = document.getElementById('content');
+            if (!getEleveFromStorage()) {
+                container.innerHTML = `
+                    <div class="no-connection">
+                        <i class="fas fa-lock"></i>
+                        <p>Veuillez vous connecter pour voir votre emploi du temps</p>
+                        <a href="connexion.html">Se connecter</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="date-selector">
+                    <div class="date-nav">
+                        <button class="date-arrow" onclick="changeWeek(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <span class="current-date" id="currentDateLabel">lun. 19 sept.</span>
+                        <button class="date-arrow" onclick="changeWeek(1)"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="week-info" id="weekInfo">Semaine Q2</div>
+                </div>
+                <div class="timeline" id="timelineContainer"></div>
+            `;
+            updateDateDisplay();
+            loadTimetable();
+        }
+
+        initTimetable();
+        window.changeWeek = changeWeek;
+    </script>
+</body>
+</html>
