@@ -2,274 +2,890 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emploi du temps</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Gestion emplois du temps - GROUPE SCOLAIRE SALDIA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: white;
+            font-family: 'Montserrat', 'Segoe UI', Roboto, sans-serif;
+            background: #f0f4f8;
             min-height: 100vh;
-            font-size: 14px;
-            color: #1a1a2e;
         }
+
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 20px 20px 20px;
+            padding: 20px;
         }
-        .date-selector {
-            margin-bottom: 10px;
-        }
-        .date-nav {
+
+        /* Header commun */
+        .header {
+            background: #1e3d3a;
+            border-radius: 0 0 30px 30px;
+            padding: 25px 24px;
+            margin-bottom: 30px;
+            color: white;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            background: white;
-            padding: 12px 20px;
-            border-radius: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border: 1px solid #e8ecef;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        .date-arrow {
-            background: none;
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .header h1 small {
+            font-size: 13px;
+            opacity: 0.85;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
             border: none;
-            font-size: 20px;
-            color: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
             cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 50%;
+            font-size: 14px;
+            transition: all 0.2s;
         }
-        .date-arrow:hover { background: #f0f4f8; }
-        .current-date { font-size: 16px; font-weight: 600; color: #1a3a3a; }
-        .week-info { text-align: center; font-size: 12px; color: #8a9aa8; margin-top: 8px; }
-        .timeline { padding: 10px 0; max-height: calc(100vh - 180px); overflow-y: auto; }
-        .course-item { display: flex; margin-bottom: 28px; }
-        .course-time { width: 70px; font-size: 13px; font-weight: 500; color: #6c7a89; flex-shrink: 0; }
-        .course-indicator { width: 4px; border-radius: 4px; margin-right: 15px; flex-shrink: 0; }
-        .course-content { flex: 1; }
-        .course-title { font-size: 16px; font-weight: 700; color: #1a1a2e; text-transform: uppercase; margin-bottom: 6px; }
-        .course-teacher { font-size: 13px; color: #4a5568; margin-bottom: 4px; }
-        .course-room { font-size: 12px; color: #8a9aa8; }
-        .lunch-item { display: flex; margin-bottom: 28px; }
-        .lunch-time { width: 70px; font-size: 13px; font-weight: 500; color: #6c7a89; flex-shrink: 0; }
-        .lunch-indicator { width: 4px; background: #e2e8f0; border-radius: 4px; margin-right: 15px; flex-shrink: 0; }
-        .lunch-content { flex: 1; display: flex; align-items: center; gap: 12px; color: #8a9aa8; }
-        .no-connection { text-align: center; padding: 60px 20px; color: #8a9aa8; }
-        .no-connection i { font-size: 48px; margin-bottom: 16px; }
-        .no-connection a { display: inline-block; margin-top: 16px; background: #1a4d3e; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; }
-        
-        .color-francais { background: #3b82f6; }
-        .color-histoire { background: #06b6d4; }
-        .color-maths { background: #f97316; }
-        .color-svt { background: #1e293b; }
-        .color-anglais { background: #eab308; }
-        .color-physique { background: #8b5cf6; }
-        .color-eps { background: #10b981; }
-        .color-philo { background: #ec489a; }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Section Classes (vue liste) */
+        .section {
+            display: block;
+        }
+
+        .section-hidden {
+            display: none;
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 15px;
+            font-family: inherit;
+            min-width: 180px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1e3d3a;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #1e3d3a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #16312e;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #1e3d3a;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .class-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .class-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .class-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e3d3a;
+            margin-bottom: 12px;
+        }
+
+        .class-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .class-actions button {
+            flex: 1;
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        .add-class-btn {
+            background: #1e3d3a;
+            color: white;
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 28px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #1e3d3a;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        /* Tableau emploi du temps */
+        .timetable-container {
+            background: white;
+            border-radius: 24px;
+            overflow-x: auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-top: 20px;
+        }
+
+        .timetable-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .timetable-table th,
+        .timetable-table td {
+            border: 1px solid #e2e8f0;
+            padding: 12px 10px;
+            vertical-align: top;
+        }
+
+        .timetable-table th {
+            background: #1e3d3a;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .time-col {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #1e3d3a;
+            width: 100px;
+            text-align: center;
+        }
+
+        .special-time {
+            background: #fef3c7;
+        }
+
+        .course-cell {
+            min-width: 170px;
+        }
+
+        .course-input, .teacher-input, .room-input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 6px;
+            font-family: inherit;
+        }
+
+        .course-input:focus, .teacher-input:focus, .room-input:focus {
+            outline: none;
+            border-color: #1e3d3a;
+        }
+
+        .empty-course {
+            color: #94a3b8;
+            text-align: center;
+            font-size: 12px;
+            padding: 15px 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .save-status {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 40px;
+            font-size: 13px;
+        }
+
+        .status-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .legend {
+            background: white;
+            border-radius: 16px;
+            padding: 15px 20px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8a9aa8;
+        }
+
+        h2 {
+            color: #1e3d3a;
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+
+        .class-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
 
         @media (max-width: 768px) {
-            .container { padding: 0 12px 12px 12px; }
-            .course-time { width: 55px; font-size: 12px; }
-            .course-title { font-size: 14px; }
+            .container {
+                padding: 12px;
+            }
+            .timetable-table th,
+            .timetable-table td {
+                padding: 8px 6px;
+            }
+        }
+              .teacher-select {
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 6px 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            width: 100%;
+            font-family: inherit;
+        }
+        
+        .teacher-select:focus {
+            outline: none;
+            border-color: #1e3d3a;
+        }
+        
+        .course-input[readonly] {
+            background: #f0f4f8;
+            cursor: default;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="content">
-            <div class="no-connection">
-                <i class="fas fa-spinner fa-pulse"></i>
-                <p>Chargement...</p>
+<div class="container">
+    <!-- Header commun -->
+    <div class="header">
+        <h1>
+            <i class="fas fa-calendar-alt"></i> GROUPE SCOLAIRE SALDIA
+            <small>Gestion des emplois du temps par classe</small>
+        </h1>
+        <button class="back-btn" id="backToClassesBtn" style="display: none;" onclick="showClassesList()">
+            <i class="fas fa-arrow-left"></i> Retour aux classes
+        </button>
+    </div>
+
+    <!-- SECTION 1 : LISTE DES CLASSES -->
+    <div id="classesSection" class="section">
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="Rechercher une classe... (ex: 3eme, 4eme)">
+                <button class="btn btn-primary" onclick="searchClass()"><i class="fas fa-search"></i> Rechercher</button>
+                <button class="btn btn-secondary" onclick="resetSearch()"><i class="fas fa-redo"></i> Tout voir</button>
             </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2><i class="fas fa-school"></i> Liste des classes</h2>
+            <button class="btn btn-primary" onclick="openAddClassModal()"><i class="fas fa-plus"></i> Nouvelle classe</button>
+        </div>
+
+        <div id="classesContainer" class="classes-grid">
+            <div class="loading"><i class="fas fa-spinner fa-pulse"></i> Chargement...</div>
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg",
-            authDomain: "teste-saldia.firebaseapp.com",
-            projectId: "teste-saldia",
-            storageBucket: "teste-saldia.firebasestorage.app",
-            messagingSenderId: "620601259237",
-            appId: "1:620601259237:web:57795c7a64082399d0d00c"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+    <!-- SECTION 2 : EDITEUR EMPLOI DU TEMPS (cachée au départ) -->
+    <div id="timetableSection" class="section-hidden">
+        <div class="class-header">
+            <h2><i class="fas fa-edit"></i> Emploi du temps : <span id="currentClassName">---</span></h2>
+            <button class="btn btn-warning" onclick="showClassesList()">
+                <i class="fas fa-list"></i> Changer de classe
+            </button>
+        </div>
 
-        let currentEleve = null;
-        let currentWeekOffset = 0;
+        <div class="timetable-container">
+            <table class="timetable-table" id="timetableTable">
+                <thead>
+                    <tr>
+                        <th>Horaire</th>
+                        <th>LUNDI</th>
+                        <th>MARDI</th>
+                        <th>MERCREDI</th>
+                        <th>JEUDI</th>
+                        <th>VENDREDI</th>
+                    </tr>
+                </thead>
+                <tbody id="timetableBody"></tbody>
+            </table>
+        </div>
 
-        const sampleTimetable = {
-            monday: [
-                { time: '8h00', subject: 'FRANÇAIS', teacher: 'Mme. Diallo', room: '105', color: 'color-francais' },
-                { time: '10h00', subject: 'HISTOIRE-GÉO', teacher: 'M. Kouadio', room: '203', color: 'color-histoire' },
-                { time: '12h00', isLunch: true },
-                { time: '13h30', subject: 'MATHÉMATIQUES', teacher: 'Mme. Bamba', room: '206', color: 'color-maths' },
-                { time: '15h30', subject: 'ANGLAIS', teacher: 'M. Smith', room: '101', color: 'color-anglais' }
-            ],
-            tuesday: [
-                { time: '8h00', subject: 'SVT', teacher: 'M. Koné', room: '304', color: 'color-svt' },
-                { time: '10h00', subject: 'MATHÉMATIQUES', teacher: 'Mme. Bamba', room: '206', color: 'color-maths' },
-                { time: '12h00', isLunch: true },
-                { time: '13h30', subject: 'PHYSIQUE-CHIMIE', teacher: 'M. Touré', room: 'Labo 1', color: 'color-physique' }
-            ],
-            wednesday: [
-                { time: '8h00', subject: 'ANGLAIS', teacher: 'M. Smith', room: '101', color: 'color-anglais' },
-                { time: '10h00', subject: 'FRANÇAIS', teacher: 'Mme. Diallo', room: '105', color: 'color-francais' },
-                { time: '12h00', isLunch: true },
-                { time: '13h30', subject: 'HISTOIRE-GÉO', teacher: 'M. Kouadio', room: '203', color: 'color-histoire' },
-                { time: '15h30', subject: 'EPS', teacher: 'M. Yao', room: 'Gymnase', color: 'color-eps' }
-            ],
-            thursday: [
-                { time: '8h00', subject: 'MATHÉMATIQUES', teacher: 'Mme. Bamba', room: '206', color: 'color-maths' },
-                { time: '10h00', subject: 'SVT', teacher: 'M. Koné', room: '304', color: 'color-svt' },
-                { time: '12h00', isLunch: true },
-                { time: '13h30', subject: 'PHILOSOPHIE', teacher: 'M. N\'Guessan', room: '102', color: 'color-philo' }
-            ],
-            friday: [
-                { time: '8h00', subject: 'FRANÇAIS', teacher: 'Mme. Diallo', room: '105', color: 'color-francais' },
-                { time: '10h00', subject: 'ANGLAIS', teacher: 'M. Smith', room: '101', color: 'color-anglais' },
-                { time: '12h00', isLunch: true },
-                { time: '13h30', subject: 'PHYSIQUE-CHIMIE', teacher: 'M. Touré', room: 'Labo 1', color: 'color-physique' }
-            ]
-        };
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="saveTimetable()">
+                <i class="fas fa-save"></i> Enregistrer l'emploi du temps
+            </button>
+            <button class="btn btn-danger" onclick="deleteAllCourses()">
+                <i class="fas fa-trash-alt"></i> Tout effacer
+            </button>
+        </div>
+        <div id="saveStatus" class="save-status"></div>
 
-        function getEleveFromStorage() {
-            const parent = localStorage.getItem('parentConnected');
-            if (parent) {
-                try {
-                    currentEleve = JSON.parse(parent);
-                    return true;
-                } catch(e) { return false; }
-            }
-            return false;
+        <div class="legend">
+            <i class="fas fa-info-circle"></i>
+            <strong>Légende horaires :</strong>
+            8h-9h | 9h-10h | 10h-10h50 | 🎉 10h50-11h05 (Récréation) | 11h05-12h05 | 12h05-13h05 |
+            🍽️ 13h05-13h35 (Pause déjeuner) | 13h35-14h35 | 14h35-15h35 | 15h35-16h35 | 16h35-17h35
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ajouter/Modifier classe -->
+<div id="classModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Ajouter une classe</h3>
+        <input type="text" id="className" placeholder="Nom de la classe (ex: 3eme A, Terminale C)">
+        <input type="hidden" id="classId">
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeClassModal()">Annuler</button>
+            <button class="btn btn-primary" onclick="saveClass()">Enregistrer</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+    // ==================== FIREBASE ====================
+    const firebaseConfig = {
+        apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg",
+        authDomain: "teste-saldia.firebaseapp.com",
+        projectId: "teste-saldia",
+        storageBucket: "teste-saldia.firebasestorage.app",
+        messagingSenderId: "620601259237",
+        appId: "1:620601259237:web:57795c7a64082399d0d00c"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // ==================== VARIABLES GLOBALES ====================
+    let allClasses = [];
+    let currentClassId = null;
+    let currentClassName = null;
+    let timetableData = {};
+      let allTeachers = [];
+
+    // Horaires (avec créneaux fixes)
+    const timeSlots = [
+        { time: "8h00 - 9h00", key: "h8", type: "course" },
+        { time: "9h00 - 10h00", key: "h9", type: "course" },
+        { time: "10h00 - 10h50", key: "h10", type: "course" },
+        { time: "10h50 - 11h05", key: "recreation", type: "break", label: "🎉 RÉCRÉATION" },
+        { time: "11h05 - 12h05", key: "h11", type: "course" },
+        { time: "12h05 - 13h05", key: "h12", type: "course" },
+        { time: "13h05 - 13h35", key: "dejeuner", type: "break", label: "🍽️ PAUSE DÉJEUNER" },
+        { time: "13h35 - 14h35", key: "h13", type: "course" },
+        { time: "14h35 - 15h35", key: "h14", type: "course" },
+        { time: "15h35 - 16h35", key: "h15", type: "course" },
+        { time: "16h35 - 17h35", key: "h16", type: "course" }
+    ];
+
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+    const dayNames = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI'];
+
+    // ==================== GESTION DES VUES ====================
+    function showClassesList() {
+        document.getElementById('classesSection').classList.remove('section-hidden');
+        document.getElementById('classesSection').classList.add('section');
+        document.getElementById('timetableSection').classList.add('section-hidden');
+        document.getElementById('timetableSection').classList.remove('section');
+        document.getElementById('backToClassesBtn').style.display = 'none';
+        loadClasses();
+    }
+
+    function showTimetableEditor(classId, className) {
+        currentClassId = classId;
+        currentClassName = className;
+        document.getElementById('currentClassName').innerText = className;
+        document.getElementById('classesSection').classList.add('section-hidden');
+        document.getElementById('timetableSection').classList.remove('section-hidden');
+        document.getElementById('timetableSection').classList.add('section');
+        document.getElementById('backToClassesBtn').style.display = 'flex';
+        loadTimetableData();
+    }
+
+    // ==================== GESTION DES CLASSES ====================
+    function loadClasses() {
+        const container = document.getElementById('classesContainer');
+        container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-pulse"></i> Chargement...</div>';
+        
+        db.collection('classes').get().then(snapshot => {
+            allClasses = [];
+            snapshot.forEach(doc => {
+                allClasses.push({
+                    id: doc.id,
+                    name: doc.data().name || doc.id
+                });
+            });
+            displayClasses(allClasses);
+        }).catch(error => {
+            console.error('Erreur:', error);
+            container.innerHTML = '<div class="loading">❌ Erreur de chargement</div>';
+        });
+    }
+
+    function displayClasses(classes) {
+        const container = document.getElementById('classesContainer');
+        if (classes.length === 0) {
+            container.innerHTML = '<div class="loading"><i class="fas fa-folder-open"></i> Aucune classe trouvée</div>';
+            return;
         }
-
-        function getWeekDates(offset) {
-            const today = new Date();
-            const currentDay = today.getDay();
-            const monday = new Date(today);
-            const diff = currentDay === 0 ? -6 : 1 - currentDay;
-            monday.setDate(today.getDate() + diff + (offset * 7));
-            const dates = [];
-            for (let i = 0; i < 5; i++) {
-                const date = new Date(monday);
-                date.setDate(monday.getDate() + i);
-                dates.push(date);
-            }
-            return dates;
-        }
-
-        function formatDateLabel(date) {
-            const days = ['lun.', 'mar.', 'mer.', 'jeu.', 'ven.'];
-            return `${days[date.getDay() === 0 ? 4 : date.getDay() - 1]} ${date.getDate()} ${getMonthName(date)}`;
-        }
-
-        function getMonthName(date) {
-            const months = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
-            return months[date.getMonth()];
-        }
-
-        function getWeekNumber(date) {
-            const start = new Date(date.getFullYear(), 0, 1);
-            const diff = Math.floor((date - start) / (24 * 60 * 60 * 1000));
-            return Math.ceil((diff + start.getDay() + 1) / 7);
-        }
-
-        function updateDateDisplay() {
-            const dates = getWeekDates(currentWeekOffset);
-            if (dates.length > 0) {
-                const firstDate = dates[0];
-                const lastDate = dates[4];
-                document.getElementById('currentDateLabel').innerHTML = `${formatDateLabel(firstDate)} - ${formatDateLabel(lastDate)}`;
-                const weekNum = getWeekNumber(firstDate);
-                document.getElementById('weekInfo').innerHTML = `Semaine Q${weekNum}`;
-            }
-        }
-
-        function changeWeek(delta) {
-            currentWeekOffset += delta;
-            updateDateDisplay();
-            loadTimetable();
-        }
-
-        function loadTimetable() {
-            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-            const dayNames = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI'];
-            const dates = getWeekDates(currentWeekOffset);
-            
-            let html = '';
-            for (let i = 0; i < days.length; i++) {
-                const dayData = sampleTimetable[days[i]] || [];
-                const dateStr = dates[i] ? `${formatDateLabel(dates[i])}` : '';
-                
-                html += `<div style="margin-bottom: 24px;">
-                            <div style="display: flex; align-items: baseline; margin-bottom: 12px;">
-                                <h3 style="font-size: 16px; font-weight: 700; color: #1a4d3e;">${dayNames[i]}</h3>
-                                <span style="margin-left: 12px; font-size: 12px; color: #8a9aa8;">${dateStr}</span>
-                            </div>`;
-                
-                for (const course of dayData) {
-                    if (course.isLunch) {
-                        html += `<div class="lunch-item">
-                                    <div class="lunch-time">${course.time}</div>
-                                    <div class="lunch-indicator"></div>
-                                    <div class="lunch-content">
-                                        <i class="fas fa-utensils"></i>
-                                        <span>Pause déjeuner</span>
-                                    </div>
-                                </div>`;
-                    } else {
-                        html += `<div class="course-item">
-                                    <div class="course-time">${course.time}</div>
-                                    <div class="course-indicator ${course.color}"></div>
-                                    <div class="course-content">
-                                        <div class="course-title">${course.subject}</div>
-                                        <div class="course-teacher"><i class="fas fa-chalkboard-user"></i> ${course.teacher}</div>
-                                        <div class="course-room"><i class="fas fa-door-open"></i> Salle ${course.room}</div>
-                                    </div>
-                                </div>`;
-                    }
-                }
-                html += `</div>`;
-            }
-            document.getElementById('timelineContainer').innerHTML = html || '<p style="text-align:center;padding:40px;">Aucun cours pour cette semaine</p>';
-        }
-
-        function initTimetable() {
-            const container = document.getElementById('content');
-            if (!getEleveFromStorage()) {
-                container.innerHTML = `
-                    <div class="no-connection">
-                        <i class="fas fa-lock"></i>
-                        <p>Veuillez vous connecter pour voir votre emploi du temps</p>
-                        <a href="connexion.html">Se connecter</a>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = `
-                <div class="date-selector">
-                    <div class="date-nav">
-                        <button class="date-arrow" onclick="changeWeek(-1)"><i class="fas fa-chevron-left"></i></button>
-                        <span class="current-date" id="currentDateLabel">lun. 19 sept.</span>
-                        <button class="date-arrow" onclick="changeWeek(1)"><i class="fas fa-chevron-right"></i></button>
-                    </div>
-                    <div class="week-info" id="weekInfo">Semaine Q2</div>
+        
+        container.innerHTML = classes.map(c => `
+            <div class="class-card" onclick="showTimetableEditor('${c.id}', '${escapeHtml(c.name).replace(/'/g, "\\'")}')">
+                <div class="class-name"><i class="fas fa-chalkboard"></i> ${escapeHtml(c.name)}</div>
+                <div class="class-actions">
+                    <button class="btn btn-warning" onclick="event.stopPropagation(); editClass('${c.id}', '${escapeHtml(c.name).replace(/'/g, "\\'")}')">
+                        <i class="fas fa-edit"></i> Modifier
+                    </button>
+                    <button class="btn btn-danger" onclick="event.stopPropagation(); deleteClass('${c.id}')">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
                 </div>
-                <div class="timeline" id="timelineContainer"></div>
-            `;
-            updateDateDisplay();
-            loadTimetable();
+            </div>
+        `).join('');
+    }
+
+    function searchClass() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        if (!searchTerm) {
+            displayClasses(allClasses);
+            return;
+        }
+        const filtered = allClasses.filter(c => c.name.toLowerCase().includes(searchTerm));
+        displayClasses(filtered);
+    }
+
+    function resetSearch() {
+        document.getElementById('searchInput').value = '';
+        displayClasses(allClasses);
+    }
+
+    function openAddClassModal() {
+        document.getElementById('modalTitle').innerText = 'Ajouter une classe';
+        document.getElementById('className').value = '';
+        document.getElementById('classId').value = '';
+        document.getElementById('classModal').style.display = 'flex';
+    }
+
+    function editClass(id, name) {
+        document.getElementById('modalTitle').innerText = 'Modifier la classe';
+        document.getElementById('className').value = name;
+        document.getElementById('classId').value = id;
+        document.getElementById('classModal').style.display = 'flex';
+    }
+
+    function saveClass() {
+        const name = document.getElementById('className').value.trim();
+        const id = document.getElementById('classId').value;
+        
+        if (!name) {
+            alert('Veuillez entrer un nom de classe');
+            return;
+        }
+        
+        if (id) {
+            db.collection('classes').doc(id).update({ name: name }).then(() => {
+                closeClassModal();
+                loadClasses();
+            }).catch(error => {
+                alert('Erreur: ' + error.message);
+            });
+        } else {
+            db.collection('classes').add({ name: name }).then(() => {
+                closeClassModal();
+                loadClasses();
+            }).catch(error => {
+                alert('Erreur: ' + error.message);
+            });
+        }
+    }
+
+    function deleteClass(id) {
+        if (confirm('Voulez-vous vraiment supprimer cette classe ? Cela supprimera aussi son emploi du temps.')) {
+            db.collection('timetables').doc(id).delete().then(() => {
+                return db.collection('classes').doc(id).delete();
+            }).then(() => {
+                loadClasses();
+            }).catch(error => {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la suppression');
+            });
+        }
+    }
+
+    function closeClassModal() {
+        document.getElementById('classModal').style.display = 'none';
+    }
+
+    // ==================== GESTION EMPLOI DU TEMPS ====================
+     function loadTimetableData() {
+        if (!currentClassId) return;
+        
+        // Charger d'abord les professeurs
+        db.collection('professeurs').get().then(snapshot => {
+            allTeachers = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allTeachers.push({
+                    id: doc.id,
+                    nom: data.nom || 'Nom inconnu',
+                    matiere: data.matiere || 'Matière inconnue',
+                    password: data.password || ''
+                });
+            });
+            
+            // Puis charger l'emploi du temps
+            return db.collection('timetables').doc(currentClassId).get();
+        }).then(doc => {
+            if (doc.exists) {
+                timetableData = doc.data();
+            } else {
+                timetableData = {};
+            }
+            renderTimetable();
+        }).catch(error => {
+            console.error('Erreur:', error);
+            renderTimetable();
+        });
+    }
+
+     function renderTimetable() {
+        const tbody = document.getElementById('timetableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        for (let slotIndex = 0; slotIndex < timeSlots.length; slotIndex++) {
+            const slot = timeSlots[slotIndex];
+            const tr = document.createElement('tr');
+            
+            // Colonne horaire
+            const tdTime = document.createElement('td');
+            tdTime.className = 'time-col';
+            if (slot.type === 'break') {
+                tdTime.classList.add('special-time');
+            }
+            tdTime.innerHTML = `<strong>${slot.time}</strong>`;
+            tr.appendChild(tdTime);
+
+            // Pour chaque jour
+            for (let dayIndex = 0; dayIndex < days.length; dayIndex++) {
+                const day = days[dayIndex];
+                const td = document.createElement('td');
+                td.className = 'course-cell';
+                
+                if (slot.type === 'break') {
+                    td.innerHTML = `<div class="empty-course">${slot.label}</div>`;
+                    td.style.backgroundColor = '#fef9e3';
+                } else {
+                    const courseKey = `${day}_${slot.key}`;
+                    const course = timetableData[courseKey] || { subject: '', teacher: '', teacherId: '', room: '' };
+                    
+                    // Générer le HTML du select pour les professeurs
+                    let teacherOptions = '<option value="">-- Choisir un professeur --</option>';
+                    allTeachers.forEach(teacher => {
+                        const selected = (course.teacherId === teacher.id || course.teacher === teacher.nom) ? 'selected' : '';
+                        teacherOptions += `<option value="${teacher.id}" data-matiere="${escapeHtml(teacher.matiere)}" ${selected}>${escapeHtml(teacher.nom)} - ${escapeHtml(teacher.matiere)}</option>`;
+                    });
+                    
+                    td.innerHTML = `
+                        <select class="course-input teacher-select" id="${courseKey}_teacherId" data-day="${day}" data-slot="${slot.key}" style="margin-bottom: 6px;">
+                            ${teacherOptions}
+                        </select>
+                        <input type="text" class="course-input" placeholder="Matière (auto)" 
+                               id="${courseKey}_subject" value="${escapeHtml(course.subject || '')}" readonly style="background:#f0f4f8;">
+                        <input type="text" class="room-input" placeholder="Salle" 
+                               id="${courseKey}_room" value="${escapeHtml(course.room || '')}">
+                        <input type="hidden" id="${courseKey}_teacher" value="${escapeHtml(course.teacher || '')}">
+                    `;
+                }
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        }
+        
+        // Ajouter les événements pour les selects
+        document.querySelectorAll('.teacher-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const matiere = selectedOption.getAttribute('data-matiere') || '';
+                const teacherName = selectedOption.textContent.split(' - ')[0];
+                const teacherId = this.value;
+                
+                // Extraire l'ID du champ
+                const idParts = this.id.split('_');
+                const day = idParts[0];
+                const slotKey = idParts[1];
+                const subjectField = document.getElementById(`${day}_${slotKey}_subject`);
+                const teacherField = document.getElementById(`${day}_${slotKey}_teacher`);
+                
+                if (subjectField) {
+                    subjectField.value = matiere;
+                }
+                if (teacherField) {
+                    teacherField.value = teacherName;
+                }
+            });
+        });
+    }
+
+      function saveTimetable() {
+        const updatedData = {};
+        
+        for (let slot of timeSlots) {
+            if (slot.type === 'break') continue;
+            
+            for (let day of days) {
+                const courseKey = `${day}_${slot.key}`;
+                const teacherSelect = document.getElementById(`${courseKey}_teacherId`);
+                const subjectInput = document.getElementById(`${courseKey}_subject`);
+                const roomInput = document.getElementById(`${courseKey}_room`);
+                const teacherHidden = document.getElementById(`${courseKey}_teacher`);
+                
+                if (teacherSelect) {
+                    const selectedOption = teacherSelect.options[teacherSelect.selectedIndex];
+                    const teacherName = selectedOption.textContent.split(' - ')[0];
+                    const teacherId = teacherSelect.value;
+                    const matiere = selectedOption.getAttribute('data-matiere') || '';
+                    
+                    updatedData[courseKey] = {
+                        subject: matiere || (subjectInput ? subjectInput.value.trim() : ''),
+                        teacher: teacherName || (teacherHidden ? teacherHidden.value.trim() : ''),
+                        teacherId: teacherId,
+                        room: roomInput ? roomInput.value.trim() : ''
+                    };
+                } else if (subjectInput) {
+                    // Fallback au cas où
+                    updatedData[courseKey] = {
+                        subject: subjectInput.value.trim(),
+                        teacher: teacherHidden ? teacherHidden.value.trim() : '',
+                        teacherId: '',
+                        room: roomInput ? roomInput.value.trim() : ''
+                    };
+                }
+            }
         }
 
-        initTimetable();
-        window.changeWeek = changeWeek;
-    </script>
+        const statusDiv = document.getElementById('saveStatus');
+        statusDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Enregistrement en cours...';
+        statusDiv.className = 'save-status';
+
+        db.collection('timetables').doc(currentClassId).set(updatedData)
+            .then(() => {
+                statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ Emploi du temps enregistré avec succès !';
+                statusDiv.className = 'save-status status-success';
+                timetableData = updatedData;
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                    statusDiv.className = 'save-status';
+                }, 3000);
+            })
+            .catch(error => {
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ❌ Erreur: ' + error.message;
+                statusDiv.className = 'save-status status-error';
+            });
+    }
+
+    function deleteAllCourses() {
+        if (confirm('⚠️ ATTENTION : Voulez-vous vraiment effacer TOUS les cours de cet emploi du temps ? Cette action est irréversible.')) {
+            const emptyData = {};
+            for (let slot of timeSlots) {
+                if (slot.type === 'break') continue;
+                for (let day of days) {
+                    emptyData[`${day}_${slot.key}`] = { subject: '', teacher: '', room: '' };
+                }
+            }
+            
+            db.collection('timetables').doc(currentClassId).set(emptyData)
+                .then(() => {
+                    timetableData = emptyData;
+                    renderTimetable();
+                    const statusDiv = document.getElementById('saveStatus');
+                    statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> 🗑️ Tous les cours ont été effacés';
+                    statusDiv.className = 'save-status status-success';
+                    setTimeout(() => {
+                        statusDiv.innerHTML = '';
+                        statusDiv.className = 'save-status';
+                    }, 3000);
+                })
+                .catch(error => {
+                    alert('Erreur: ' + error.message);
+                });
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // ==================== INITIALISATION ====================
+    window.onclick = function(event) {
+        const modal = document.getElementById('classModal');
+        if (event.target === modal) {
+            closeClassModal();
+        }
+    }
+
+    loadClasses();
+</script>
 </body>
 </html>
