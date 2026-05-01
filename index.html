@@ -2,867 +2,1088 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Groupe Scolaire Saldia - Administration</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Saldia Admin | Gestion Examens & EDT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', 'Poppins', sans-serif; background: #f8f9fa; color: #1e293b; }
-        
-        .home-container { min-height: 100vh; background: #f8f9fa; padding: 2rem; }
-        .hero-header {
-            background: linear-gradient(135deg, #0f2b5c 0%, #1e4a8a 50%, #0f2b5c 100%);
-            border-radius: 0 0 30px 30px;
-            margin: -2rem -2rem 2rem -2rem;
-            padding: 1.5rem 2rem;
-            color: white;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-600: #4B5563;
+            --gray-800: #1F2937;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #F8FAFE 0%, #EEF2F9 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .admin-header {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
-        .logo-section { display: flex; align-items: center; gap: 15px; }
-        .logo-section img { width: 55px; height: 55px; border-radius: 15px; background: white; padding: 5px; }
-        .logo-section h1 { font-size: 1.5rem; font-weight: 700; }
-        .user-badge { background: rgba(255,255,255,0.15); padding: 0.5rem 1.2rem; border-radius: 50px; }
-        
-        .dashboard-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.8rem; padding: 1rem; }
-        .dashboard-card {
-            background: white; border-radius: 20px; padding: 1.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s ease; cursor: pointer; text-align: center;
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .dashboard-card:hover { transform: translateY(-8px); box-shadow: 0 20px 35px rgba(0,0,0,0.12); }
-        .card-icon { width: 70px; height: 70px; background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem auto; font-size: 2rem; color: #0f2b5c; }
-        .dashboard-card h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; color: #0f2b5c; }
-        
-        .page-container { min-height: 100vh; background: #f8f9fa; padding: 1rem; }
-        .page-card { max-width: 1400px; margin: 0 auto; background: white; border-radius: 24px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .page-header-inline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid #f1f5f9; flex-wrap: wrap; gap: 1rem; }
-        .page-header-inline h1 { font-size: 1.5rem; color: #0f2b5c; display: flex; align-items: center; gap: 12px; }
-        .btn-back { background: #f1f5f9; border: none; padding: 0.6rem 1.2rem; border-radius: 40px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; color: #475569; transition: all 0.2s; }
-        .btn-back:hover { background: #e2e8f0; transform: translateX(-3px); }
-        
-        .niveau-buttons { display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center; }
-        .niveau-btn { padding: 0.8rem 2rem; border: none; border-radius: 50px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .niveau-btn.college { background: #10b981; color: white; }
-        .niveau-btn.lycee { background: #f59e0b; color: white; }
-        .niveau-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
-        
-        .classes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
-        .class-card { background: white; border-radius: 16px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .class-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-color: #0f2b5c; }
-        .class-icon { font-size: 2.5rem; color: #0f2b5c; margin-bottom: 0.8rem; }
-        .class-name { font-size: 1.2rem; font-weight: 600; color: #1e293b; }
-        .class-count { font-size: 0.8rem; color: #64748b; margin-top: 0.3rem; }
-        
-        .eleves-list { display: flex; flex-direction: column; gap: 0.8rem; }
-        .eleve-item { background: white; border-radius: 16px; padding: 0.8rem 1.2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; border: 1px solid #edf2f7; cursor: pointer; transition: all 0.2s; }
-        .eleve-item:hover { background: #fefefe; transform: translateX(3px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-        .eleve-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 3px solid #cbd5e1; }
-        .eleve-info { flex: 1; }
-        .eleve-nom { font-weight: 600; font-size: 1rem; }
-        .eleve-matricule { font-size: 0.75rem; color: #64748b; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { background: white; border-radius: 24px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 2rem; position: relative; animation: modalIn 0.3s ease; }
-        @keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal-close { position: absolute; top: 1rem; right: 1rem; background: #fee2e2; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; }
-        .modal-header { margin-bottom: 1.5rem; text-align: center; }
-        .modal-header img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid #0f2b5c; margin-bottom: 1rem; }
-        .detail-row { display: flex; padding: 0.8rem 0; border-bottom: 1px solid #f1f5f9; }
-        .detail-label { width: 120px; font-weight: 600; color: #475569; }
-        .detail-value { flex: 1; color: #1e293b; }
-        
-        .form-card { background: #ffffff; border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #edf2f7; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.3rem; }
-        .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
-        .form-group label { font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; }
-        input, select, textarea { padding: 0.7rem 1rem; border: 1.5px solid #e2e8f0; border-radius: 12px; font-size: 0.9rem; font-family: 'Inter', sans-serif; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #0f2b5c; }
-        .batch-textarea { font-family: 'Courier New', monospace; font-size: 0.85rem; min-height: 200px; }
-        button.primary-btn { background: #0f2b5c; border: none; padding: 0.7rem 1.6rem; border-radius: 40px; font-weight: 600; color: white; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s; }
-        button.primary-btn:hover { background: #1e3a6f; transform: translateY(-2px); }
-        button.secondary-btn { background: white; border: 1.5px solid #e2e8f0; color: #475569; padding: 0.5rem 1.2rem; border-radius: 40px; cursor: pointer; }
-        button.secondary-btn:hover { border-color: #0f2b5c; color: #0f2b5c; }
-        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
-        .tab-btn { background: none; border: none; padding: 0.6rem 1.2rem; font-size: 0.9rem; font-weight: 500; cursor: pointer; border-radius: 40px; color: #64748b; }
-        .tab-btn.active { background: #0f2b5c; color: white; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .alert { padding: 1rem; border-radius: 12px; margin-bottom: 1rem; }
-        .alert-success { background: #d1fae5; color: #065f46; }
-        .alert-error { background: #fee2e2; color: #991b1b; }
-        .table-container { overflow-x: auto; border-radius: 16px; border: 1px solid #edf2f7; background: white; margin-top: 1rem; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid #f1f5f9; }
-        th { background: #f8fafc; font-weight: 600; }
-        
+
+        .logo-area img {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, var(--primary), #7C3AED);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Navigation Admin */
+        .admin-nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-admin-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .nav-admin-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-admin-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Cartes */
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-800);
+        }
+
+        /* Formulaires */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--gray-600);
+            margin-bottom: 0.3rem;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 2rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.7rem;
+        }
+
+        /* Grille */
+        .row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .col {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Liste des classes à cocher */
+        .classes-checkbox {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+
+        /* Tableau EDT */
+        .edt-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .edt-table th, .edt-table td {
+            border: 1px solid var(--gray-200);
+            padding: 0.8rem 0.5rem;
+            text-align: center;
+            font-size: 0.75rem;
+            vertical-align: middle;
+        }
+
+        .edt-table th {
+            background: var(--gray-100);
+            font-weight: 700;
+        }
+
+        .time-cell {
+            background: var(--gray-100);
+            font-weight: 600;
+            width: 90px;
+        }
+
+        .edt-select {
+            width: 100%;
+            padding: 0.3rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--gray-200);
+            font-size: 0.7rem;
+        }
+
+        /* Liste des enregistrements */
+        .saved-item {
+            background: var(--gray-100);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .saved-item-info h4 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .saved-item-info p {
+            margin: 0.3rem 0 0;
+            font-size: 0.7rem;
+            color: var(--gray-600);
+        }
+
+        .saved-item-badge {
+            background: var(--primary);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.6rem;
+            margin-left: 0.5rem;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin: 0 0.3rem;
+        }
+
+        /* Compte à rebours */
+        .countdown-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .countdown-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .countdown-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .countdown-timer {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: monospace;
+        }
+
+        .countdown-classes {
+            font-size: 0.65rem;
+            opacity: 0.8;
+            margin-top: 0.3rem;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1.5rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1rem;
+        }
+
+        .modal-footer {
+            padding: 1rem;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Back button */
+        .back-btn {
+            background: var(--gray-100);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
         @media (max-width: 768px) {
-            .hero-header { flex-direction: column; text-align: center; }
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .classes-grid { grid-template-columns: 1fr; }
+            .edt-table {
+                font-size: 0.7rem;
+            }
+            .edt-table th, .edt-table td {
+                padding: 0.4rem 0.2rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="app"></div>
+<div class="container">
+    <div class="admin-header">
+        <div class="logo-area">
+            <img src="https://groupescolairesaldia.com/wp-content/uploads/2022/06/logo.png" alt="Logo">
+            <h1><i class="fas fa-crown"></i> Saldia Administration</h1>
+        </div>
+        <div class="admin-nav">
+            <button class="nav-admin-btn active" data-tab="countdown">📅 Comptes à rebours</button>
+            <button class="nav-admin-btn" data-tab="edt">📚 Emplois du temps spéciaux</button>
+        </div>
+    </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-    <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg", 
-            authDomain: "teste-saldia.firebaseapp.com", 
-            projectId: "teste-saldia", 
-            storageBucket: "teste-saldia.firebasestorage.app", 
-            messagingSenderId: "620601259237", 
-            appId: "1:620601259237:web:57795c7a64082399d0d00c" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+    <div id="mainContent"></div>
+</div>
 
-        let currentNiveau = null;
-        let currentClasseId = null;
-        let currentClasseName = null;
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg",
+        authDomain: "teste-saldia.firebaseapp.com",
+        projectId: "teste-saldia",
+        storageBucket: "teste-saldia.firebasestorage.app",
+        messagingSenderId: "620601259237",
+        appId: "1:620601259237:web:57795c7a64082399d0d00c"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-        function renderHome() {
-            document.getElementById('app').innerHTML = `
-                <div class="home-container">
-                    <div class="hero-header">
-                        <div class="logo-section">
-                            <img src="https://groupescolairesaldia.com/wp-content/uploads/2022/06/logo.png" onerror="this.src='https://via.placeholder.com/55'">
-                            <div><h1>GROUPE SCOLAIRE SALDIA</h1><p>Administration & Excellence</p></div>
-                        </div>
-                        <div class="user-badge"><i class="fas fa-user-shield"></i> Administrateur</div>
-                    </div>
-                    <div class="dashboard-grid">
-                        <div class="dashboard-card" onclick="navigateTo('classes')"><div class="card-icon"><i class="fas fa-school"></i></div><h3>Classes</h3><p>Gérer les classes</p></div>
-                        <div class="dashboard-card" onclick="navigateTo('eleves')"><div class="card-icon"><i class="fas fa-users"></i></div><h3>Élèves</h3><p>Liste et gestion</p></div>
-                        <div class="dashboard-card" onclick="navigateTo('profs')"><div class="card-icon"><i class="fas fa-chalkboard-user"></i></div><h3>Professeurs</h3><p>Corps enseignant</p></div>
-                        <div class="dashboard-card" onclick="navigateTo('emploi')"><div class="card-icon"><i class="fas fa-calendar-week"></i></div><h3>Emploi du temps</h3></div>
-                        <div class="dashboard-card" onclick="navigateTo('bulletins')"><div class="card-icon"><i class="fas fa-file-pdf"></i></div><h3>Bulletins</h3></div>
-                        <div class="dashboard-card" onclick="navigateTo('documents')"><div class="card-icon"><i class="fas fa-file-alt"></i></div><h3>Demandes</h3></div>
-                        <div class="dashboard-card" onclick="navigateTo('presences')"><div class="card-icon"><i class="fas fa-calendar-check"></i></div><h3>Présences</h3></div>
-                    </div>
-                </div>
-            `;
+    let currentTab = "countdown";
+    let allClasses = [];
+
+    // Charger toutes les classes
+    async function loadAllClasses() {
+        const snapshot = await db.collection('classes').get();
+        allClasses = [];
+        snapshot.forEach(doc => {
+            allClasses.push({ id: doc.id, name: doc.data().name || doc.id });
+        });
+        return allClasses;
+    }
+
+    // Afficher la page selon l'onglet
+    async function renderCurrentTab() {
+        if (currentTab === "countdown") {
+            await renderCountdownTab();
+        } else {
+            await renderEdtTab();
         }
+    }
 
-        window.navigateTo = function(page) {
-            if (page === 'classes') renderClassesPage();
-            else if (page === 'eleves') renderElevesMainPage();
-            else if (page === 'profs') renderProfsPage();
-            else if (page === 'emploi') renderEmploiPage();
-            else if (page === 'bulletins') renderBulletinsPage();
-            else if (page === 'documents') renderDocumentsPage();
-            else if (page === 'presences') renderPresencesPage();
-        };
-
-        window.goHome = function() { renderHome(); };
-
-        function renderBackButton(title, icon) {
-            return `
-                <div class="page-header-inline">
-                    <h1><i class="fas ${icon}"></i> ${title}</h1>
-                    <button class="btn-back" onclick="goHome()"><i class="fas fa-arrow-left"></i> Retour à l'accueil</button>
-                </div>
-            `;
-        }
-
-        // ==================== PAGE CLASSES ====================
-        async function renderClassesPage() {
-            document.getElementById('app').innerHTML = `
-                <div class="page-container">
-                    <div class="page-card">
-                        ${renderBackButton('Gestion des Classes', 'fa-school')}
-                        <div class="form-card">
-                            <div class="form-grid">
-                                <div class="form-group"><label>Nom de la classe</label><input type="text" id="className" placeholder="Ex: 3ème A, Terminale C"></div>
-                                <div class="form-group"><label>Niveau</label>
-                                    <select id="classNiveau">
-                                        <option value="">Choisir un niveau</option>
-                                        <option value="college">COLLÈGE (6ème à 3ème)</option>
-                                        <option value="lycee">LYCÉE (Seconde à Terminale)</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button class="primary-btn" onclick="addClass()"><i class="fas fa-plus"></i> Ajouter une classe</button>
+    // ==================== COMPTES À REBOURS ====================
+    async function renderCountdownTab() {
+        await loadAllClasses();
+        const countdowns = await db.collection('countdowns').orderBy('dateTime', 'asc').get();
+        
+        let html = `
+            <div class="card">
+                <h2><i class="fas fa-hourglass-half"></i> Nouveau compte à rebours</h2>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Nom de l'examen</label>
+                            <input type="text" id="examName" class="form-input" placeholder="Ex: BFEM 2026, BAC 2026...">
                         </div>
-                        <div class="tabs">
-                            <button class="tab-btn active" onclick="switchClassTab('college')">COLLÈGE</button>
-                            <button class="tab-btn" onclick="switchClassTab('lycee')">LYCÉE</button>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Date et heure</label>
+                            <input type="datetime-local" id="examDateTime" class="form-input">
                         </div>
-                        <div id="collegeClasses" class="classes-grid"></div>
-                        <div id="lyceeClasses" class="classes-grid" style="display:none"></div>
                     </div>
                 </div>
-            `;
-            await loadClassesByNiveau('college');
-            await loadClassesByNiveau('lycee');
-        }
-
-        window.switchClassTab = function(niveau) {
-            document.getElementById('collegeClasses').style.display = niveau === 'college' ? 'grid' : 'none';
-            document.getElementById('lyceeClasses').style.display = niveau === 'lycee' ? 'grid' : 'none';
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-        };
-
-        window.addClass = async function() {
-            let name = document.getElementById('className').value.trim();
-            let niveau = document.getElementById('classNiveau').value;
-            if (!name || !niveau) return alert('Veuillez remplir tous les champs');
-            await db.collection('classes').add({ name, niveau });
-            document.getElementById('className').value = '';
-            document.getElementById('classNiveau').value = '';
-            await loadClassesByNiveau('college');
-            await loadClassesByNiveau('lycee');
-            showAlert('Classe ajoutée avec succès !', 'success');
-        };
-
-        async function loadClassesByNiveau(niveau) {
-            let snap = await db.collection('classes').where('niveau', '==', niveau).get();
-            let container = document.getElementById(`${niveau}Classes`);
-            if (!container) return;
-            container.innerHTML = '';
-            for (let doc of snap.docs) {
-                let classe = doc.data();
-                let elevesCount = await db.collection('eleves').where('classe', '==', classe.name).get();
-                let div = document.createElement('div');
-                div.className = 'class-card';
-                div.innerHTML = `
-                    <div class="class-icon"><i class="fas fa-chalkboard"></i></div>
-                    <div class="class-name">${classe.name}</div>
-                    <div class="class-count">${elevesCount.size} élève(s)</div>
-                    <button class="secondary-btn" style="margin-top:0.8rem" onclick="deleteClass('${doc.id}')"><i class="fas fa-trash"></i> Supprimer</button>
-                `;
-                container.appendChild(div);
-            }
-        }
-
-        window.deleteClass = async (id) => {
-            if (confirm('Supprimer cette classe ? Les élèves ne seront pas supprimés mais n\'auront plus de classe.')) {
-                await db.collection('classes').doc(id).delete();
-                await loadClassesByNiveau('college');
-                await loadClassesByNiveau('lycee');
-                showAlert('Classe supprimée', 'success');
-            }
-        };
-
-        // ==================== PAGE ÉLÈVES ====================
-        async function renderElevesMainPage() {
-            currentNiveau = null;
-            currentClasseId = null;
-            document.getElementById('app').innerHTML = `
-                <div class="page-container">
-                    <div class="page-card">
-                        ${renderBackButton('Gestion des Élèves', 'fa-users')}
-                        <div class="niveau-buttons">
-                            <button class="niveau-btn college" onclick="showNiveauClasses('college')"><i class="fas fa-graduation-cap"></i> COLLÈGE (6ème - 3ème)</button>
-                            <button class="niveau-btn lycee" onclick="showNiveauClasses('lycee')"><i class="fas fa-school"></i> LYCÉE (2nde - Terminale)</button>
-                        </div>
-                        <div id="niveauContent"></div>
+                <div class="form-group">
+                    <label>Classes concernées (sélectionnez une ou plusieurs)</label>
+                    <div class="classes-checkbox" id="classesCheckbox">
+                        ${allClasses.map(c => `
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="${c.id}" data-name="${c.name}">
+                                <span>${c.name}</span>
+                            </label>
+                        `).join('')}
                     </div>
                 </div>
-            `;
-        }
-
-        window.showNiveauClasses = async function(niveau) {
-            currentNiveau = niveau;
-            let snap = await db.collection('classes').where('niveau', '==', niveau).get();
-            let container = document.getElementById('niveauContent');
-            if (snap.empty) {
-                container.innerHTML = `
-                    <button class="btn-back" onclick="renderElevesMainPage()" style="margin-bottom:1rem"><i class="fas fa-arrow-left"></i> Retour aux niveaux</button>
-                    <div style="text-align:center;padding:2rem;color:#64748b">Aucune classe dans ce niveau. <a href="#" onclick="navigateTo('classes')">Ajoutez des classes</a></div>
-                `;
+                <button id="saveCountdownBtn" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-list"></i> Comptes à rebours actifs</h2>
+                <div id="countdownList" class="countdown-list"></div>
+            </div>
+        `;
+        
+        document.getElementById('mainContent').innerHTML = html;
+        
+        // Afficher la liste des countdowns existants
+        const countdownList = [];
+        countdowns.forEach(doc => {
+            countdownList.push({ id: doc.id, ...doc.data() });
+        });
+        renderCountdownList(countdownList);
+        
+        // Événement sauvegarde
+        document.getElementById('saveCountdownBtn').addEventListener('click', async () => {
+            const name = document.getElementById('examName').value.trim();
+            const dateTime = document.getElementById('examDateTime').value;
+            const selectedClasses = [];
+            document.querySelectorAll('#classesCheckbox input:checked').forEach(cb => {
+                selectedClasses.push({
+                    id: cb.value,
+                    name: cb.dataset.name
+                });
+            });
+            
+            if (!name || !dateTime) {
+                alert("Veuillez remplir tous les champs");
                 return;
             }
-            container.innerHTML = `
-                <button class="btn-back" onclick="renderElevesMainPage()" style="margin-bottom:1rem"><i class="fas fa-arrow-left"></i> Retour aux niveaux</button>
-                <h3 style="margin-bottom:1rem"><i class="fas ${niveau === 'college' ? 'fa-graduation-cap' : 'fa-school'}"></i> ${niveau === 'college' ? 'COLLÈGE' : 'LYCÉE'}</h3>
-                <div class="classes-grid" id="niveauClassesGrid"></div>
-            `;
-            let grid = document.getElementById('niveauClassesGrid');
-            for (let doc of snap.docs) {
-                let classe = doc.data();
-                let elevesCount = await db.collection('eleves').where('classe', '==', classe.name).get();
-                let div = document.createElement('div');
-                div.className = 'class-card';
-                div.innerHTML = `
-                    <div class="class-icon"><i class="fas fa-door-open"></i></div>
-                    <div class="class-name">${classe.name}</div>
-                    <div class="class-count">${elevesCount.size} élève(s)</div>
-                    <button class="primary-btn" style="margin-top:0.8rem" onclick="showClasseEleves('${doc.id}', '${classe.name}')"><i class="fas fa-eye"></i> Voir les élèves</button>
-                `;
-                grid.appendChild(div);
-            }
-        };
-
-        window.showClasseEleves = async function(classeId, className) {
-            currentClasseId = classeId;
-            currentClasseName = className;
-            let elevesSnap = await db.collection('eleves').where('classe', '==', className).get();
-            let container = document.getElementById('niveauContent');
-            let elevesList = '';
-            for (let doc of elevesSnap.docs) {
-                let e = doc.data();
-                elevesList += `
-                    <div class="eleve-item" onclick="showEleveDetails('${e.matricule}')">
-                        <img src="${e.photoUrl || 'https://via.placeholder.com/100'}" class="eleve-avatar" onerror="this.src='https://via.placeholder.com/100'">
-                        <div class="eleve-info">
-                            <div class="eleve-nom">${e.nom}</div>
-                            <div class="eleve-matricule"><i class="fas fa-id-card"></i> ${e.matricule}</div>
-                        </div>
-                        <i class="fas fa-chevron-right" style="color:#cbd5e1"></i>
-                    </div>
-                `;
-            }
-            container.innerHTML = `
-                <button class="btn-back" onclick="showNiveauClasses('${currentNiveau}')" style="margin-bottom:1rem"><i class="fas fa-arrow-left"></i> Retour aux classes</button>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem">
-                    <h3><i class="fas fa-users"></i> Classe : ${className}</h3>
-                    <button class="primary-btn" onclick="showAddEleveForm()"><i class="fas fa-plus"></i> Ajouter un élève</button>
-                </div>
-                <div class="eleves-list">
-                    ${elevesList || '<div style="text-align:center;padding:2rem;color:#64748b">Aucun élève dans cette classe</div>'}
-                </div>
-            `;
-        };
-
-        window.showAddEleveForm = function() {
-            let container = document.getElementById('niveauContent');
-            container.innerHTML = `
-                <button class="btn-back" onclick="showClasseEleves('${currentClasseId}', '${currentClasseName}')" style="margin-bottom:1rem"><i class="fas fa-arrow-left"></i> Retour à la liste</button>
-                <div class="tabs">
-                    <button class="tab-btn active" onclick="switchEleveTab('simple')">Ajout simple</button>
-                    <button class="tab-btn" onclick="switchEleveTab('batch')">Ajout par lot</button>
-                </div>
-                <div id="eleveSimpleTab" class="tab-content active">
-                    <div class="form-card">
-                                                <div class="form-grid">
-                            <div class="form-group"><label>Matricule *</label><input id="matricule" placeholder="Ex: E001"></div>
-                            <div class="form-group"><label>Nom complet *</label><input id="nomEleve" placeholder="Nom et prénom"></div>
-                            <div class="form-group"><label>Date naissance</label><input type="date" id="dateNaissance"></div>
-                            <div class="form-group"><label>Téléphone</label><input id="telephone" placeholder="+221 ..."></div>
-                            <div class="form-group"><label>Email</label><input id="emailEleve" placeholder="email@exemple.com"></div>
-                            <div class="form-group"><label>Mot de passe *</label><input type="password" id="motDePasse" placeholder="Mot de passe pour la connexion"></div>
-                            <div class="form-group"><label>Confirmer mot de passe *</label><input type="password" id="confirmMotDePasse" placeholder="Retapez le mot de passe"></div>
-                            <div class="form-group"><label>Photo URL</label><input id="photoUrl" placeholder="https://..."></div>
-                        </div>
-                        <div class="form-group"><label>Classe</label>
-                            <select id="classeSelectForEleve">
-                                <option value="${currentClasseName}">${currentClasseName}</option>
-                            </select>
-                        </div>
-                        <button class="primary-btn" onclick="addSingleEleve()"><i class="fas fa-save"></i> Enregistrer l'élève</button>
-                    </div>
-                </div>
-                <div id="eleveBatchTab" class="tab-content">
-                    <div class="form-card">
-                        <div class="form-group">
-                            <label>Ajout multiple d'élèves (un élève par ligne)</label>
-                            <textarea id="batchEleves" class="batch-textarea" placeholder="Format : matricule | nom complet | date naissance | téléphone | email | photo URL&#10;Exemple :&#10;E001|Dupont Jean|2005-06-15|771234567|jean@email.com|&#10;E002|Martin Marie|2006-03-22|778765432|marie@email.com|"></textarea>
-                           <small><i class="fas fa-info-circle"></i> Format : Matricule | Nom | Mot de passe | Date naissance | Téléphone | Email | Photo<br>
-<strong>La classe sera automatiquement : ${currentClasseName}</strong></small>
-                        </div>
-                        <button class="primary-btn" onclick="addBatchEleves()"><i class="fas fa-layer-group"></i> Ajouter tous les élèves</button>
-                    </div>
-                </div>
-            `;
-        };
-
-        window.switchEleveTab = function(tab) {
-            document.getElementById('eleveSimpleTab').classList.remove('active');
-            document.getElementById('eleveBatchTab').classList.remove('active');
-            document.getElementById(`eleve${tab === 'simple' ? 'SimpleTab' : 'BatchTab'}`).classList.add('active');
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-        };
-
-             window.addSingleEleve = async function() {
-            let selectedClasse = document.getElementById('classeSelectForEleve') ? document.getElementById('classeSelectForEleve').value : currentClasseName;
-            let password = document.getElementById('motDePasse').value;
-            let confirmPassword = document.getElementById('confirmMotDePasse').value;
             
-            if (!password) return alert('Veuillez saisir un mot de passe');
-            if (password !== confirmPassword) return alert('Les mots de passe ne correspondent pas');
-            if (password.length < 4) return alert('Le mot de passe doit contenir au moins 4 caractères');
+            if (selectedClasses.length === 0) {
+                alert("Veuillez sélectionner au moins une classe");
+                return;
+            }
             
-            let data = {
-                matricule: document.getElementById('matricule').value.trim(),
-                nom: document.getElementById('nomEleve').value.trim(),
-                dateNaissance: document.getElementById('dateNaissance').value,
-                telephone: document.getElementById('telephone').value,
-                email: document.getElementById('emailEleve').value,
-                motDePasse: btoa(password),
-                classe: selectedClasse,
-                photoUrl: document.getElementById('photoUrl').value || 'https://via.placeholder.com/100'
-            };
-            if (!data.matricule || !data.nom) return alert('Matricule et nom requis');
-            await db.collection('eleves').doc(data.matricule).set(data);
-            document.getElementById('matricule').value = '';
-            document.getElementById('nomEleve').value = '';
-            document.getElementById('dateNaissance').value = '';
-            document.getElementById('telephone').value = '';
-            document.getElementById('emailEleve').value = '';
-            document.getElementById('motDePasse').value = '';
-            document.getElementById('confirmMotDePasse').value = '';
-            document.getElementById('photoUrl').value = '';
-            showAlert('Élève ajouté avec succès !', 'success');
-            showClasseEleves(currentClasseId, currentClasseName);
-        };
-
-              window.addBatchEleves = async function() {
-            let textarea = document.getElementById('batchEleves');
-            let lines = textarea.value.split('\n').filter(l => l.trim().length > 0);
-            if (lines.length === 0) return alert('Entrez au moins un élève');
-            let added = 0;
-            let errors = [];
-            for (let line of lines) {
-                let parts = line.split('|').map(p => p.trim());
-                if (parts.length < 3) {
-                    errors.push(line);
-                    continue;
-                }
-                if (!parts[2]) {
-                    errors.push(line);
-                    continue;
-                }
-                let data = {
-                    matricule: parts[0],
-                    nom: parts[1],
-                    motDePasse: btoa(parts[2]),
-                    dateNaissance: parts[3] || '',
-                    telephone: parts[4] || '',
-                    email: parts[5] || '',
-                    classe: currentClasseName,
-                    photoUrl: parts[6] || 'https://via.placeholder.com/100'
-                };
-                if (data.matricule && data.nom) {
-                    await db.collection('eleves').doc(data.matricule).set(data);
-                    added++;
-                } else {
-                    errors.push(line);
-                }
-            }
-            textarea.value = '';
-            if (errors.length > 0) {
-                showAlert(`${added} élève(s) ajouté(s). ${errors.length} ligne(s) ignorée(s)`, 'error');
-            } else {
-                showAlert(`${added} élève(s) ajouté(s) à la classe ${currentClasseName} !`, 'success');
-            }
-            showClasseEleves(currentClasseId, currentClasseName);
-        };
+            await db.collection('countdowns').add({
+                name: name,
+                dateTime: new Date(dateTime).toISOString(),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                classes: selectedClasses
+            });
             
-
-        window.showEleveDetails = async function(matricule) {
-            let doc = await db.collection('eleves').doc(matricule).get();
-            let e = doc.data();
-            if (!e) return;
-            let modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.style.display = 'flex';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <button class="modal-close" onclick="this.closest('.modal').remove()"><i class="fas fa-times"></i></button>
-                    <div class="modal-header">
-                        <img src="${e.photoUrl || 'https://via.placeholder.com/100'}" onerror="this.src='https://via.placeholder.com/100'">
-                        <h2>${e.nom}</h2>
-                        <p style="color:#64748b">${e.classe || 'Classe non affectée'}</p>
-                    </div>
-                    <div class="detail-row"><div class="detail-label">Matricule</div><div class="detail-value">${e.matricule}</div></div>
-                    <div class="detail-row"><div class="detail-label">Date de naissance</div><div class="detail-value">${e.dateNaissance || 'Non renseignée'}</div></div>
-                    <div class="detail-row"><div class="detail-label">Téléphone</div><div class="detail-value">${e.telephone || 'Non renseigné'}</div></div>
-                    <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${e.email || 'Non renseigné'}</div></div>
-                    <div class="detail-row"><div class="detail-label">Classe</div><div class="detail-value">${e.classe || 'Non affecté'}</div></div>
-                    <div style="margin-top:1.5rem; display:flex; gap:0.5rem; justify-content:flex-end">
-                        <button class="secondary-btn" onclick="this.closest('.modal').remove()">Fermer</button>
-                        <button class="secondary-btn" style="background:#fee2e2" onclick="deleteEleveAndClose('${matricule}', this)">Supprimer</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
-        };
-
-        window.deleteEleveAndClose = async function(matricule, btn) {
-            if (confirm('Supprimer définitivement cet élève ?')) {
-                await db.collection('eleves').doc(matricule).delete();
-                btn.closest('.modal').remove();
-                if (currentClasseId && currentClasseName) {
-                    showClasseEleves(currentClasseId, currentClasseName);
-                }
-                showAlert('Élève supprimé', 'success');
-            }
-        };
-
-        // ==================== PAGE PROFESSEURS ====================
-        async function renderProfsPage() {
-            document.getElementById('app').innerHTML = `
-                <div class="page-container"><div class="page-card">
-                    ${renderBackButton('Gestion des Professeurs', 'fa-chalkboard-user')}
-                    <div class="form-card">
-                       <div class="form-grid">
-    <div class="form-group"><label>Identifiant *</label><input id="profId" placeholder="Ex: P001"></div>
-    <div class="form-group"><label>Mot de passe *</label><input type="password" id="profPassword" placeholder="Mot de passe pour l'espace professeur"></div>
-    <div class="form-group"><label>Confirmer mot de passe *</label><input type="password" id="profPasswordConfirm" placeholder="Retapez le mot de passe"></div>
-    <div class="form-group"><label>Nom complet *</label><input id="profNom" placeholder="Nom et prénom"></div>
-    <div class="form-group"><label>Matière</label><input id="profMatiere" placeholder="Mathématiques, Physique..."></div>
-</div>
-                        <button class="primary-btn" onclick="addProfesseur()"><i class="fas fa-user-plus"></i> Ajouter</button>
-                    </div>
-                    <div class="table-container"><table id="profsTable"><thead>
-    <tr>
-        <th>ID</th>
-        <th>Nom</th>
-        <th>Matière</th>
-        <th>Mot de passe</th>
-        <th>Actions</th>
-    </tr>
-</thead><tbody></tbody></table></div>
-                </div></div>
-            `;
-            await loadProfsTable();
+            alert("✅ Compte à rebours ajouté !");
+            document.getElementById('examName').value = '';
+            document.getElementById('examDateTime').value = '';
+            document.querySelectorAll('#classesCheckbox input:checked').forEach(cb => cb.checked = false);
+            await renderCountdownTab();
+        });
+    }
+    
+    function renderCountdownList(countdowns) {
+        const container = document.getElementById('countdownList');
+        if (!container) return;
+        
+        if (countdowns.length === 0) {
+            container.innerHTML = '<p style="color: gray; text-align:center;">Aucun compte à rebours</p>';
+            return;
         }
-
-      window.addProfesseur = async function() {
-    let id = document.getElementById('profId').value.trim();
-    let password = document.getElementById('profPassword').value;
-    let passwordConfirm = document.getElementById('profPasswordConfirm').value;
-    let nom = document.getElementById('profNom').value.trim();
-    let matiere = document.getElementById('profMatiere').value;
+        
+        let html = '';
+        for (const cd of countdowns) {
+            const targetDate = new Date(cd.dateTime);
+            const now = new Date();
+            const diff = targetDate - now;
+            
+            let timerText = '';
+            if (diff <= 0) {
+                timerText = '✅ TERMINÉ !';
+            } else {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (86400000)) / 3600000);
+                const minutes = Math.floor((diff % 3600000) / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+                timerText = `${days}j ${hours}h ${minutes}m ${seconds}s`;
+            }
+            
+            const classesText = cd.classes.map(c => c.name).join(', ');
+            const dateFormatted = new Date(cd.dateTime).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            
+            html += `
+                <div class="countdown-card" data-id="${cd.id}">
+                    <div class="countdown-info">
+                        <h4><i class="fas fa-graduation-cap"></i> ${cd.name}</h4>
+                        <div class="countdown-classes">📅 ${dateFormatted} | 🏫 ${classesText}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <div class="countdown-timer" id="timer-${cd.id}">${timerText}</div>
+                        <div>
+                            <button class="btn-icon edit-countdown" data-id="${cd.id}" style="color: #F59E0B;"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon delete-countdown" data-id="${cd.id}" style="color: #EF4444;"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        container.innerHTML = html;
+        
+        // Démarrer les timers
+        for (const cd of countdowns) {
+            startTimer(cd.id, cd.dateTime);
+        }
+        
+        // Événements supprimer
+        document.querySelectorAll('.delete-countdown').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = btn.dataset.id;
+                if (confirm("Supprimer ce compte à rebours ?")) {
+                    await db.collection('countdowns').doc(id).delete();
+                    await renderCountdownTab();
+                }
+            });
+        });
+        
+        // Événements modifier
+        document.querySelectorAll('.edit-countdown').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = btn.dataset.id;
+                const doc = await db.collection('countdowns').doc(id).get();
+                const data = doc.data();
+                showEditCountdownModal(id, data);
+            });
+        });
+    }
     
-    if (!id || !nom) return alert('ID et nom requis');
-    if (!password) return alert('Veuillez saisir un mot de passe');
-    if (password !== passwordConfirm) return alert('Les mots de passe ne correspondent pas');
-    if (password.length < 4) return alert('Le mot de passe doit contenir au moins 4 caractères');
+    function startTimer(id, dateTimeStr) {
+        const timerElement = document.getElementById(`timer-${id}`);
+        if (!timerElement) return;
+        
+        const targetDate = new Date(dateTimeStr);
+        
+        const interval = setInterval(() => {
+            const now = new Date();
+            const diff = targetDate - now;
+            
+            if (diff <= 0) {
+                timerElement.innerHTML = '✅ TERMINÉ !';
+                clearInterval(interval);
+            } else {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % 86400000) / 3600000);
+                const minutes = Math.floor((diff % 3600000) / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+                timerElement.innerHTML = `${days}j ${hours}h ${minutes}m ${seconds}s`;
+            }
+        }, 1000);
+    }
     
-    // Hashage simple (pour la démo - en production utilisez bcrypt côté serveur)
-    // Ici on stocke en Base64 pour simuler un hash
-    let hashedPassword = btoa(password);
+    async function showEditCountdownModal(id, data) {
+        const modalHtml = `
+            <div class="modal" id="editModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Modifier le compte à rebours</h3>
+                        <button class="btn-icon" onclick="closeModal()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Nom</label>
+                            <input type="text" id="editName" class="form-input" value="${data.name}">
+                        </div>
+                        <div class="form-group">
+                            <label>Date et heure</label>
+                            <input type="datetime-local" id="editDateTime" class="form-input" value="${new Date(data.dateTime).toISOString().slice(0, 16)}">
+                        </div>
+                        <div class="form-group">
+                            <label>Classes concernées</label>
+                            <div class="classes-checkbox" id="editClassesCheckbox">
+                                ${allClasses.map(c => `
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" value="${c.id}" data-name="${c.name}" ${data.classes.some(cls => cls.id === c.id) ? 'checked' : ''}>
+                                        <span>${c.name}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" onclick="closeModal()">Annuler</button>
+                        <button class="btn btn-primary" id="confirmEditBtn">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        document.getElementById('confirmEditBtn').addEventListener('click', async () => {
+            const newName = document.getElementById('editName').value.trim();
+            const newDateTime = document.getElementById('editDateTime').value;
+            const selectedClasses = [];
+            document.querySelectorAll('#editClassesCheckbox input:checked').forEach(cb => {
+                selectedClasses.push({
+                    id: cb.value,
+                    name: cb.dataset.name
+                });
+            });
+            
+            if (!newName || !newDateTime) {
+                alert("Veuillez remplir tous les champs");
+                return;
+            }
+            
+            await db.collection('countdowns').doc(id).update({
+                name: newName,
+                dateTime: new Date(newDateTime).toISOString(),
+                classes: selectedClasses
+            });
+            
+            closeModal();
+            await renderCountdownTab();
+        });
+    }
     
-    await db.collection('professeurs').doc(id).set({ 
-        identifiant: id, 
-        password: hashedPassword,
-        nom: nom, 
-        matiere: matiere || '' 
+    // ==================== EMPLOIS DU TEMPS SPÉCIAUX ====================
+    async function renderEdtTab() {
+        await loadAllClasses();
+        
+        const specialEdts = await db.collection('special_timetables').orderBy('createdAt', 'desc').get();
+        const edtList = [];
+        specialEdts.forEach(doc => {
+            edtList.push({ id: doc.id, ...doc.data() });
+        });
+        
+        let html = `
+            <div class="card">
+                <h2><i class="fas fa-plus-circle"></i> Nouvel emploi du temps spécial</h2>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Titre</label>
+                            <input type="text" id="edtTitle" class="form-input" placeholder="Ex: CC1 du 1er Semestre, Composition...">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>Période (dates de la semaine)</label>
+                            <input type="date" id="startDate" class="form-input">
+                            <span> à </span>
+                            <input type="date" id="endDate" class="form-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Classes concernées</label>
+                    <div class="classes-checkbox" id="edtClassesCheckbox">
+                        ${allClasses.map(c => `
+                            <label class="checkbox-item">
+                                <input type="checkbox" value="${c.id}" data-name="${c.name}">
+                                <span>${c.name}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+                <button id="createEdtBtn" class="btn btn-primary"><i class="fas fa-table"></i> Créer l'emploi du temps</button>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-archive"></i> Emplois du temps enregistrés</h2>
+                <div id="savedEdtList">
+                    ${edtList.map(edt => `
+                        <div class="saved-item" data-id="${edt.id}">
+                            <div class="saved-item-info">
+                                <h4><i class="fas fa-calendar-alt"></i> ${edt.title}</h4>
+                                <p>📅 ${new Date(edt.startDate).toLocaleDateString('fr-FR')} - ${new Date(edt.endDate).toLocaleDateString('fr-FR')} | 🏫 ${edt.classes.map(c => c.name).join(', ')}</p>
+                            </div>
+                            <div>
+                                <button class="btn-icon view-edt" data-id="${edt.id}" style="color: #4F46E5;"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon edit-edt" data-id="${edt.id}" style="color: #F59E0B;"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon delete-edt" data-id="${edt.id}" style="color: #EF4444;"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('mainContent').innerHTML = html;
+        
+        document.getElementById('createEdtBtn').addEventListener('click', () => {
+            const title = document.getElementById('edtTitle').value.trim();
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const selectedClasses = [];
+            document.querySelectorAll('#edtClassesCheckbox input:checked').forEach(cb => {
+                selectedClasses.push({
+                    id: cb.value,
+                    name: cb.dataset.name
+                });
+            });
+            
+            if (!title || !startDate) {
+                alert("Veuillez remplir le titre et la date de début");
+                return;
+            }
+            
+            if (selectedClasses.length === 0) {
+                alert("Veuillez sélectionner au moins une classe");
+                return;
+            }
+            
+            // Ouvrir l'éditeur d'emploi du temps
+            showEdtEditor(null, title, startDate, endDate, selectedClasses);
+        });
+        
+        // Événements pour les enregistrements existants
+        document.querySelectorAll('.view-edt').forEach(btn => {
+            btn.addEventListener('click', () => viewEdt(btn.dataset.id));
+        });
+        
+        document.querySelectorAll('.edit-edt').forEach(btn => {
+            btn.addEventListener('click', () => editEdt(btn.dataset.id));
+        });
+        
+        document.querySelectorAll('.delete-edt').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (confirm("Supprimer cet emploi du temps ?")) {
+                    await db.collection('special_timetables').doc(btn.dataset.id).delete();
+                    await renderEdtTab();
+                }
+            });
+        });
+    }
+    
+    // Créneaux horaires
+    const timeSlots = [
+        "08h00-09h00", "09h00-10h00", "10h00-10h50", "11h05-12h05",
+        "12h05-13h05", "13h35-14h35", "14h35-15h35", "15h35-16h35", "16h35-17h35"
+    ];
+    
+    const jours = ["LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI"];
+    
+    // Obtenir les dates des jours de la semaine
+    function getWeekDates(startDateStr) {
+        const start = new Date(startDateStr);
+        const dayOfWeek = start.getDay(); // 0=dimanche, 1=lundi...
+        const monday = new Date(start);
+        const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+        monday.setDate(start.getDate() + diff);
+        
+        const dates = {};
+        const joursEn = ["monday", "tuesday", "wednesday", "thursday", "friday"];
+        jours.forEach((jour, idx) => {
+            const date = new Date(monday);
+            date.setDate(monday.getDate() + idx);
+            dates[joursEn[idx]] = date.toISOString().slice(0, 10);
+        });
+        return dates;
+    }
+    
+    async function showEdtEditor(edtId, title, startDate, endDate, selectedClasses) {
+        const weekDates = getWeekDates(startDate);
+        
+        let html = `
+            <button class="back-btn" id="backToEdtList"><i class="fas fa-arrow-left"></i> Retour</button>
+            <div class="card">
+                <h2 class="text-center"><i class="fas fa-calendar-edit"></i> ${title}</h2>
+                <p class="text-center" style="color: gray; margin-bottom: 1rem;">Du ${new Date(startDate).toLocaleDateString('fr-FR')} au ${endDate ? new Date(endDate).toLocaleDateString('fr-FR') : new Date(startDate).toLocaleDateString('fr-FR')}</p>
+                
+                <div style="overflow-x: auto;">
+                    <table class="edt-table">
+                        <thead>
+                            <tr><th>Horaire</th>
+                                ${jours.map((jour, idx) => {
+                                    const dateKey = ["monday", "tuesday", "wednesday", "thursday", "friday"][idx];
+                                    const dateStr = weekDates[dateKey];
+                                    const dateFormatted = new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+                                    return `<th>${jour}<br><span style="font-size:0.6rem;">${dateFormatted}</span></th>`;
+                                }).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+        
+        for (const slot of timeSlots) {
+            html += `<tr><td class="time-cell">${slot}</td>`;
+            for (let i = 0; i < 5; i++) {
+                const dayKey = ["monday", "tuesday", "wednesday", "thursday", "friday"][i];
+                const dateStr = weekDates[dayKey];
+                const selectId = `slot_${dayKey}_${slot.replace(/[^0-9]/g, '_')}`;
+                html += `
+                    <td>
+                        <select class="edt-select" id="${selectId}" data-day="${dayKey}" data-time="${slot}">
+                            <option value="">-- Choisir une matière --</option>
+                            <option value="Français">📖 Français</option>
+                            <option value="Anglais">🇬🇧 Anglais</option>
+                            <option value="Mathématiques">📐 Mathématiques</option>
+                            <option value="Physique-Chimie">⚗️ Physique-Chimie</option>
+                            <option value="Histoire-Géographie">🌍 Histoire-Géographie</option>
+                            <option value="Philosophie">💭 Philosophie</option>
+                            <option value="SVT">🔬 SVT</option>
+                            <option value="Espagnol">🇪🇸 Espagnol</option>
+                            <option value="Arabe">🕌 Arabe</option>
+                            <option value="EPS">⚽ EPS</option>
+                        </select>
+                    </td>
+                `;
+            }
+            html += `</tr>`;
+        }
+        
+        html += `
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem;">
+                    <button id="saveEdtBtn" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer l'emploi du temps</button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('mainContent').innerHTML = html;
+        
+        // Si édition, charger les données existantes
+        if (edtId) {
+            const doc = await db.collection('special_timetables').doc(edtId).get();
+            if (doc.exists) {
+                const data = doc.data();
+                if (data.schedule) {
+                    for (const [key, value] of Object.entries(data.schedule)) {
+                        const select = document.getElementById(key);
+                        if (select && value) select.value = value;
+                    }
+                }
+            }
+        }
+        
+        document.getElementById('backToEdtList').addEventListener('click', () => renderEdtTab());
+        
+        document.getElementById('saveEdtBtn').addEventListener('click', async () => {
+            const schedule = {};
+            for (const slot of timeSlots) {
+                for (const dayKey of ["monday", "tuesday", "wednesday", "thursday", "friday"]) {
+                    const selectId = `slot_${dayKey}_${slot.replace(/[^0-9]/g, '_')}`;
+                    const select = document.getElementById(selectId);
+                    if (select && select.value) {
+                        const key = `${dayKey}_${slot}`;
+                        schedule[key] = select.value;
+                    }
+                }
+            }
+            
+            const edtData = {
+                title: title,
+                startDate: startDate,
+                endDate: endDate || startDate,
+                classes: selectedClasses,
+                schedule: schedule,
+                weekDates: weekDates,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            if (edtId) {
+                await db.collection('special_timetables').doc(edtId).update(edtData);
+                alert("✅ Emploi du temps modifié !");
+            } else {
+                await db.collection('special_timetables').add(edtData);
+                alert("✅ Emploi du temps enregistré !");
+            }
+            
+            await renderEdtTab();
+        });
+    }
+    
+    async function viewEdt(edtId) {
+        const doc = await db.collection('special_timetables').doc(edtId).get();
+        const data = doc.data();
+        if (!data) return;
+        
+        let html = `
+            <button class="back-btn" id="backToEdtListView"><i class="fas fa-arrow-left"></i> Retour</button>
+            <div class="card">
+                <h2 class="text-center"><i class="fas fa-calendar-alt"></i> ${data.title}</h2>
+                <p class="text-center" style="color: gray; margin-bottom: 1rem;">Du ${new Date(data.startDate).toLocaleDateString('fr-FR')} au ${new Date(data.endDate).toLocaleDateString('fr-FR')}</p>
+                <p class="text-center" style="color: gray; margin-bottom: 1rem;">🏫 Classes: ${data.classes.map(c => c.name).join(', ')}</p>
+                
+                <div style="overflow-x: auto;">
+                    <table class="edt-table">
+                        <thead>
+                            <tr><th>Horaire</th>
+                                ${jours.map((jour, idx) => {
+                                    const dateKey = ["monday", "tuesday", "wednesday", "thursday", "friday"][idx];
+                                    const dateStr = data.weekDates ? data.weekDates[dateKey] : '';
+                                    const dateFormatted = dateStr ? new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
+                                    return `<th>${jour}<br><span style="font-size:0.6rem;">${dateFormatted}</span></th>`;
+                                }).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+        
+        for (const slot of timeSlots) {
+            html += `<tr><td class="time-cell">${slot}</td>`;
+            for (const dayKey of ["monday", "tuesday", "wednesday", "thursday", "friday"]) {
+                const key = `${dayKey}_${slot}`;
+                const value = data.schedule ? data.schedule[key] : '';
+                html += `<td style="text-align:center;">${value ? `<strong>${value}</strong>` : '-'}</td>`;
+            }
+            html += `</tr>`;
+        }
+        
+        html += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('mainContent').innerHTML = html;
+        document.getElementById('backToEdtListView').addEventListener('click', () => renderEdtTab());
+    }
+    
+    async function editEdt(edtId) {
+        const doc = await db.collection('special_timetables').doc(edtId).get();
+        const data = doc.data();
+        if (!data) return;
+        
+        await loadAllClasses();
+        showEdtEditor(edtId, data.title, data.startDate, data.endDate, data.classes);
+    }
+    
+    function closeModal() {
+        const modal = document.getElementById('editModal');
+        if (modal) modal.remove();
+    }
+    
+  
+  
+    // Initialisation
+    document.querySelectorAll('.nav-admin-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.nav-admin-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentTab = btn.dataset.tab;
+            renderCurrentTab();
+        });
     });
     
-    document.getElementById('profId').value = '';
-    document.getElementById('profPassword').value = '';
-    document.getElementById('profPasswordConfirm').value = '';
-    document.getElementById('profNom').value = '';
-    document.getElementById('profMatiere').value = '';
-    await loadProfsTable();
-    showAlert('Professeur ajouté avec succès !', 'success');
-};
-
-      async function loadProfsTable() {
-    let snap = await db.collection('professeurs').get();
-    let tbody = document.querySelector('#profsTable tbody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    for (let doc of snap.docs) {
-        let p = doc.data();
-        let row = tbody.insertRow();
-        row.insertCell(0).innerText = p.identifiant;
-        row.insertCell(1).innerText = p.nom;
-        row.insertCell(2).innerText = p.matiere || '-';
-        let passStatus = p.password ? '<i class="fas fa-lock" style="color:#10b981"></i> Défini' : '<i class="fas fa-lock-open" style="color:#f59e0b"></i> Non défini';
-        row.insertCell(3).innerHTML = passStatus;
-        
-        // Cellule des actions avec 2 boutons : Modifier et Supprimer
-        let actionsCell = row.insertCell(4);
-        
-        // Bouton Modifier
-        let editBtn = document.createElement('button');
-        editBtn.innerHTML = '<i class="fas fa-edit"></i> Modifier';
-        editBtn.className = 'secondary-btn';
-        editBtn.style.marginRight = '8px';
-        editBtn.style.background = '#e0e7ff';
-        editBtn.style.borderColor = '#0f2b5c';
-        editBtn.style.color = '#0f2b5c';
-        editBtn.onclick = () => {
-            openEditProfModal(p.identifiant, p.nom, p.matiere, p.password);
-        };
-        
-        // Bouton Supprimer
-        let delBtn = document.createElement('button');
-        delBtn.innerHTML = '<i class="fas fa-trash"></i> Supprimer';
-        delBtn.className = 'secondary-btn';
-        delBtn.style.background = '#fee2e2';
-        delBtn.onclick = async () => { 
-            if (confirm('Supprimer définitivement ce professeur ?')) {
-                await db.collection('professeurs').doc(p.identifiant).delete(); 
-                await loadProfsTable();
-                showAlert('Professeur supprimé', 'success');
-            }
-        };
-        
-        actionsCell.appendChild(editBtn);
-        actionsCell.appendChild(delBtn);
+    renderCurrentTab();
+  
+  // ========== GESTION DES HORAIRES DYNAMIQUES ==========
+async function saveTimeSlots() {
+    const slots = [];
+    for (let i = 0; i < 9; i++) {
+        const start = document.getElementById(`slot_start_${i}`)?.value;
+        const end = document.getElementById(`slot_end_${i}`)?.value;
+        if (start && end) {
+            slots.push({ start: start, end: end, display: `${start}-${end}` });
+        }
     }
+    
+    await db.collection('settings').doc('timeSlots').set({
+        slots: slots,
+        updatedAt: new Date()
+    });
+    alert("✅ Horaires sauvegardés !");
 }
 
-      // Fonction pour ouvrir la modal de modification d'un professeur
-function openEditProfModal(id, nom, matiere, currentPassword) {
-    // Créer la modal
-    let modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.style.display = 'flex';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-    modal.style.zIndex = '2000';
-    modal.style.alignItems = 'center';
-    modal.style.justifyContent = 'center';
+async function loadTimeSlotsForAdmin() {
+    const doc = await db.collection('settings').doc('timeSlots').get();
+    if (doc.exists) {
+        return doc.data().slots;
+    }
+    return [
+        { start: "08h00", end: "09h00", display: "08h00-09h00" },
+        { start: "09h00", end: "10h00", display: "09h00-10h00" },
+        { start: "10h00", end: "10h50", display: "10h00-10h50" },
+        { start: "11h05", end: "12h05", display: "11h05-12h05" },
+        { start: "12h05", end: "13h05", display: "12h05-13h05" },
+        { start: "13h35", end: "14h35", display: "13h35-14h35" },
+        { start: "14h35", end: "15h35", display: "14h35-15h35" },
+        { start: "15h35", end: "16h35", display: "15h35-16h35" },
+        { start: "16h35", end: "17h35", display: "16h35-17h35" }
+    ];
+}
+
+async function renderSettingsTab() {
+    const slots = await loadTimeSlotsForAdmin();
     
-    modal.innerHTML = `
-        <div class="modal-content" style="max-width: 500px; background: white; border-radius: 24px; padding: 2rem; position: relative; animation: modalIn 0.3s ease;">
-            <button class="modal-close" onclick="this.closest('.modal').remove()" style="position: absolute; top: 1rem; right: 1rem; background: #fee2e2; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer;">
-                <i class="fas fa-times"></i>
-            </button>
-            <div class="modal-header" style="margin-bottom: 1.5rem; text-align: center;">
-                <i class="fas fa-chalkboard-user" style="font-size: 3rem; color: #0f2b5c;"></i>
-                <h2 style="margin-top: 0.5rem;">Modifier le professeur</h2>
+    let html = `
+        <div class="card">
+            <h2><i class="fas fa-clock"></i> Configuration des horaires</h2>
+            <p style="color: gray; margin-bottom: 1rem;">Modifiez les horaires des cours</p>
+    `;
+    
+    for (let i = 0; i < slots.length; i++) {
+        html += `
+            <div style="display: flex; gap: 1rem; margin-bottom: 0.5rem; align-items: center;">
+                <input type="text" id="slot_start_${i}" value="${slots[i].start}" style="flex:1; padding: 0.5rem; border-radius: 0.8rem; border: 1px solid #ccc;">
+                <span>à</span>
+                <input type="text" id="slot_end_${i}" value="${slots[i].end}" style="flex:1; padding: 0.5rem; border-radius: 0.8rem; border: 1px solid #ccc;">
             </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
-                <label>ID (non modifiable)</label>
-                <input type="text" id="editProfId" value="${id}" disabled style="background: #f1f5f9;">
-            </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
-                <label>Nom complet *</label>
-                <input type="text" id="editProfNom" value="${nom.replace(/"/g, '&quot;')}" placeholder="Nom et prénom">
-            </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
-                <label>Matière</label>
-                <input type="text" id="editProfMatiere" value="${matiere || ''}" placeholder="Ex: Mathématiques">
-            </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
-                <label>Nouveau mot de passe</label>
-                <input type="password" id="editProfPassword" placeholder="Laisser vide pour garder l'ancien">
-            </div>
-            <div class="form-group" style="margin-bottom: 1rem;">
-                <label>Confirmer le mot de passe</label>
-                <input type="password" id="editProfPasswordConfirm" placeholder="Retapez le nouveau mot de passe">
-            </div>
-            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                <button class="secondary-btn" onclick="this.closest('.modal').remove()" style="flex: 1;">Annuler</button>
-                <button class="primary-btn" onclick="updateProfesseur('${id}', this)" style="flex: 1;"><i class="fas fa-save"></i> Enregistrer</button>
-            </div>
+        `;
+    }
+    
+    html += `
+            <button id="saveTimeSlotsBtn" class="btn btn-primary" style="margin-top: 1rem;">💾 Enregistrer les horaires</button>
         </div>
     `;
     
-    document.body.appendChild(modal);
-    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    document.getElementById('mainContent').innerHTML = html;
+    
+    document.getElementById('saveTimeSlotsBtn').addEventListener('click', saveTimeSlots);
 }
-
-// Fonction pour mettre à jour le professeur
-window.updateProfesseur = async function(id, btn) {
-    let modal = btn.closest('.modal');
-    let nom = document.getElementById('editProfNom').value.trim();
-    let matiere = document.getElementById('editProfMatiere').value;
-    let newPassword = document.getElementById('editProfPassword').value;
-    let newPasswordConfirm = document.getElementById('editProfPasswordConfirm').value;
-    
-    if (!nom) {
-        alert('Le nom est requis');
-        return;
-    }
-    
-    // Vérifier les mots de passe si un nouveau est fourni
-    let passwordToSave = null;
-    if (newPassword) {
-        if (newPassword !== newPasswordConfirm) {
-            alert('Les mots de passe ne correspondent pas');
-            return;
-        }
-        if (newPassword.length < 4) {
-            alert('Le mot de passe doit contenir au moins 4 caractères');
-            return;
-        }
-        passwordToSave = btoa(newPassword);
-    }
-    
-    try {
-        // Récupérer le professeur existant
-        let doc = await db.collection('professeurs').doc(id).get();
-        let existingData = doc.data();
-        
-        // Préparer les données mises à jour
-        let updatedData = {
-            identifiant: id,
-            nom: nom,
-            matiere: matiere || '',
-            password: passwordToSave !== null ? passwordToSave : existingData.password
-        };
-        
-        // Sauvegarder les modifications
-        await db.collection('professeurs').doc(id).set(updatedData);
-        
-        // Fermer la modal
-        modal.remove();
-        
-        // Recharger le tableau
-        await loadProfsTable();
-        
-        showAlert('Professeur modifié avec succès !', 'success');
-    } catch (error) {
-        console.error('Erreur lors de la modification:', error);
-        alert('Erreur lors de la modification');
-    }
-};
-        // ==================== AUTRES PAGES ====================
-   function renderEmploiPage() {
-    document.getElementById('app').innerHTML = `
-        <div class="page-container" style="padding: 0; background: white;">
-            <div class="page-card" style="max-width: 100%; margin: 0; border-radius: 0; padding: 0; box-shadow: none;">
-                <div style="position: fixed; top: 1rem; left: 1rem; z-index: 1000;">
-                    <button class="btn-back" onclick="goHome()" style="background: #0f2b5c; color: white; border: none; padding: 0.7rem 1.2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
-                        <i class="fas fa-arrow-left"></i> Retour à l'accueil
-                    </button>
-                </div>
-                <iframe src="emploi.html" style="width: 100%; height: 100vh; border: none;"></iframe>
-            </div>
-        </div>
-    `;
-}
-
-        async function renderBulletinsPage() {
-            document.getElementById('app').innerHTML = `<div class="page-container"><div class="page-card">
-                ${renderBackButton('Bulletins', 'fa-file-pdf')}
-                <div class="form-card"><div class="form-grid">
-                    <div class="form-group"><label>Classe</label><select id="bulletinClasseSelect"></select></div>
-                    <div class="form-group"><label>Semestre</label><select id="bulletinSemestreSelect"><option value="1">Semestre 1</option><option value="2">Semestre 2</option></select></div>
-                </div>
-                <button class="primary-btn" onclick="genererBulletins()"><i class="fas fa-print"></i> Générer</button></div>
-                <div id="bulletinsListGlobal" class="eleves-list"></div>
-            </div></div>`;
-            let snap = await db.collection('classes').get();
-            let select = document.getElementById('bulletinClasseSelect');
-            select.innerHTML = '<option value="">Choisir une classe</option>';
-            snap.forEach(d => { select.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`; });
-        }
-
-        window.genererBulletins = async function() {
-            let classe = document.getElementById('bulletinClasseSelect').value;
-            let semestre = document.getElementById('bulletinSemestreSelect').value;
-            if (!classe) return alert('Choisissez une classe');
-            let elevesSnap = await db.collection('eleves').where('classe', '==', classe).get();
-            let container = document.getElementById('bulletinsListGlobal');
-            container.innerHTML = '';
-            if (elevesSnap.empty) {
-                container.innerHTML = '<div style="text-align:center;padding:2rem">Aucun élève dans cette classe</div>';
-                return;
-            }
-            for (let doc of elevesSnap.docs) {
-                let eleve = doc.data();
-                container.innerHTML += `
-                    <div class="bulletin-card" style="background:white;border-radius:16px;margin-bottom:1rem;border:1px solid #e2e8f0">
-                        <div style="background:linear-gradient(120deg,#0f2b5c,#1e4a8a);color:white;padding:1rem;border-radius:16px 16px 0 0">
-                            <strong>GROUPE SCOLAIRE SALDIA</strong> - Bulletin Semestre ${semestre}
-                        </div>
-                        <div style="padding:1.5rem">
-                            <strong>${eleve.nom}</strong><br>
-                            Matricule: ${eleve.matricule}<br>
-                            Classe: ${classe}<br>
-                            <em>Aucune note disponible pour le moment</em>
-                        </div>
-                    </div>
-                `;
-            }
-        };
-
-        async function renderDocumentsPage() {
-            document.getElementById('app').innerHTML = `<div class="page-container"><div class="page-card">
-                ${renderBackButton('Demandes de Documents', 'fa-file-alt')}
-                <div class="table-container"><table id="demandesTable"><thead><tr><th>Demandeur</th><th>Document</th><th>Date</th><th>Statut</th></tr></thead><tbody></tbody></table></div>
-            </div></div>`;
-            let snap = await db.collection('demandes').get();
-            let tbody = document.querySelector('#demandesTable tbody');
-            if (snap.empty) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Aucune demande</td></tr>';
-            } else {
-                snap.forEach(d => { 
-                    let req = d.data(); 
-                    let row = tbody.insertRow(); 
-                    row.insertCell(0).innerText = req.nomComplet || 'N/A'; 
-                    row.insertCell(1).innerText = req.typeDocument || 'N/A'; 
-                    row.insertCell(2).innerText = req.date ? new Date(req.date).toLocaleDateString() : 'N/A'; 
-                    row.insertCell(3).innerText = req.statut || 'En attente'; 
-                });
-            }
-        }
-
-        async function renderPresencesPage() {
-            document.getElementById('app').innerHTML = `<div class="page-container"><div class="page-card">
-                ${renderBackButton('Suivi des Présences', 'fa-calendar-check')}
-                <div class="form-card"><div class="form-grid">
-                    <div class="form-group"><label>Classe</label><select id="presenceClasse"></select></div>
-                    <div class="form-group"><label>Date</label><input type="date" id="presenceDate"></div>
-                </div>
-                <button class="primary-btn" onclick="loadPresencesTable()"><i class="fas fa-search"></i> Charger</button></div>
-                <div class="table-container"><table id="presencesTable"><thead><tr><th>Élève</th><th>Statut</th><th>Action</th></tr></thead><tbody></tbody></table></div>
-            </div></div>`;
-            let snap = await db.collection('classes').get();
-            let select = document.getElementById('presenceClasse');
-            select.innerHTML = '<option value="">Choisir une classe</option>';
-            snap.forEach(d => { select.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`; });
-            document.getElementById('presenceDate').valueAsDate = new Date();
-        }
-
-        window.loadPresencesTable = async function() {
-            let classe = document.getElementById('presenceClasse').value;
-            let date = document.getElementById('presenceDate').value;
-            if (!classe) return alert('Choisissez une classe');
-            let eleves = await db.collection('eleves').where('classe', '==', classe).get();
-            let tbody = document.querySelector('#presencesTable tbody');
-            tbody.innerHTML = '';
-            if (eleves.empty) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center">Aucun élève dans cette classe</td></tr>';
-                return;
-            }
-            for (let doc of eleves.docs) {
-                let eleve = doc.data();
-                let presenceId = `${eleve.matricule}_${date}`;
-                let pDoc = await db.collection('presences').doc(presenceId).get();
-                let statut = pDoc.exists ? pDoc.data().statut : 'Présent';
-                let row = tbody.insertRow();
-                row.insertCell(0).innerText = eleve.nom;
-                let sel = document.createElement('select');
-                sel.innerHTML = '<option>Présent</option><option>Absent</option><option>Retard</option><option>Excusé</option>';
-                sel.value = statut;
-                let btn = document.createElement('button');
-                btn.innerText = 'Enregistrer';
-                btn.className = 'primary-btn';
-                btn.style.padding = '0.3rem 1rem';
-                btn.onclick = async () => {
-                    await db.collection('presences').doc(presenceId).set({ matricule: eleve.matricule, nom: eleve.nom, classe, date, statut: sel.value });
-                    showAlert('Présence enregistrée', 'success');
-                };
-                row.insertCell(1).appendChild(sel);
-                row.insertCell(2).appendChild(btn);
-            }
-        };
-
-        function showAlert(msg, type) {
-            let alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${msg}`;
-            let container = document.querySelector('.page-card');
-            if (container) {
-                container.prepend(alertDiv);
-                setTimeout(() => alertDiv.remove(), 3000);
-            }
-        }
-
-        renderHome();
-    </script>
+</script>
 </body>
 </html>
