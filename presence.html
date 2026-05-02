@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Saldia Admin - Relevé des présences</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #F8FAFE 0%, #EEF2F9 100%);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .admin-header {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-area img {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Boutons niveau */
+        .niveau-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+        }
+
+        .btn-niveau {
+            padding: 0.8rem 2rem;
+            border-radius: 2rem;
+            border: none;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-niveau.college {
+            background: #10B981;
+            color: white;
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+        }
+
+        .btn-niveau.lycee {
+            background: #4F46E5;
+            color: white;
+            box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+        }
+
+        .btn-niveau:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-niveau.active {
+            transform: scale(0.98);
+        }
+
+        /* Grille des classes */
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .class-card {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #E2E8F0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .class-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            border-color: #4F46E5;
+        }
+
+        .class-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #1E293B;
+        }
+
+        .class-card .total-eleves {
+            font-size: 0.8rem;
+            color: #64748B;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Calendrier */
+        .calendar-container {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            background: #F1F5F9;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #E2E8F0;
+        }
+
+        .calendar-month {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1E293B;
+        }
+
+        .calendar-week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            padding: 0.5rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #64748B;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            background: #F8FAFE;
+            border: 1px solid #E2E8F0;
+        }
+
+        .calendar-day:hover {
+            background: #E0E7FF;
+            border-color: #4F46E5;
+        }
+
+        .calendar-day.selected {
+            background: #4F46E5;
+            color: white;
+            border-color: #4F46E5;
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            cursor: default;
+        }
+
+        /* Tableau des présences */
+        .presence-table-container {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .presence-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .presence-table th {
+            background: #4F46E5;
+            color: white;
+            padding: 0.8rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .presence-table td {
+            border: 1px solid #E2E8F0;
+            padding: 0.6rem;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+
+        .presence-table .time-cell {
+            background: #F8FAFE;
+            font-weight: 600;
+            width: 100px;
+        }
+
+        .stat-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin: 0.1rem;
+        }
+
+        .stat-present {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .stat-late {
+            background: #FEF3C7;
+            color: #B45309;
+        }
+
+        .stat-absent {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+
+        /* Liste des élèves */
+        .eleves-list {
+            margin-top: 1rem;
+            background: #F8FAFE;
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+
+        .eleves-list h4 {
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            color: #1E293B;
+        }
+
+        .eleve-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #E2E8F0;
+            font-size: 0.8rem;
+        }
+
+        .btn-back {
+            background: #F1F5F9;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .stat-card .label {
+            font-size: 0.7rem;
+            color: #64748B;
+        }
+
+        .stat-card.present .number { color: #10B981; }
+        .stat-card.late .number { color: #F59E0B; }
+        .stat-card.absent .number { color: #EF4444; }
+
+        .info-classe {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+      .presence-table th, .presence-table td, .stat-badge { font-size: 1rem !important; }
+.presence-table td strong { font-size: 1.2rem !important; }
+.presence-table td small { font-size: 1rem !important; }
+      /* AGRANDIR LA POLICE DE LA LISTE DES ÉLÈVES */
+.eleves-list, .eleve-row, .eleve-row strong, .eleve-row .stat-badge {
+    font-size: 1.1rem !important;
+}
+.eleves-list h4 {
+    font-size: 1.2rem !important;
+}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="admin-header">
+        <div class="logo-area">
+            <img src="https://groupescolairesaldia.com/wp-content/uploads/2022/06/logo.png" alt="Logo">
+            <h1><i class="fas fa-clipboard-list"></i> Relevé des présences</h1>
+        </div>
+    </div>
+
+    <div id="mainContent"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg",
+        authDomain: "teste-saldia.firebaseapp.com",
+        projectId: "teste-saldia",
+        storageBucket: "teste-saldia.firebasestorage.app",
+        messagingSenderId: "620601259237",
+        appId: "1:620601259237:web:57795c7a64082399d0d00c"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    let currentNiveau = null;
+    let currentClasse = null;
+    let currentDate = new Date();
+    let selectedDate = new Date();
+
+    // Afficher la page d'accueil avec les boutons Lycée/Collège
+    async function renderAccueil() {
+        currentClasse = null;
+        let html = `
+            <div class="niveau-buttons">
+                <button class="btn-niveau college" onclick="selectNiveau('college')">
+                    <i class="fas fa-school"></i> Collège
+                </button>
+                <button class="btn-niveau lycee" onclick="selectNiveau('lycee')">
+                    <i class="fas fa-graduation-cap"></i> Lycée
+                </button>
+            </div>
+            <div id="classesContainer"></div>
+        `;
+        document.getElementById('mainContent').innerHTML = html;
+    }
+
+    // Sélectionner le niveau et afficher les classes
+    window.selectNiveau = async function(niveau) {
+        currentNiveau = niveau;
+        currentClasse = null;
+        
+        const classesContainer = document.getElementById('classesContainer');
+        classesContainer.innerHTML = '<div class="loader">Chargement des classes...</div>';
+        
+        const classesSnap = await db.collection('classes').where('niveau', '==', niveau).get();
+        const classes = [];
+        classesSnap.forEach(doc => {
+            classes.push({ id: doc.id, ...doc.data() });
+        });
+        
+        if (classes.length === 0) {
+            classesContainer.innerHTML = '<p style="text-align:center;">Aucune classe trouvée pour ce niveau</p>';
+            return;
+        }
+        
+        // Compter le nombre total d'élèves
+        let totalEleves = 0;
+        for (const classe of classes) {
+            const elevesSnap = await db.collection('eleves').where('classe', '==', classe.name).get();
+            if (elevesSnap.empty) {
+                const elevesSnap2 = await db.collection('eleves').where('classeId', '==', classe.id).get();
+                totalEleves += elevesSnap2.size;
+            } else {
+                totalEleves += elevesSnap.size;
+            }
+        }
+        
+        let classesHtml = `<div style="margin-bottom: 1rem;"><strong>📊 Total élèves: ${totalEleves}</strong></div>`;
+        classesHtml += `<div class="classes-grid">`;
+        
+        for (const classe of classes) {
+            let elevesCount = 0;
+            const elevesSnap = await db.collection('eleves').where('classe', '==', classe.name).get();
+            if (elevesSnap.empty) {
+                const elevesSnap2 = await db.collection('eleves').where('classeId', '==', classe.id).get();
+                elevesCount = elevesSnap2.size;
+            } else {
+                elevesCount = elevesSnap.size;
+            }
+            
+            classesHtml += `
+                <div class="class-card" onclick="selectClasse('${classe.id}', '${classe.name}')">
+                    <h3><i class="fas fa-chalkboard-user"></i> ${classe.name}</h3>
+                    <div class="total-eleves"><i class="fas fa-users"></i> ${elevesCount} élèves</div>
+                </div>
+            `;
+        }
+        classesHtml += `</div>`;
+        classesContainer.innerHTML = classesHtml;
+    }
+
+    // Sélectionner une classe et afficher le calendrier
+    window.selectClasse = async function(classeId, classeName) {
+        currentClasse = { id: classeId, name: classeName };
+        currentDate = new Date();
+        selectedDate = new Date();
+        await renderCalendar();
+    }
+
+    // Afficher le calendrier
+    async function renderCalendar() {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startDayOfWeek = firstDay.getDay() || 7;
+        
+        const daysInMonth = lastDay.getDate();
+        const daysPrevMonth = startDayOfWeek - 1;
+        
+        const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        const weekdays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+        
+        let html = `
+            <button class="btn-back" onclick="renderAccueil()">
+                <i class="fas fa-arrow-left"></i> Retour aux classes
+            </button>
+            
+            <div class="info-classe">
+                <div><i class="fas fa-school"></i> <strong>${currentClasse.name}</strong></div>
+                <div><i class="fas fa-calendar-alt"></i> Relevé des présences</div>
+            </div>
+            
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-nav">
+                        <button class="nav-btn" onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                        <button class="nav-btn" onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-month">${monthNames[month]} ${year}</div>
+                </div>
+                
+                <div class="calendar-week">
+                    ${weekdays.map(d => `<div class="calendar-weekday">${d}</div>`).join('')}
+                </div>
+                
+                <div class="calendar-days">
+        `;
+        
+        for (let i = 0; i < daysPrevMonth; i++) {
+            html += `<div class="calendar-day empty"></div>`;
+        }
+        
+        for (let d = 1; d <= daysInMonth; d++) {
+            const isSelected = selectedDate.getDate() === d && selectedDate.getMonth() === month && selectedDate.getFullYear() === year;
+            html += `<div class="calendar-day ${isSelected ? 'selected' : ''}" onclick="selectDay(${d})">${d}</div>`;
+        }
+        
+        const remainingDays = 42 - (daysPrevMonth + daysInMonth);
+        for (let i = 0; i < remainingDays; i++) {
+            html += `<div class="calendar-day empty"></div>`;
+        }
+        
+        html += `
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('mainContent').innerHTML = html;
+        
+        // Afficher les présences pour la date sélectionnée
+        await renderPresencesForDate();
+    }
+
+    // Changer de mois
+    window.changeMonth = function(delta) {
+        currentDate.setMonth(currentDate.getMonth() + delta);
+        renderCalendar();
+    }
+
+    // Sélectionner un jour
+ // Sélectionner un jour et afficher toute la semaine
+window.selectDay = async function(day) {
+    // Date sélectionnée
+    selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    
+    // Calculer le lundi de la semaine de la date sélectionnée
+    const dayOfWeek = selectedDate.getDay(); // 0 = dimanche, 1 = lundi, ..., 6 = samedi
+    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const mondayDate = new Date(selectedDate);
+    mondayDate.setDate(selectedDate.getDate() + mondayOffset);
+    
+    // Stocker la semaine complète
+    window.weekDates = {
+        monday: new Date(mondayDate),
+        tuesday: new Date(mondayDate.setDate(mondayDate.getDate() + 1)),
+        wednesday: new Date(mondayDate.setDate(mondayDate.getDate() + 1)),
+        thursday: new Date(mondayDate.setDate(mondayDate.getDate() + 1)),
+        friday: new Date(mondayDate.setDate(mondayDate.getDate() + 1))
+    };
+    // Recalculer car les setDate modifient l'original
+    const baseMonday = new Date(selectedDate);
+    baseMonday.setDate(selectedDate.getDate() + (dayOfWeek === 0 ? -6 : 1 - dayOfWeek));
+    window.weekDates = {
+        monday: new Date(baseMonday),
+        tuesday: new Date(baseMonday.setDate(baseMonday.getDate() + 1)),
+        wednesday: new Date(baseMonday.setDate(baseMonday.getDate() + 1)),
+        thursday: new Date(baseMonday.setDate(baseMonday.getDate() + 1)),
+        friday: new Date(baseMonday.setDate(baseMonday.getDate() + 1))
+    };
+    
+    await renderCalendar();
+}
+
+    // Afficher les présences pour la date sélectionnée
+ // Afficher les présences pour toute la semaine
+// Afficher les présences pour toute la semaine
+async function renderPresencesForDate() {
+    const weekStart = window.weekDates?.monday || selectedDate;
+    const weekEnd = window.weekDates?.friday || selectedDate;
+    
+    const dateFormatted = `${weekStart.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })} - ${weekEnd.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+    
+    // Récupérer l'emploi du temps de la classe
+    const ttDoc = await db.collection('timetables').doc(currentClasse.id).get();
+    const timetable = ttDoc.exists ? ttDoc.data() : {};
+    
+    // Récupérer les élèves
+    let studentsSnap = await db.collection('eleves').where('classeId', '==', currentClasse.id).get();
+    if (studentsSnap.empty) {
+        studentsSnap = await db.collection('eleves').where('classe', '==', currentClasse.name).get();
+    }
+    
+    const students = [];
+    studentsSnap.forEach(doc => {
+        const d = doc.data();
+        students.push({
+            id: doc.id,
+            nom: d.nom || 'Élève',
+            prenom: d.prenom || '',
+            matricule: d.matricule || doc.id.slice(0,8)
+        });
+    });
+    
+    // Créneaux horaires
+    const timeSlots = [
+        "08h00", "09h00", "10h00", "11h05", "12h05", "13h35", "14h35", "15h35", "16h35"
+    ];
+    const timeEnds = ["09h00", "10h00", "10h50", "12h05", "13h05", "14h35", "15h35", "16h35", "17h35"];
+    const days = ["monday", "tuesday", "wednesday", "thursday", "friday"];
+    const dayNames = ["LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI"];
+    
+    // Récupérer les présences de toute la semaine
+    const presencesSnap = await db.collection('presences').get();
+    let presenceMap = new Map();
+    
+    // Dates de la semaine
+    const weekDatesStr = {};
+    for (let i = 0; i < days.length; i++) {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + i);
+        weekDatesStr[days[i]] = date.toISOString().split('T')[0];
+    }
+    
+    presencesSnap.forEach(doc => {
+        const p = doc.data();
+        if (p.classeId === currentClasse.id || p.classeNom === currentClasse.name) {
+            const isInWeek = Object.values(weekDatesStr).includes(p.date);
+            if (isInWeek) {
+                for (const student of students) {
+                    let statut = null;
+                    if (p.eleves && p.eleves[student.id] && p.eleves[student.id].statut) {
+                        statut = p.eleves[student.id].statut;
+                    } else if (p.statuts && p.statuts[student.id]) {
+                        statut = p.statuts[student.id];
+                    }
+                    if (statut && p.heure) {
+                        const key = `${student.id}_${p.date}_${p.heure}`;
+                        presenceMap.set(key, statut);
+                    }
+                }
+            }
+        }
+    });
+    
+    // Calculer les statistiques par élève sur la semaine
+    let studentStats = {};
+    for (const student of students) {
+        studentStats[student.id] = { present: 0, late: 0, absent: 0, total: 0 };
+        for (let i = 0; i < timeSlots.length; i++) {
+            for (let j = 0; j < days.length; j++) {
+                const dateStr = weekDatesStr[days[j]];
+                const key = `${student.id}_${dateStr}_${timeSlots[i]}`;
+                const statut = presenceMap.get(key);
+                if (statut === 'present') studentStats[student.id].present++;
+                else if (statut === 'late') studentStats[student.id].late++;
+                else if (statut === 'absent') studentStats[student.id].absent++;
+            }
+        }
+        studentStats[student.id].total = timeSlots.length * days.length;
+    }
+    
+    // Statistiques globales de la semaine
+    let totalPresent = 0, totalLate = 0, totalAbsent = 0;
+    for (const student of students) {
+        totalPresent += studentStats[student.id].present;
+        totalLate += studentStats[student.id].late;
+        totalAbsent += studentStats[student.id].absent;
+    }
+    
+    let html = `
+        <div class="stats-cards">
+            <div class="stat-card present">
+                <div class="number">${totalPresent}</div>
+                <div class="label">Présents (semaine)</div>
+            </div>
+            <div class="stat-card late">
+                <div class="number">${totalLate}</div>
+                <div class="label">Retards (semaine)</div>
+            </div>
+            <div class="stat-card absent">
+                <div class="number">${totalAbsent}</div>
+                <div class="label">Absents (semaine)</div>
+            </div>
+        </div>
+        
+        <div class="presence-table-container">
+            <h3 style="margin-bottom: 1rem;"><i class="fas fa-calendar-week"></i> Semaine du ${dateFormatted}</h3>
+            <table class="presence-table">
+                <thead>
+                    <tr>
+                        <th>Horaire</th>
+                        ${dayNames.map((d, idx) => `<th>${d}<br><span style="font-size:0.6rem;">${new Date(weekDatesStr[days[idx]]).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</span></th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    for (let i = 0; i < timeSlots.length; i++) {
+        html += `<tr>`;
+        html += `<td class="time-cell">${timeSlots[i]} - ${timeEnds[i]}</td>`;
+        
+        for (let j = 0; j < days.length; j++) {
+            const courseKey = `${days[j]}_${i === 0 ? 'h8' : i === 1 ? 'h9' : i === 2 ? 'h10' : i === 3 ? 'h11' : i === 4 ? 'h12' : i === 5 ? 'h13' : i === 6 ? 'h14' : i === 7 ? 'h15' : 'h16'}`;
+            const course = timetable[courseKey];
+            const dateStr = weekDatesStr[days[j]];
+            
+            if (course && course.subject) {
+                let slotPresent = 0, slotLate = 0, slotAbsent = 0;
+                for (const student of students) {
+                    const key = `${student.id}_${dateStr}_${timeSlots[i]}`;
+                    const statut = presenceMap.get(key);
+                    if (statut === 'present') slotPresent++;
+                    else if (statut === 'late') slotLate++;
+                    else if (statut === 'absent') slotAbsent++;
+                }
+                
+                html += `
+                    <td>
+                        <strong>${course.subject}</strong><br>
+                        <small>${course.teacher || 'Prof'}</small><br>
+                        <div style="margin-top: 5px;">
+                            <span class="stat-badge stat-present">P:${slotPresent}</span>
+                            <span class="stat-badge stat-late">R:${slotLate}</span>
+                            <span class="stat-badge stat-absent">A:${slotAbsent}</span>
+                        </div>
+                    </td>
+                `;
+            } else {
+                html += `<td style="color:#94A3B8;">-</td>`;
+            }
+        }
+        html += `</tr>`;
+    }
+    
+    // ========== AJOUT DES STATISTIQUES PAR JOUR ==========
+    // Calcul des statistiques par jour
+    let dayStats = {};
+    for (let j = 0; j < days.length; j++) {
+        const dateStr = weekDatesStr[days[j]];
+        dayStats[days[j]] = { present: 0, late: 0, absent: 0 };
+        for (const student of students) {
+            for (let i = 0; i < timeSlots.length; i++) {
+                const key = `${student.id}_${dateStr}_${timeSlots[i]}`;
+                const statut = presenceMap.get(key);
+                if (statut === 'present') dayStats[days[j]].present++;
+                else if (statut === 'late') dayStats[days[j]].late++;
+                else if (statut === 'absent') dayStats[days[j]].absent++;
+            }
+        }
+    }
+    
+    // Ajouter la ligne des statistiques par jour
+    html += `<tr style="background: #F1F5F9; border-top: 2px solid #4F46E5;">`;
+    html += `<td class="time-cell" style="font-weight: 700;"><i class="fas fa-chart-bar"></i>RÉSUMÉ</td>`;
+    for (let j = 0; j < days.length; j++) {
+        const stats = dayStats[days[j]];
+        const totalJour = stats.present + stats.late + stats.absent;
+        html += `
+            <td style="text-align: center;">
+                <div><span class="stat-badge stat-late">R:${stats.late}</span></div>
+                <div><span class="stat-badge stat-absent">A:${stats.absent}</span></div>
+            </td>
+        `;
+    }
+    html += `</tr>`;
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="eleves-list">
+            <h4><i class="fas fa-users"></i> Liste des élèves (${students.length}) - Bilan de la semaine</h4>
+            ${students.map(s => {
+                const stats = studentStats[s.id];
+                const taux = stats.total > 0 ? Math.round((stats.present + stats.late) / stats.total * 100) : 0;
+                return `
+                    <div class="eleve-row">
+                        <div><strong>${s.matricule}</strong> - ${s.nom} ${s.prenom}</div>
+                        <div>
+                            <span class="stat-badge stat-present">P:${stats.present}</span>
+                            <span class="stat-badge stat-late">R:${stats.late}</span>
+                            <span class="stat-badge stat-absent">A:${stats.absent}</span>
+                            <span style="margin-left: 8px; font-weight:600;">${taux}%</span>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+    
+    document.getElementById('mainContent').innerHTML += html;
+}
+
+    // Initialisation
+    renderAccueil();
+</script>
+</body>
+</html>
