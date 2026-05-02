@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SALDIA - Gestion des bulletins</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-600: #475569;
+            --gray-800: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--gray-50) 0%, #eef2ff 100%);
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Header */
+        .main-header {
+            background: white;
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-area img {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .nav-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-btn.secondary {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Cartes */
+        .card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Grille des boutons niveau */
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .level-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+        }
+
+        .level-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .level-card h3 {
+            font-size: 1.5rem;
+        }
+
+        /* Grille des classes */
+        .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .class-card {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 0.75rem;
+            padding: 1.2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .class-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .class-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tableau des coefficients */
+        .coeff-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .coeff-table th, .coeff-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--gray-200);
+            text-align: left;
+        }
+
+        .coeff-table input {
+            width: 80px;
+            padding: 0.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        /* Liste des élèves */
+        .students-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .student-item:hover {
+            background: var(--gray-100);
+            transform: translateX(5px);
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .student-rank {
+            font-weight: bold;
+            background: var(--primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        /* Sélecteur de semestre */
+        .semestre-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .semestre-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 2rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .semestre-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .back-btn {
+            background: var(--gray-100);
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 1rem;
+            }
+            .level-card {
+                padding: 1rem;
+            }
+            .coeff-table {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="main-header">
+            <div class="logo-area">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6TrgU4AASRSJarnI58KyEGExNCsT9lL7hSI91R5fymQ&s" alt="Logo">
+                <h1>GROUPE SALDIA<br><small style="font-size: 0.7rem;">Gestion des bulletins</small></h1>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn primary" id="homeBtn"><i class="fas fa-home"></i> Accueil</button>
+            </div>
+        </div>
+
+        <div id="mainContent"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script>
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC2AC5ZBXkHmtQhuksZnzt0B2sl-d8bvAg",
+            authDomain: "teste-saldia.firebaseapp.com",
+            projectId: "teste-saldia",
+            storageBucket: "teste-saldia.firebasestorage.app",
+            messagingSenderId: "620601259237",
+            appId: "1:620601259237:web:57795c7a64082399d0d00c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Variables d'état
+        let currentNiveau = null;
+        let currentClasse = null;
+        let currentClasseId = null;
+        let currentClasseName = null;
+        let currentSemestre = '1';
+        let currentTypeNote = 'CC1'; // CC1, CC2, Composition
+        let coefficients = {};
+        let matieresList = [];
+        let studentsList = [];
+        let bulletinsData = [];
+
+        // Stockage local des coefficients
+        const COEFF_STORAGE_KEY = 'saldia_coefficients';
+
+        // Fonction pour sauvegarder les coefficients
+        function saveCoefficientsLocal(classeId, coeffs) {
+            const allCoeffs = JSON.parse(localStorage.getItem(COEFF_STORAGE_KEY) || '{}');
+            allCoeffs[classeId] = coeffs;
+            localStorage.setItem(COEFF_STORAGE_KEY, JSON.stringify(allCoeffs));
+        }
+
+        function loadCoefficientsLocal(classeId) {
+            const allCoeffs = JSON.parse(localStorage.getItem(COEFF_STORAGE_KEY) || '{}');
+            return allCoeffs[classeId] || {};
+        }
+
+        // Page d'accueil avec les boutons COLLEGE et LYCEE
+        function renderHome() {
+            return `
+                <div class="level-grid">
+                    <div class="level-card" data-niveau="college">
+                        <i class="fas fa-school"></i>
+                        <h3>COLLÈGE</h3>
+                        <p>Classes du collège</p>
+                    </div>
+                    <div class="level-card" data-niveau="lycee">
+                        <i class="fas fa-university"></i>
+                        <h3>LYCÉE</h3>
+                        <p>Classes du lycée</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Récupérer les classes par niveau
+        async function renderClassesByNiveau(niveau) {
+            currentNiveau = niveau;
+            const main = document.getElementById('mainContent');
+            main.innerHTML = '<div class="loading"><div class="spinner"></div> Chargement des classes...</div>';
+            
+            try {
+                const classesSnapshot = await db.collection('classes').where('niveau', '==', niveau).get();
+                const classes = [];
+                classesSnapshot.forEach(doc => {
+                    classes.push({ id: doc.id, name: doc.data().name, niveau: doc.data().niveau });
+                });
+                
+                if (classes.length === 0) {
+                    main.innerHTML = `
+                        <div class="card">
+                            <button class="btn back-btn" id="backHomeBtn"><i class="fas fa-arrow-left"></i> Retour</button>
+                            <p style="text-align:center; padding:2rem;">Aucune classe trouvée pour le ${niveau === 'college' ? 'Collège' : 'Lycée'}</p>
+                        </div>
+                    `;
+                    document.getElementById('backHomeBtn')?.addEventListener('click', () => renderHomePage());
+                    return;
+                }
+                
+                let html = `
+                    <button class="btn back-btn" id="backHomeBtn"><i class="fas fa-arrow-left"></i> Retour</button>
+                    <div class="card">
+                        <h2><i class="fas fa-chalkboard"></i> Classes du ${niveau === 'college' ? 'Collège' : 'Lycée'}</h2>
+                        <div class="classes-grid">
+                `;
+                
+                classes.forEach(classe => {
+                    html += `
+                        <div class="class-card" data-class-id="${classe.id}" data-class-name="${classe.name}">
+                            <i class="fas fa-users"></i>
+                            <h3>${classe.name}</h3>
+                            <p>${classe.niveau}</p>
+                        </div>
+                    `;
+                });
+                
+                html += `</div></div>`;
+                main.innerHTML = html;
+                
+                document.getElementById('backHomeBtn').onclick = () => renderHomePage();
+                document.querySelectorAll('.class-card').forEach(card => {
+                    card.onclick = () => renderMatieresAndCoeffs(card.dataset.classId, card.dataset.className);
+                });
+                
+            } catch(error) {
+                main.innerHTML = `<div class="card error">Erreur: ${error.message}</div>`;
+            }
+        }
+
+        // Page des matières et coefficients
+        async function renderMatieresAndCoeffs(classeId, className) {
+            currentClasseId = classeId;
+            currentClasseName = className;
+            currentClasse = className;
+            
+            const main = document.getElementById('mainContent');
+            main.innerHTML = '<div class="loading"><div class="spinner"></div> Chargement des matières...</div>';
+            
+            try {
+                // Récupérer les professeurs pour avoir les matières
+                const profsSnapshot = await db.collection('professeurs').get();
+                const matieresSet = new Set();
+                
+                profsSnapshot.forEach(doc => {
+                    const matiere = doc.data().matiere;
+                    if (matiere) matieresSet.add(matiere);
+                });
+                
+                matieresList = Array.from(matieresSet).sort();
+                
+                // Charger les coefficients existants
+                const savedCoeffs = loadCoefficientsLocal(classeId);
+                
+                let html = `
+                    <button class="btn back-btn" id="backClassesBtn"><i class="fas fa-arrow-left"></i> Retour aux classes</button>
+                    <div class="card">
+                        <h2><i class="fas fa-calculator"></i> Configuration des coefficients</h2>
+                        <p>Classe: <strong>${className}</strong></p>
+                        <p style="font-size:0.8rem; color:gray;">Définissez le coefficient pour chaque matière</p>
+                        
+                        <table class="coeff-table">
+                            <thead>
+                                <tr><th>Matière</th><th>Coefficient</th><th>Action</th></tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                matieresList.forEach(matiere => {
+                    const savedValue = savedCoeffs[matiere] || 1;
+                    html += `
+                        <tr>
+                            <td>${matiere}</td>
+                            <td><input type="number" id="coeff_${matiere.replace(/\s/g, '_')}" value="${savedValue}" step="0.5" min="0.5" max="10" style="width:80px;"></td>
+                            <td><button class="btn-reset-coeff" data-matiere="${matiere}" style="background:none; border:none; color:var(--danger); cursor:pointer;"><i class="fas fa-undo"></i></button></td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                            </tbody>
+                        </table>
+                        
+                        <div class="btn-group">
+                            <button id="saveCoeffsBtn" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer les coefficients</button>
+                            <button id="nextStepBtn" class="btn btn-success"><i class="fas fa-arrow-right"></i> Continuer vers les bulletins</button>
+                        </div>
+                    </div>
+                `;
+                
+                main.innerHTML = html;
+                
+                document.getElementById('backClassesBtn').onclick = () => renderClassesByNiveau(currentNiveau);
+                
+                document.getElementById('saveCoeffsBtn').onclick = () => {
+                    matieresList.forEach(matiere => {
+                        const input = document.getElementById(`coeff_${matiere.replace(/\s/g, '_')}`);
+                        if (input) {
+                            coefficients[matiere] = parseFloat(input.value);
+                        }
+                    });
+                    saveCoefficientsLocal(classeId, coefficients);
+                    alert('Coefficients enregistrés localement !');
+                };
+                
+                document.getElementById('nextStepBtn').onclick = () => renderBulletinConfig();
+                
+                // Boutons reset
+                document.querySelectorAll('.btn-reset-coeff').forEach(btn => {
+                    btn.onclick = () => {
+                        const matiere = btn.dataset.matiere;
+                        const input = document.getElementById(`coeff_${matiere.replace(/\s/g, '_')}`);
+                        if (input) input.value = 1;
+                    };
+                });
+                
+            } catch(error) {
+                main.innerHTML = `<div class="card error">Erreur: ${error.message}</div>`;
+            }
+        }
+
+        // Configuration du bulletin (semestre, type de note)
+        function renderBulletinConfig() {
+            const main = document.getElementById('mainContent');
+            
+            let html = `
+                <button class="btn back-btn" id="backCoeffsBtn"><i class="fas fa-arrow-left"></i> Retour aux coefficients</button>
+                <div class="card">
+                    <h2><i class="fas fa-file-alt"></i> Configuration du bulletin</h2>
+                    <p>Classe: <strong>${currentClasseName}</strong></p>
+                    
+                    <div style="margin: 1rem 0;">
+                        <label><strong>Semestre :</strong></label>
+                        <div class="semestre-selector">
+                            <button class="semestre-btn ${currentSemestre === '1' ? 'active' : ''}" data-semestre="1">1er Semestre</button>
+                            <button class="semestre-btn ${currentSemestre === '2' ? 'active' : ''}" data-semestre="2">2ème Semestre</button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 1rem 0;">
+                        <label><strong>Type d'évaluation :</strong></label>
+                        <div class="semestre-selector">
+                            <button class="type-btn ${currentTypeNote === 'CC1' ? 'active' : ''}" data-type="CC1">CC1</button>
+                            <button class="type-btn ${currentTypeNote === 'CC2' ? 'active' : ''}" data-type="CC2">CC2</button>
+                            <button class="type-btn ${currentTypeNote === 'Composition' ? 'active' : ''}" data-type="Composition">Composition</button>
+                        </div>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button id="generateBulletinsBtn" class="btn btn-primary"><i class="fas fa-chalkboard-user"></i> Générer les bulletins</button>
+                    </div>
+                </div>
+            `;
+            
+            main.innerHTML = html;
+            
+            document.getElementById('backCoeffsBtn').onclick = () => renderMatieresAndCoeffs(currentClasseId, currentClasseName);
+            
+            document.querySelectorAll('.semestre-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.semestre-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSemestre = btn.dataset.semestre;
+                };
+            });
+            
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentTypeNote = btn.dataset.type;
+                };
+            });
+            
+            document.getElementById('generateBulletinsBtn').onclick = () => generateBulletins();
+        }
+
+        // Générer les bulletins
+        async function generateBulletins() {
+            const main = document.getElementById('mainContent');
+            main.innerHTML = '<div class="loading"><div class="spinner"></div> Chargement des élèves et des notes...</div>';
+            
+            try {
+                // Récupérer les élèves
+                let studentsSnap = await db.collection('eleves').where('classeId', '==', currentClasseId).get();
+                if (studentsSnap.empty) {
+                    const classDoc = await db.collection('classes').doc(currentClasseId).get();
+                    const className = classDoc.exists ? classDoc.data().name : currentClasseName;
+                    studentsSnap = await db.collection('eleves').where('classe', '==', className).get();
+                }
+                
+                studentsList = [];
+                studentsSnap.forEach(doc => {
+                    const data = doc.data();
+                    studentsList.push({
+                        id: doc.id,
+                        matricule: data.matricule || doc.id.slice(0, 8),
+                        nom: data.nom || 'Élève',
+                        prenom: data.prenom || '',
+                        nomComplet: `${data.nom || 'Élève'} ${data.prenom || ''}`.trim()
+                    });
+                });
+                
+                // Récupérer toutes les notes
+                await loadAllNotes();
+                
+                // Calculer les moyennes et rangs
+                calculateAveragesAndRanks();
+                
+                // Afficher la liste des élèves
+                renderStudentsList();
+                
+            } catch(error) {
+                main.innerHTML = `<div class="card error">Erreur: ${error.message}</div>`;
+            }
+        }
+
+        async function loadAllNotes() {
+            for (const student of studentsList) {
+                student.notes = {};
+                student.appreciations = {};
+                
+                for (const matiere of matieresList) {
+                    // Récupérer les notes pour cette matière
+                    const coeff = coefficients[matiere] || 1;
+                    
+                    const noteCC1 = await getNote(student.matricule, matiere, currentSemestre, 'CC1');
+                    const noteCC2 = await getNote(student.matricule, matiere, currentSemestre, 'CC2');
+                    const noteComp = await getNote(student.matricule, matiere, currentSemestre, 'Composition');
+                    const appreciation = await getAppreciation(student.matricule, matiere, currentSemestre, currentTypeNote);
+                    
+                    let moyenne = null;
+                    if (currentTypeNote === 'CC1') moyenne = noteCC1;
+                    else if (currentTypeNote === 'CC2') moyenne = noteCC2;
+                    else if (currentTypeNote === 'Composition') {
+                        if (noteCC1 !== null && noteCC2 !== null && noteComp !== null) {
+                            const moyCC = (noteCC1 + noteCC2) / 2;
+                            moyenne = (moyCC + noteComp) / 2;
+                        } else if (noteComp !== null) moyenne = noteComp;
+                        else if (noteCC1 !== null) moyenne = noteCC1;
+                        else if (noteCC2 !== null) moyenne = noteCC2;
+                    }
+                    
+                    student.notes[matiere] = {
+                        cc1: noteCC1,
+                        cc2: noteCC2,
+                        comp: noteComp,
+                        moyenne: moyenne,
+                        coefficient: coeff
+                    };
+                    student.appreciations[matiere] = appreciation;
+                }
+            }
+        }
+
+        async function getNote(matricule, matiere, semestre, type) {
+            try {
+                const docId = `${matricule}_${matiere}_${semestre}_${type}`;
+                const doc = await db.collection('notes').doc(docId).get();
+                if (doc.exists && doc.data().note !== undefined && doc.data().note !== null) {
+                    return doc.data().note;
+                }
+                return null;
+            } catch(e) {
+                return null;
+            }
+        }
+
+        async function getAppreciation(matricule, matiere, semestre, type) {
+            try {
+                const docId = `${matricule}_${matiere}_${semestre}_${type}`;
+                const doc = await db.collection('notes').doc(docId).get();
+                if (doc.exists && doc.data().appreciation) {
+                    return doc.data().appreciation;
+                }
+                return '';
+            } catch(e) {
+                return '';
+            }
+        }
+
+        function calculateAveragesAndRanks() {
+            for (const student of studentsList) {
+                let totalPoints = 0;
+                let totalCoeffs = 0;
+                
+                for (const matiere of matieresList) {
+                    const note = student.notes[matiere]?.moyenne;
+                    const coeff = coefficients[matiere] || 1;
+                    
+                    if (note !== null && note !== undefined) {
+                        totalPoints += note * coeff;
+                        totalCoeffs += coeff;
+                    }
+                }
+                
+                student.moyenneGenerale = totalCoeffs > 0 ? totalPoints / totalCoeffs : null;
+            }
+            
+            // Trier et attribuer les rangs
+            const sorted = [...studentsList].sort((a, b) => {
+                const moyA = a.moyenneGenerale !== null ? a.moyenneGenerale : -1;
+                const moyB = b.moyenneGenerale !== null ? b.moyenneGenerale : -1;
+                return moyB - moyA;
+            });
+            
+            let rank = 1;
+            for (let i = 0; i < sorted.length; i++) {
+                if (i > 0 && sorted[i].moyenneGenerale === sorted[i-1].moyenneGenerale) {
+                    sorted[i].rang = sorted[i-1].rang;
+                } else {
+                    sorted[i].rang = rank;
+                }
+                rank++;
+            }
+            
+            // Remettre dans l'ordre original
+            const rankMap = new Map();
+            sorted.forEach(s => rankMap.set(s.id, s.rang));
+            studentsList.forEach(s => s.rang = rankMap.get(s.id));
+            
+            // Trier par rang
+            studentsList.sort((a, b) => (a.rang || 999) - (b.rang || 999));
+        }
+
+        function renderStudentsList() {
+            const main = document.getElementById('mainContent');
+            
+            let html = `
+                <button class="btn back-btn" id="backConfigBtn"><i class="fas fa-arrow-left"></i> Retour configuration</button>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <h2><i class="fas fa-users"></i> Élèves de ${currentClasseName}</h2>
+                        <button id="downloadAllBtn" class="btn btn-primary"><i class="fas fa-download"></i> Télécharger tous les bulletins (${studentsList.length} élèves)</button>
+                    </div>
+                    <p style="margin: 1rem 0; color: gray;">Cliquez sur un élève pour télécharger son bulletin individuel</p>
+                    
+                    <div class="students-list">
+            `;
+            
+            studentsList.forEach((student, index) => {
+                const rangDisplay = student.rang === 1 ? '🥇 1er' : student.rang === 2 ? '🥈 2ème' : student.rang === 3 ? '🥉 3ème' : `${student.rang}ème`;
+                html += `
+                    <div class="student-item" data-student-id="${student.id}" data-student-matricule="${student.matricule}">
+                        <div class="student-info">
+                            <div class="student-rank">${student.rang || '-'}</div>
+                            <div>
+                                <strong>${student.nomComplet}</strong><br>
+                                <small>${student.matricule}</small>
+                            </div>
+                        </div>
+                        <div>
+                            <span style="background: ${student.moyenneGenerale >= 12 ? '#10b981' : student.moyenneGenerale >= 10 ? '#f59e0b' : '#ef4444'}; color:white; padding:0.2rem 0.8rem; border-radius:2rem;">
+                                ${student.moyenneGenerale !== null ? student.moyenneGenerale.toFixed(2) : 'N/A'}
+                            </span>
+                            <i class="fas fa-chevron-right" style="margin-left: 0.5rem; color: gray;"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            main.innerHTML = html;
+            
+            document.getElementById('backConfigBtn').onclick = () => renderBulletinConfig();
+            document.getElementById('downloadAllBtn').onclick = () => downloadAllBulletins();
+            
+            document.querySelectorAll('.student-item').forEach(item => {
+                item.onclick = () => {
+                    const studentId = item.dataset.studentId;
+                    const student = studentsList.find(s => s.id === studentId);
+                    if (student) downloadSingleBulletin(student);
+                };
+            });
+        }
+
+        async function downloadSingleBulletin(student) {
+            const bulletinHTML = generateBulletinHTML(student);
+            downloadPDF(bulletinHTML, `Bulletin_${student.nomComplet}_${currentClasseName}.pdf`);
+        }
+
+        async function downloadAllBulletins() {
+            const allHTML = [];
+            for (const student of studentsList) {
+                allHTML.push(generateBulletinHTML(student));
+            }
+            
+            const combinedHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Bulletins_${currentClasseName}</title>
+                    <style>
+                        @page {
+                            size: landscape;
+                            margin: 1cm;
+                        }
+                        .page {
+                            page-break-after: always;
+                        }
+                        .page:last-child {
+                            page-break-after: auto;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${allHTML.map(html => `<div class="page">${html}</div>`).join('')}
+                </body>
+                </html>
+            `;
+            
+            downloadPDF(combinedHTML, `Bulletins_${currentClasseName}_tous.pdf`);
+        }
+
+        function generateBulletinHTML(student) {
+            // Calcul des statistiques de classe
+            const moyennes = studentsList.map(s => s.moyenneGenerale).filter(m => m !== null);
+            const moyenneClasse = moyennes.length > 0 ? moyennes.reduce((a,b) => a+b, 0) / moyennes.length : 0;
+            const minMoyenne = moyennes.length > 0 ? Math.min(...moyennes) : 0;
+            const maxMoyenne = moyennes.length > 0 ? Math.max(...moyennes) : 0;
+            
+            let tableRows = '';
+            for (const matiere of matieresList) {
+                const note = student.notes[matiere];
+                const coeff = coefficients[matiere] || 1;
+                const appreciation = student.appreciations[matiere] || '';
+                
+                tableRows += `
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${matiere}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${coeff}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${note?.cc1 !== null && note?.cc1 !== undefined ? note.cc1 : '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${note?.cc2 !== null && note?.cc2 !== undefined ? note.cc2 : '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${note?.comp !== null && note?.comp !== undefined ? note.comp : '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px; text-align: center; font-weight: bold; background: #eef2ff;">${note?.moyenne !== null ? note.moyenne.toFixed(2) : '-'}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${appreciation}</td>
+                    </tr>
+                `;
+            }
+            
+            return `
+                <div style="font-family: Arial, sans-serif; padding: 20px; width: 100%;">
+                    <!-- En-tête -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                        <div>
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6TrgU4AASRSJarnI58KyEGExNCsT9lL7hSI91R5fymQ&s" alt="Logo" style="width: 60px;">
+                            <h2 style="margin: 0;">GROUPE SALDIA</h2>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="border: 2px solid #2563eb; border-radius: 20px; padding: 10px 20px;">
+                                <h3 style="margin: 0;">BULLETIN DE NOTES</h3>
+                                <p style="margin: 0;">${currentClasseName.includes('ème') ? 'COLLÈGE' : 'LYCÉE'}</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <p><strong>Année scolaire:</strong> 2025-2026</p>
+                            <p><strong>Semestre:</strong> ${currentSemestre}</p>
+                            <p><strong>${currentTypeNote}</strong></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Infos élève -->
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 10px;">
+                        <div>
+                            <p><strong>Nom et Prénom(s):</strong> ${student.nomComplet}</p>
+                            <p><strong>Matricule:</strong> ${student.matricule}</p>
+                            <p><strong>Classe:</strong> ${currentClasseName}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="width: 80px; height: 80px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
+                                <i class="fas fa-user" style="font-size: 40px; color: #94a3b8;"></i>
+                            </div>
+                            <p style="font-size: 10px; margin-top: 5px;">ID: ${student.id.slice(0, 8)}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Tableau des notes -->
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                        <thead>
+                            <tr style="background: #1e293b; color: white;">
+                                <th style="border: 1px solid #ddd; padding: 8px;">MATIÈRES</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">COEF</th>
+                                <th colspan="3" style="border: 1px solid #ddd; padding: 8px;">NOTES</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">MOY.</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">APPRÉCIATIONS</th>
+                            </tr>
+                            <tr style="background: #334155; color: white;">
+                                <th style="border: 1px solid #ddd; padding: 8px;"></th>
+                                <th style="border: 1px solid #ddd; padding: 8px;"></th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">CC1</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">CC2</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;">COMPO</th>
+                                <th style="border: 1px solid #ddd; padding: 8px;"></th>
+                                <th style="border: 1px solid #ddd; padding: 8px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                    
+                    <!-- Résultats et statistiques -->
+                    <div style="display: flex; justify-content: space-between; margin-top: 20px; gap: 20px;">
+                        <div style="flex: 1; background: #f1f5f9; padding: 10px; border-radius: 10px;">
+                            <h4>PERFORMANCES</h4>
+                            <p>Moyenne élève: <strong>${student.moyenneGenerale !== null ? student.moyenneGenerale.toFixed(2) : 'N/A'}</strong></p>
+                            <p>Moyenne classe: <strong>${moyenneClasse.toFixed(2)}</strong></p>
+                            <p>Rang: <strong>${student.rang}${student.rang === 1 ? 'er' : 'ème'} / ${studentsList.length}</strong></p>
+                            <p>Min: ${minMoyenne.toFixed(2)} | Max: ${maxMoyenne.toFixed(2)}</p>
+                        </div>
+                        <div style="flex: 1; background: #f1f5f9; padding: 10px; border-radius: 10px;">
+                            <h4>DÉCISIONS</h4>
+                            <p>
+                                <label><input type="checkbox"> Félicitations</label><br>
+                                <label><input type="checkbox"> Encouragements</label><br>
+                                <label><input type="checkbox"> Tableau d'honneur</label>
+                            </p>
+                        </div>
+                        <div style="flex: 1; background: #f1f5f9; padding: 10px; border-radius: 10px;">
+                            <h4>ASSIDUITÉ</h4>
+                            <p>Absences justifiées: ____</p>
+                            <p>Absences non justifiées: ____</p>
+                            <p>Retards: ____</p>
+                            <p>Retenues: ____</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Signatures -->
+                    <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+                        <div style="text-align: center;">
+                            <p>Le Directeur des études</p>
+                            <div style="width: 100px; height: 100px; border: 2px dashed #ccc; margin-top: 20px; border-radius: 50%;"></div>
+                        </div>
+                        <div style="text-align: center;">
+                            <p>Signature des parents</p>
+                            <div style="width: 150px; height: 60px; border-bottom: 1px solid #000; margin-top: 40px;"></div>
+                        </div>
+                        <div style="text-align: right;">
+                            <p>Date d'édition: ${new Date().toLocaleDateString('fr-FR')}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div style="text-align: center; margin-top: 30px; font-size: 9px; color: gray; border-top: 1px solid #ccc; padding-top: 10px;">
+                        GROUPE SALDIA - Tél: (+221) 33 123 45 67 - Email: contact@saldia.sn - www.saldia.sn
+                    </div>
+                </div>
+            `;
+        }
+
+        function downloadPDF(htmlContent, filename) {
+            const style = `
+                <style>
+                    @page {
+                        size: landscape;
+                        margin: 1cm;
+                    }
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 20px;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                    }
+                </style>
+            `;
+            
+            const fullHTML = `<!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>${filename}</title>
+                ${style}
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
+            </head>
+            <body>
+                ${htmlContent}
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            var element = document.body;
+                            var opt = {
+                                margin: [0.5, 0.5, 0.5, 0.5],
+                                filename: '${filename}',
+                                image: { type: 'jpeg', quality: 0.98 },
+                                html2canvas: { scale: 2, letterRendering: true },
+                                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+                            };
+                            html2pdf().set(opt).from(element).save().then(function() {
+                                window.close();
+                            });
+                        }, 500);
+                    };
+                <\/script>
+            </body>
+            </html>`;
+            
+            const win = window.open('', '_blank');
+            win.document.write(fullHTML);
+            win.document.close();
+        }
+
+        function renderHomePage() {
+            currentNiveau = null;
+            currentClasse = null;
+            currentClasseId = null;
+            coefficients = {};
+            const main = document.getElementById('mainContent');
+            main.innerHTML = renderHome();
+            
+            document.querySelectorAll('.level-card').forEach(card => {
+                card.onclick = () => renderClassesByNiveau(card.dataset.niveau);
+            });
+        }
+
+        document.getElementById('homeBtn').onclick = () => renderHomePage();
+        
+        renderHomePage();
+    </script>
+</body>
+</html>
