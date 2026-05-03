@@ -368,6 +368,7 @@
             else if (page === 'bulletins') renderBulletinsPage();
             else if (page === 'documents') renderDocumentsPage();
             else if (page === 'presences') renderPresencesPage();
+          else if (page === 'devoirs') renderDevoirsPage();
         };
 
         window.goHome = function() { renderHome(); };
@@ -398,6 +399,7 @@
                         <div class="dashboard-card" onclick="navigateTo('bulletins')"><div class="card-icon"><i class="fas fa-file-pdf"></i></div><h3>Bulletins</h3></div>
                         <div class="dashboard-card" onclick="navigateTo('documents')"><div class="card-icon"><i class="fas fa-file-alt"></i></div><h3>Demandes</h3></div>
                         <div class="dashboard-card" onclick="navigateTo('presences')"><div class="card-icon"><i class="fas fa-calendar-check"></i></div><h3>Présences</h3></div>
+                        <div class="dashboard-card" onclick="navigateTo('devoirs')"><div class="card-icon"><i class="fas fa-tasks"></i></div><h3>Devoirs</h3><p>Gérer les devoirs/compte à rebours</p></div>
                     </div>
                 </div>
             `;
@@ -504,7 +506,16 @@
                 showAlert('Classe supprimée', 'success');
             }
         };
-
+function renderDevoirsPage() {
+    document.getElementById('app').innerHTML = `
+        <div class="page-container" style="padding: 0;">
+            <iframe src="gestiondesdevoir.html" style="width: 100%; height: 100vh; border: none;"></iframe>
+            <div style="position: fixed; top: 1rem; left: 1rem; z-index: 1000;">
+                <button class="btn-back" onclick="goHome()" style="background: #0f2b5c; color: white;"><i class="fas fa-arrow-left"></i> Retour</button>
+            </div>
+        </div>
+    `;
+}
         // ==================== PAGE ÉLÈVES ====================
         async function renderElevesMainPage() {
             currentNiveau = null;
