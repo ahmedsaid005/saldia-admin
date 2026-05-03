@@ -1220,87 +1220,138 @@
             downloadPDF(combinedHTML, `Bulletins_${currentClasseName}_tous.pdf`);
         }
 
-     function generateBulletinHTML(student) {
+  function generateBulletinHTML(student) {
     // Calcul des statistiques de classe
     const moyennes = studentsList.map(s => s.moyenneGenerale).filter(m => m !== null);
     const moyenneClasse = moyennes.length > 0 ? moyennes.reduce((a,b) => a+b, 0) / moyennes.length : 0;
     const minMoyenne = moyennes.length > 0 ? Math.min(...moyennes) : 0;
     const maxMoyenne = moyennes.length > 0 ? Math.max(...moyennes) : 0;
     
+    // Calcul des totaux pour la moyenne élève
+    let totalPoints = 0;
+    let totalCoeffs = 0;
+    for (const matiere of matieresList) {
+        const note = student.notes[matiere];
+        const coeff = coefficients[matiere] || 1;
+        if (note?.moyenne !== null && note?.moyenne !== undefined) {
+            totalPoints += note.moyenne * coeff;
+            totalCoeffs += coeff;
+        }
+    }
+    const moyenneEleve = totalCoeffs > 0 ? totalPoints / totalCoeffs : 0;
+    
+    // Génération des lignes du tableau
     let tableRows = '';
     for (const matiere of matieresList) {
         const note = student.notes[matiere];
         const coeff = coefficients[matiere] || 1;
         const appreciation = student.appreciations[matiere] || '';
         
+        // Déterminer la couleur de la moyenne
+        let moyColor = '';
+        let moyValue = note?.moyenne !== null && note?.moyenne !== undefined ? note.moyenne.toFixed(2) : '-';
+        if (note?.moyenne !== null && note?.moyenne !== undefined) {
+            if (note.moyenne >= 16) moyColor = '#10B981';
+            else if (note.moyenne >= 14) moyColor = '#3B82F6';
+            else if (note.moyenne >= 12) moyColor = '#8B5CF6';
+            else if (note.moyenne >= 10) moyColor = '#F59E0B';
+            else moyColor = '#EF4444';
+        }
+        
         tableRows += `
-            <tr>
-                <td style="border: 1px solid #aaa; padding: 6px 4px; font-size: 10px;">${matiere}</td>
-                <td style="border: 1px solid #aaa; padding: 6px 4px; text-align: center; font-size: 10px;">${coeff}</td>
-                <td style="border: 1px solid #aaa; padding: 6px 4px; text-align: center; font-size: 10px;">${note?.cc1 !== null && note?.cc1 !== undefined ? note.cc1 : '-'}</td>
-                <td style="border: 1px solid #aaa; padding: 6px 4px; text-align: center; font-size: 10px;">${note?.cc2 !== null && note?.cc2 !== undefined ? note.cc2 : '-'}</td>
-                <td style="border: 1px solid #aaa; padding: 6px 4px; text-align: center; font-size: 10px;">${note?.comp !== null && note?.comp !== undefined ? note.comp : '-'}</td>
-                <td style="border: 1px solid #aaa; padding: 6px 4px; text-align: center; font-weight: bold; background: #eef2ff; font-size: 10px;">${note?.moyenne !== null ? note.moyenne.toFixed(2) : '-'}</td>
-                <td style="border: 1px solid #aaa; padding: 6px 4px; font-size: 9px;">${appreciation}</td>
-            <tr>
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+                <td style="padding: 8px 6px; font-size: 10pt; border-bottom: 1px solid #e2e8f0;">${matiere.charAt(0).toUpperCase() + matiere.slice(1).toLowerCase()}</td>
+                <td style="padding: 8px 6px; text-align: center; font-size: 10pt; border-bottom: 1px solid #e2e8f0;">${coeff}</td>
+                <td style="padding: 8px 6px; text-align: center; font-size: 10pt; border-bottom: 1px solid #e2e8f0;">${note?.cc1 !== null && note?.cc1 !== undefined ? note.cc1 : '-'}</td>
+                <td style="padding: 8px 6px; text-align: center; font-size: 10pt; border-bottom: 1px solid #e2e8f0;">${note?.cc2 !== null && note?.cc2 !== undefined ? note.cc2 : '-'}</td>
+                <td style="padding: 8px 6px; text-align: center; font-size: 10pt; border-bottom: 1px solid #e2e8f0;">${note?.comp !== null && note?.comp !== undefined ? note.comp : '-'}</td>
+                <td style="padding: 8px 6px; text-align: center; font-weight: bold; font-size: 10pt; border-bottom: 1px solid #e2e8f0; color: ${moyColor};">${moyValue}</td>
+                <td style="padding: 8px 6px; font-size: 9pt; border-bottom: 1px solid #e2e8f0; color: #334155;">${appreciation || '—'}</td>
+            </tr>
         `;
     }
     
+    // Déterminer la mention
+    let mention = '';
+    let mentionColor = '';
+    if (moyenneEleve >= 16) { mention = 'Très Bien'; mentionColor = '#10B981'; }
+    else if (moyenneEleve >= 14) { mention = 'Bien'; mentionColor = '#3B82F6'; }
+    else if (moyenneEleve >= 12) { mention = 'Assez Bien'; mentionColor = '#8B5CF6'; }
+    else if (moyenneEleve >= 10) { mention = 'Passable'; mentionColor = '#F59E0B'; }
+    else if (moyenneEleve > 0) { mention = 'Insuffisant'; mentionColor = '#EF4444'; }
+    
     return `
-        <div style="font-family: Arial, sans-serif; padding: 5px; width: 100%; font-size: 11px; margin: 0; page-break-after: avoid; page-break-inside: avoid;">
+        <div style="font-family: 'Helvetica', 'Arial', sans-serif; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 10mm; background: white; box-sizing: border-box; position: relative;">
             
-            <!-- EN-TÊTE COMPACT SANS ESPACE VIDE -->
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2563eb; padding-bottom: 5px; margin-bottom: 8px;">
+            <!-- FILIGRANE -->
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; pointer-events: none; z-index: 0;">
+                <img src="https://groupescolairesaldia.com/wp-content/uploads/2022/06/logo.png" alt="SALDIA" style="width: 200px; height: auto;">
+            </div>
+            
+            <!-- BORDURE LATÉRALE DROITE -->
+            <div style="position: absolute; right: 5mm; top: 50%; transform: translateY(-50%) rotate(90deg); font-size: 7pt; color: #cbd5e1; letter-spacing: 3px; white-space: nowrap;">
+                SALDIA SCHOOL MANAGEMENT SYSTEM
+            </div>
+            
+            <!-- EN-TÊTE -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12mm; position: relative; z-index: 1;">
+                <!-- Bloc Gauche : Logo + Nom -->
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6TrgU4AASRSJarnI58KyEGExNCsT9lL7hSI91R5fymQ&s" alt="Logo" style="width: 35px; height: 35px;">
+                    <img src="https://groupescolairesaldia.com/wp-content/uploads/2022/06/logo.png" alt="Logo Saldia" style="width: 50px; height: 50px; object-fit: cover;">
                     <div>
-                        <div style="font-size: 13px; font-weight: bold;">GROUPE SALDIA</div>
-                        <div style="font-size: 8px;">${currentClasseName.includes('ème') ? 'COLLÈGE' : 'LYCÉE'}</div>
+                        <div style="font-size: 18pt; font-weight: bold; letter-spacing: 1px;">GROUPE SALDIA</div>
+                        <div style="font-size: 9pt; font-weight: 600; color: #4F46E5;">ÉTABLISSEMENT D'EXCELLENCE</div>
                     </div>
                 </div>
+                
+                <!-- Bloc Central : Titre du document -->
                 <div style="text-align: center;">
-                    <div style="background: #2563eb; border-radius: 12px; padding: 3px 12px;">
-                        <div style="font-size: 12px; font-weight: bold; color: white;">BULLETIN</div>
-                        <div style="font-size: 8px; color: white;">S${currentSemestre} - ${currentTypeNote}</div>
+                    <div style="background: #1e293b; border-radius: 30px; padding: 6px 20px;">
+                        <div style="font-size: 14pt; font-weight: bold; color: white; letter-spacing: 2px;">BULLETIN DE NOTES</div>
                     </div>
+                    <div style="font-size: 10pt; font-weight: bold; letter-spacing: 3px; margin-top: 5px; color: #334155;">${currentClasseName.includes('ème') ? 'COLLÈGE' : 'LYCÉE'}</div>
                 </div>
-                <div style="text-align: right; font-size: 9px;">
-                    <div>2025-2026</div>
-                    <div>${student.nomComplet.substring(0, 18)}</div>
+                
+                <!-- Bloc Droit : Année + QR Code -->
+                <div style="text-align: right;">
+                    <div style="font-size: 9pt; font-weight: bold;">Année scolaire 2025-2026</div>
+                    <div style="margin-top: 5px;">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${student.matricule}" style="width: 45px; height: 45px;">
+                        <div style="font-size: 7pt; font-family: monospace; margin-top: 2px;">ID: ${student.matricule}</div>
+                    </div>
                 </div>
             </div>
             
-            <!-- INFOS ÉLÈVE COMPACTES 1 LIGNE -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; background: #f1f5f9; padding: 6px 10px; border-radius: 6px; font-size: 10px;">
-                <div style="display: flex; gap: 20px;">
-                    <span><strong>Mat:</strong> ${student.matricule}</span>
-                    <span><strong>ID:</strong> ${student.id.slice(0, 6)}</span>
-                    <span><strong>Classe:</strong> ${currentClasseName}</span>
+            <!-- INFORMATIONS DE L'ÉLÈVE -->
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10mm; border-bottom: 1px solid #cbd5e1; padding-bottom: 6mm; position: relative; z-index: 1;">
+                <div>
+                    <div style="font-size: 10pt; margin-bottom: 4px;"><strong>Nom et Prénom(s) :</strong> ${student.nomComplet.toUpperCase()}</div>
+                    <div style="font-size: 10pt;"><strong>Date et lieu de naissance :</strong> ${student.dateNaissance || '_____ / _____ / _____'}</div>
                 </div>
-                <div style="display: flex; gap: 15px;">
-                    <span>📊 <strong>Rang:</strong> ${student.rang}${student.rang === 1 ? 'er' : 'ème'}/${studentsList.length}</span>
-                    <span>⭐ <strong>Moy:</strong> ${student.moyenneGenerale !== null ? student.moyenneGenerale.toFixed(2) : 'N/A'}</span>
+                <div style="text-align: right;">
+                    <div style="font-size: 10pt;"><strong>Classe(s) doublée(s) :</strong> ___________</div>
+                    <div style="font-size: 10pt; margin-top: 4px;"><strong>Classe :</strong> ${currentClasseName} &nbsp;|&nbsp; <strong>Effectif :</strong> ${studentsList.length}</div>
                 </div>
             </div>
             
             <!-- TABLEAU DES NOTES -->
-            <table style="width: 100%; border-collapse: collapse;">
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 8mm; position: relative; z-index: 1;">
                 <thead>
-                    <tr style="background: #1e293b; color: white;">
-                        <th style="border: 1px solid #aaa; padding: 6px 4px; font-size: 10px;">MATIÈRES</th>
-                        <th style="border: 1px solid #aaa; padding: 6px 4px; font-size: 10px;">COEF</th>
-                        <th colspan="3" style="border: 1px solid #aaa; padding: 6px 4px; font-size: 10px;">NOTES</th>
-                        <th style="border: 1px solid #aaa; padding: 6px 4px; font-size: 10px;">MOY.</th>
-                        <th style="border: 1px solid #aaa; padding: 6px 4px; font-size: 10px;">APPRÉCIATIONS</th>
+                    <tr style="background: #f1f5f9;">
+                        <th style="border: 1px solid #cbd5e1; padding: 8px 6px; font-size: 10pt; font-weight: bold; text-align: left;">MATIÈRES</th>
+                        <th style="border: 1px solid #cbd5e1; padding: 8px 6px; font-size: 10pt; font-weight: bold; text-align: center;">COEF</th>
+                        <th colspan="3" style="border: 1px solid #cbd5e1; padding: 8px 6px; font-size: 10pt; font-weight: bold; text-align: center;">SEMESTRE ${currentSemestre}</th>
+                        <th style="border: 1px solid #cbd5e1; padding: 8px 6px; font-size: 10pt; font-weight: bold; text-align: center;">MOY.</th>
+                        <th style="border: 1px solid #cbd5e1; padding: 8px 6px; font-size: 10pt; font-weight: bold; text-align: left;">APPRÉCIATIONS</th>
                     </tr>
-                    <tr style="background: #334155; color: white;">
-                        <th style="border: 1px solid #aaa; padding: 4px 4px; font-size: 9px;"></th>
-                        <th style="border: 1px solid #aaa; padding: 4px 4px; font-size: 9px;"></th>
-                        <th style="border: 1px solid #aaa; padding: 4px 4px; font-size: 9px;">CC1</th>
-                        <th style="border: 1px solid #aaa; padding: 4px 4px; font-size: 9px;">CC2</th>
-                        <th style="border: 1px solid #aaa; padding: 4px 4px; font-size: 9px;">COMPO</th>
-                        <th style="border: 1px solid #aaa; padding: 4px 4px; font-size: 9px;"></th>
-                        <th style="border: 1px solid #aaa; padding: 4px 4px; font-size: 9px;"></th>
+                    <tr style="background: #f8fafc;">
+                        <th style="border: 1px solid #cbd5e1; padding: 5px 6px; font-size: 9pt; font-weight: normal;"></th>
+                        <th style="border: 1px solid #cbd5e1; padding: 5px 6px; font-size: 9pt; font-weight: normal;"></th>
+                        <th style="border: 1px solid #cbd5e1; padding: 5px 6px; font-size: 9pt; font-weight: normal; text-align: center;">CC1</th>
+                        <th style="border: 1px solid #cbd5e1; padding: 5px 6px; font-size: 9pt; font-weight: normal; text-align: center;">CC2</th>
+                        <th style="border: 1px solid #cbd5e1; padding: 5px 6px; font-size: 9pt; font-weight: normal; text-align: center;">COMPO.</th>
+                        <th style="border: 1px solid #cbd5e1; padding: 5px 6px; font-size: 9pt; font-weight: normal;"></th>
+                        <th style="border: 1px solid #cbd5e1; padding: 5px 6px; font-size: 9pt; font-weight: normal;"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1308,48 +1359,67 @@
                 </tbody>
             </table>
             
-            <!-- RÉSULTATS ET STATISTIQUES (1 LIGNE) -->
-            <div style="display: flex; justify-content: space-between; margin-top: 10px; gap: 8px;">
-                <div style="flex: 1; background: #f1f5f9; padding: 6px 8px; border-radius: 6px;">
-                    <div style="font-size: 9px; font-weight: bold;">PERFORMANCES</div>
-                    <div style="display: flex; justify-content: space-between; font-size: 9px; margin-top: 3px;">
-                        <span>Moy élève: <strong>${student.moyenneGenerale !== null ? student.moyenneGenerale.toFixed(2) : 'N/A'}</strong></span>
-                        <span>Moy classe: <strong>${moyenneClasse.toFixed(2)}</strong></span>
-                        <span>Rang: <strong>${student.rang}${student.rang === 1 ? 'er' : 'ème'}</strong></span>
+            <!-- BLOC DE SYNTHÈSE (3 COLONNES) -->
+            <div style="display: flex; gap: 8mm; margin-bottom: 10mm; position: relative; z-index: 1;">
+                <!-- Gauche : Statistiques -->
+                <div style="flex: 1.2; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="background: #f1f5f9;"><td colspan="2" style="padding: 6px 8px; font-weight: bold; font-size: 10pt;">STATISTIQUES</td></tr>
+                        <tr><td style="padding: 5px 8px; font-size: 9pt; border-bottom: 1px solid #e2e8f0;">Moyenne élève</td><td style="padding: 5px 8px; font-size: 10pt; font-weight: bold; text-align: right; border-bottom: 1px solid #e2e8f0;">${moyenneEleve.toFixed(2)}/20</td></tr>
+                        <tr><td style="padding: 5px 8px; font-size: 9pt; border-bottom: 1px solid #e2e8f0;">Moyenne classe</td><td style="padding: 5px 8px; font-size: 10pt; text-align: right; border-bottom: 1px solid #e2e8f0;">${moyenneClasse.toFixed(2)}/20</td></tr>
+                        <tr><td style="padding: 5px 8px; font-size: 9pt; border-bottom: 1px solid #e2e8f0;">Rang</td><td style="padding: 5px 8px; font-size: 10pt; font-weight: bold; text-align: right; border-bottom: 1px solid #e2e8f0;">${student.rang}${student.rang === 1 ? 'er' : 'ème'} / ${studentsList.length}</td></tr>
+                        <tr><td style="padding: 5px 8px; font-size: 9pt; border-bottom: 1px solid #e2e8f0;">Moyenne minimale</td><td style="padding: 5px 8px; font-size: 10pt; text-align: right; border-bottom: 1px solid #e2e8f0;">${minMoyenne.toFixed(2)}/20</td></tr>
+                        <tr><td style="padding: 5px 8px; font-size: 9pt;">Moyenne maximale</td><td style="padding: 5px 8px; font-size: 10pt; text-align: right;">${maxMoyenne.toFixed(2)}/20</td></tr>
+                    </table>
+                </div>
+                
+                <!-- Centre : Décisions / Mentions -->
+                <div style="flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px;">
+                    <div style="font-weight: bold; font-size: 10pt; margin-bottom: 8px;">MENTION</div>
+                    <div style="font-size: 14pt; font-weight: bold; color: ${mentionColor}; text-align: center; margin-bottom: 12px;">${mention || '—'}</div>
+                    <div style="font-weight: bold; font-size: 10pt; margin: 12px 0 6px;">DÉCISIONS DU CONSEIL</div>
+                    <div style="font-size: 9pt;">
+                        <div style="margin: 4px 0;">☐ Félicitations</div>
+                        <div style="margin: 4px 0;">☐ Encouragements</div>
+                        <div style="margin: 4px 0;">☐ Tableau d'honneur</div>
                     </div>
                 </div>
-                <div style="flex: 1; background: #f1f5f9; padding: 6px 8px; border-radius: 6px;">
-                    <div style="font-size: 9px; font-weight: bold;">DÉCISIONS</div>
-                    <div style="display: flex; gap: 12px; font-size: 9px; margin-top: 3px;">
-                        <span>☐ Félicitations</span>
-                        <span>☐ Encouragements</span>
-                        <span>☐ Tableau d'honneur</span>
+                
+                <!-- Droite : Assiduité -->
+                <div style="flex: 0.8; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px;">
+                    <div style="font-weight: bold; font-size: 10pt; margin-bottom: 8px;">ASSIDUITÉ</div>
+                    <div style="font-size: 9pt;">
+                        <div style="margin: 6px 0;">Absences justifiées : ______</div>
+                        <div style="margin: 6px 0;">Absences non justifiées : ______</div>
+                        <div style="margin: 6px 0;">Retards : ______</div>
+                        <div style="margin: 6px 0;">Retenues : ______</div>
                     </div>
-                </div>
-                <div style="flex: 0.8; background: #f1f5f9; padding: 6px 8px; border-radius: 6px;">
-                    <div style="font-size: 9px; font-weight: bold;">ASSIDUITÉ</div>
-                    <div style="font-size: 8px; margin-top: 3px;">Abs: ___ | Retards: ___</div>
                 </div>
             </div>
             
-            <!-- SIGNATURES ET FOOTER -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+            <!-- SIGNATURES ET PIED DE PAGE -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 8mm; position: relative; z-index: 1;">
                 <div style="text-align: center; width: 100px;">
-                    <div style="font-size: 8px;">Le Directeur des études</div>
-                    <div style="width: 70px; height: 45px; border: 1px dashed #999; margin-top: 5px; border-radius: 35px;"></div>
+                    <div style="font-size: 9pt; font-weight: bold;">Le Directeur des études</div>
+                    <div style="width: 70px; height: 50px; border: 2px solid #cbd5e1; border-radius: 35px; margin: 8px auto; position: relative;">
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20pt; color: #ef4444; opacity: 0.6;">●</div>
+                    </div>
+                    <div style="font-size: 7pt; color: #64748b;">Cachet</div>
                 </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 8px;">Signature des parents</div>
-                    <div style="width: 120px; height: 1px; border-bottom: 1px solid #000; margin-top: 15px;"></div>
+                
+                <div style="text-align: center; flex: 1;">
+                    <div style="font-size: 9pt; font-weight: bold;">Signature des parents</div>
+                    <div style="width: 80%; margin: 12px auto; border-bottom: 1px solid #000;"></div>
                 </div>
-                <div style="text-align: right; font-size: 8px;">
-                    <div>Date: ${new Date().toLocaleDateString('fr-FR')}</div>
+                
+                <div style="text-align: right;">
+                    <div style="font-size: 9pt;">Date d'édition : ${new Date().toLocaleDateString('fr-FR')}</div>
                 </div>
             </div>
             
-            <!-- FOOTER -->
-            <div style="text-align: center; margin-top: 8px; font-size: 7px; color: gray; border-top: 1px solid #ccc; padding-top: 4px;">
-                GROUPE SALDIA - Tél: (+221) 33 123 45 67 - contact@saldia.sn
+            <!-- MENTIONS LÉGALES -->
+            <div style="text-align: center; margin-top: 10mm; font-size: 7pt; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 5mm;">
+                GROUPE SCOLAIRE SALDIA - Dakar, Sénégal | Tél: (+221) 33 123 45 67 | contact@saldia.sn | www.groupescolairesaldia.com
             </div>
         </div>
     `;
