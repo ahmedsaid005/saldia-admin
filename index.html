@@ -107,6 +107,232 @@
             .dashboard-grid { grid-template-columns: 1fr; }
             .classes-grid { grid-template-columns: 1fr; }
         }
+      
+      /* Adaptation pour petits écrans (tablettes et mobiles) */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+        padding: 0.5rem;
+    }
+    
+    .dashboard-card {
+        padding: 1rem;
+    }
+    
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .dashboard-card h3 {
+        font-size: 0.85rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .dashboard-card p {
+        font-size: 0.7rem;
+        display: none; /* Cache le texte "Gérer les classes" etc sur mobile */
+    }
+    
+    .hero-header {
+        padding: 1rem;
+        margin: -1rem -1rem 1rem -1rem;
+    }
+    
+    .logo-section img {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .logo-section h1 {
+        font-size: 1rem;
+    }
+    
+    .logo-section p {
+        font-size: 0.7rem;
+    }
+    
+    .user-badge {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Pour très petits écrans (mobiles < 480px) */
+@media (max-width: 480px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 colonnes au lieu de 3-4 */
+        gap: 0.8rem;
+    }
+    
+    .dashboard-card {
+        padding: 0.8rem;
+    }
+    
+    .card-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        border-radius: 12px;
+    }
+    
+    .dashboard-card h3 {
+        font-size: 0.75rem;
+    }
+    
+    .hero-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .logo-section {
+        justify-content: center;
+    }
+}
+
+/* Pour écrans moyens (tablettes) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+    
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.8rem;
+    }
+    
+    .dashboard-card h3 {
+        font-size: 1rem;
+    }
+}
+      
+      :root {
+    --primary: #0f2b5c;
+    --accent: #1e4a8a;
+    --gray-600: #475569;
+    --radius-lg: 16px;
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.app-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 5rem;
+}
+
+.dashboard-header {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(255,255,255,0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin: 0;
+}
+
+.dashboard-header p {
+    color: var(--gray-600);
+    font-size: 1rem;
+    margin-top: 0.25rem;
+}
+
+.user-badge {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 50px;
+    font-weight: 500;
+    font-size: 1rem;
+    box-shadow: var(--shadow-md);
+}
+
+/* Responsive */
+/* Responsive */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 1rem;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .user-badge {
+        margin-left: 0 !important;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    /* AJOUTEZ CES LIGNES POUR LE LOGO */
+    .dashboard-header img {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    
+    .dashboard-header > div:first-child {
+        justify-content: center;
+    }
+}
+
+/* Pour très petits écrans (moins de 480px) */
+@media (max-width: 480px) {
+    .dashboard-header img {
+        width: 35px !important;
+        height: 35px !important;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 1.2rem !important;
+    }
+    
+    .dashboard-header p {
+        font-size: 0.75rem !important;
+    }
+}
+      
+      .logo-saldia {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    object-fit: cover;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .logo-saldia {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-saldia {
+        width: 55px;
+        height: 55px;
+        border-radius: 10px;
+    }
+}
     </style>
 </head>
 <body>
@@ -148,13 +374,21 @@
         function renderHome() {
             document.getElementById('app').innerHTML = `
                 <div class="home-container">
-                    <div class="hero-header">
-                        <div class="logo-section">
-                            <img src="https://groupescolairesaldia.com/wp-content/uploads/2022/06/logo.png" onerror="this.src='https://via.placeholder.com/55'">
-                            <div><h1>GROUPE SCOLAIRE SALDIA</h1><p>Administration & Excellence</p></div>
-                        </div>
-                        <div class="user-badge"><i class="fas fa-user-shield"></i> Administrateur</div>
-                    </div>
+                   <div class="app-container">
+    <div class="dashboard-header">
+        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+           <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6TrgU4AASRSJarnI58KyEGExNCsT9lL7hSI91R5fymQ&s" 
+     alt="Logo Saldia" 
+     style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover;"
+     class="logo-saldia">
+            <div>
+                <h1 style="margin: 0;">G. Scolaire Saldia</h1>
+                <p id="headerInfo" style="margin: 5px 0 0 0;">Espace Administration</p>
+            </div>
+        </div>
+    
+    </div>
+</div>
                     <div class="dashboard-grid">
                         <div class="dashboard-card" onclick="navigateTo('classes')"><div class="card-icon"><i class="fas fa-school"></i></div><h3>Classes</h3><p>Gérer les classes</p></div>
                         <div class="dashboard-card" onclick="navigateTo('eleves')"><div class="card-icon"><i class="fas fa-users"></i></div><h3>Élèves</h3><p>Liste et gestion</p></div>
@@ -576,15 +810,158 @@ async function uploadPhotoToStorage(file, matricule) {
                     <div class="detail-row"><div class="detail-label">Email</div><div class="detail-value">${e.email || 'Non renseigné'}</div></div>
                     <div class="detail-row"><div class="detail-label">Classe</div><div class="detail-value">${e.classe || 'Non affecté'}</div></div>
                     <div style="margin-top:1.5rem; display:flex; gap:0.5rem; justify-content:flex-end">
-                        <button class="secondary-btn" onclick="this.closest('.modal').remove()">Fermer</button>
-                        <button class="secondary-btn" style="background:#fee2e2" onclick="window.deleteEleveAndClose('${matricule}', this)">Supprimer</button>
-                    </div>
+    <button class="secondary-btn" onclick="this.closest('.modal').remove()">Fermer</button>
+    <button class="primary-btn" onclick="window.editEleve('${matricule}'); this.closest('.modal').remove()"><i class="fas fa-edit"></i> Modifier</button>
+    <button class="secondary-btn" style="background:#fee2e2" onclick="window.deleteEleveAndClose('${matricule}', this)">Supprimer</button>
+</div>
                 </div>
             `;
             document.body.appendChild(modal);
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         };
 
+      // Fonction pour modifier un élève
+window.editEleve = async function(matricule) {
+    let doc = await db.collection('eleves').doc(matricule).get();
+    let e = doc.data();
+    if (!e) return;
+    
+    let modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="modal-close" onclick="this.closest('.modal').remove()"><i class="fas fa-times"></i></button>
+            <div class="modal-header">
+                <i class="fas fa-user-edit" style="font-size: 3rem; color: #0f2b5c;"></i>
+                <h2>Modifier l'élève</h2>
+                <p>Matricule: ${e.matricule} (non modifiable)</p>
+            </div>
+            <div class="form-grid">
+                <div class="form-group"><label>Nom complet *</label><input id="editNom" value="${e.nom.replace(/"/g, '&quot;')}"></div>
+                <div class="form-group"><label>Date naissance</label><input type="date" id="editDateNaissance" value="${e.dateNaissance || ''}"></div>
+                <div class="form-group"><label>Téléphone</label><input id="editTelephone" value="${e.telephone || ''}"></div>
+                <div class="form-group"><label>Email</label><input id="editEmail" value="${e.email || ''}"></div>
+                <div class="form-group"><label>Classe</label>
+                    <select id="editClasse">
+                        <option value="">Choisir une classe</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Nouveau mot de passe</label>
+                    <input type="password" id="editPassword" placeholder="Laisser vide pour garder l'ancien">
+                </div>
+                <div class="form-group"><label>Confirmer mot de passe</label>
+                    <input type="password" id="editPasswordConfirm" placeholder="Retapez le nouveau mot de passe">
+                </div>
+                <div class="form-group"><label>Nouvelle photo</label>
+                    <input type="file" id="editPhoto" accept="image/*">
+                    <div id="editPhotoPreview" style="margin-top: 10px;">
+                        <img src="${e.photoUrl || 'https://groupescolairesaldia.com/wp-content/uploads/2022/06/logo.png'}" style="max-width: 80px; border-radius: 50%;">
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button class="secondary-btn" onclick="this.closest('.modal').remove()">Annuler</button>
+                <button class="primary-btn" onclick="window.saveEleveChanges('${matricule}', this)"><i class="fas fa-save"></i> Enregistrer</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Charger les classes dans le select
+    let select = modal.querySelector('#editClasse');
+    let classesSnap = await db.collection('classes').get();
+    select.innerHTML = '<option value="">Sans classe</option>';
+    classesSnap.forEach(doc => {
+        let classeName = doc.data().name;
+        let selected = (classeName === e.classe) ? 'selected' : '';
+        select.innerHTML += `<option value="${classeName}" ${selected}>${classeName}</option>`;
+    });
+    
+    // Prévisualisation de la nouvelle photo
+    const photoInput = modal.querySelector('#editPhoto');
+    photoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const preview = modal.querySelector('#editPhotoPreview img');
+                preview.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+};
+
+// Fonction pour sauvegarder les modifications
+window.saveEleveChanges = async function(matricule, btn) {
+    let modal = btn.closest('.modal');
+    
+    let nom = modal.querySelector('#editNom').value.trim();
+    let dateNaissance = modal.querySelector('#editDateNaissance').value;
+    let telephone = modal.querySelector('#editTelephone').value;
+    let email = modal.querySelector('#editEmail').value;
+    let classe = modal.querySelector('#editClasse').value;
+    let newPassword = modal.querySelector('#editPassword').value;
+    let newPasswordConfirm = modal.querySelector('#editPasswordConfirm').value;
+    let photoFile = modal.querySelector('#editPhoto').files[0];
+    
+    if (!nom) {
+        alert('Le nom est requis');
+        return;
+    }
+    
+    if (newPassword && newPassword !== newPasswordConfirm) {
+        alert('Les mots de passe ne correspondent pas');
+        return;
+    }
+    
+    if (newPassword && newPassword.length < 4) {
+        alert('Le mot de passe doit contenir au moins 4 caractères');
+        return;
+    }
+    
+    // Récupérer l'ancienne photo si pas de nouvelle
+    let photoUrl = null;
+    if (photoFile) {
+        const reader = new FileReader();
+        photoUrl = await new Promise((resolve) => {
+            reader.onload = function(e) {
+                resolve(e.target.result);
+            };
+            reader.readAsDataURL(photoFile);
+        });
+    }
+    
+    // Récupérer les données existantes
+    let existingDoc = await db.collection('eleves').doc(matricule).get();
+    let existingData = existingDoc.data();
+    
+    // Préparer les données mises à jour
+    let updatedData = {
+        matricule: matricule,
+        nom: nom,
+        dateNaissance: dateNaissance,
+        telephone: telephone,
+        email: email,
+        classe: classe || existingData.classe,
+        motDePasse: newPassword || existingData.motDePasse,
+        photoUrl: photoUrl || existingData.photoUrl
+    };
+    
+    await db.collection('eleves').doc(matricule).set(updatedData);
+    
+    modal.remove();
+    showAlert('Élève modifié avec succès !', 'success');
+    
+    // Rafraîchir la liste
+    if (currentClasseId && currentClasseName) {
+        window.showClasseEleves(currentClasseId, currentClasseName);
+    }
+};
+      
         window.deleteEleveAndClose = async function(matricule, btn) {
             if (confirm('Supprimer définitivement cet élève ?')) {
                 await db.collection('eleves').doc(matricule).delete();
@@ -789,21 +1166,16 @@ async function uploadPhotoToStorage(file, matricule) {
             `;
         }
 
-        async function renderBulletinsPage() {
-            document.getElementById('app').innerHTML = `<div class="page-container"><div class="page-card">
-                ${renderBackButton('Bulletins', 'fa-file-pdf')}
-                <div class="form-card"><div class="form-grid">
-                    <div class="form-group"><label>Classe</label><select id="bulletinClasseSelect"></select></div>
-                    <div class="form-group"><label>Semestre</label><select id="bulletinSemestreSelect"><option value="1">Semestre 1</option><option value="2">Semestre 2</option></select></div>
-                </div>
-                <button class="primary-btn" onclick="window.genererBulletins()"><i class="fas fa-print"></i> Générer</button></div>
-                <div id="bulletinsListGlobal" class="eleves-list"></div>
-            </div></div>`;
-            let snap = await db.collection('classes').get();
-            let select = document.getElementById('bulletinClasseSelect');
-            select.innerHTML = '<option value="">Choisir une classe</option>';
-            snap.forEach(d => { select.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`; });
-        }
+      function renderBulletinsPage() {
+    document.getElementById('app').innerHTML = `
+        <div class="page-container" style="padding: 0;">
+            <iframe src="bulletin.html" style="width: 100%; height: 100vh; border: none;"></iframe>
+            <div style="position: fixed; top: 1rem; left: 1rem; z-index: 1000;">
+                <button class="btn-back" onclick="goHome()" style="background: #0f2b5c; color: white;"><i class="fas fa-arrow-left"></i> Retour</button>
+            </div>
+        </div>
+    `;
+}
 
         window.genererBulletins = async function() {
             let classe = document.getElementById('bulletinClasseSelect').value;
@@ -853,22 +1225,16 @@ async function uploadPhotoToStorage(file, matricule) {
             }
         }
 
-        async function renderPresencesPage() {
-            document.getElementById('app').innerHTML = `<div class="page-container"><div class="page-card">
-                ${renderBackButton('Suivi des Présences', 'fa-calendar-check')}
-                <div class="form-card"><div class="form-grid">
-                    <div class="form-group"><label>Classe</label><select id="presenceClasse"></select></div>
-                    <div class="form-group"><label>Date</label><input type="date" id="presenceDate"></div>
-                </div>
-                <button class="primary-btn" onclick="window.loadPresencesTable()"><i class="fas fa-search"></i> Charger</button></div>
-                <div class="table-container"><table id="presencesTable"><thead><tr><th>Élève</th><th>Statut</th><th>Action</th></tr></thead><tbody></tbody></table></div>
-            </div></div>`;
-            let snap = await db.collection('classes').get();
-            let select = document.getElementById('presenceClasse');
-            select.innerHTML = '<option value="">Choisir une classe</option>';
-            snap.forEach(d => { select.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`; });
-            document.getElementById('presenceDate').valueAsDate = new Date();
-        }
+       function renderPresencesPage() {
+    document.getElementById('app').innerHTML = `
+        <div class="page-container" style="padding: 0;">
+            <iframe src="presence.html" style="width: 100%; height: 100vh; border: none;"></iframe>
+            <div style="position: fixed; top: 1rem; left: 1rem; z-index: 1000;">
+                <button class="btn-back" onclick="goHome()" style="background: #0f2b5c; color: white;"><i class="fas fa-arrow-left"></i> Retour</button>
+            </div>
+        </div>
+    `;
+}
 
         window.loadPresencesTable = async function() {
             let classe = document.getElementById('presenceClasse').value;
