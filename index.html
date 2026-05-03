@@ -1010,7 +1010,7 @@ window.saveEleveChanges = async function(matricule, btn) {
             if (password !== passwordConfirm) return alert('Les mots de passe ne correspondent pas');
             if (password.length < 4) return alert('Le mot de passe doit contenir au moins 4 caractères');
             
-            let hashedPassword = btoa(password);
+           let hashedPassword = password;
             
             await db.collection('professeurs').doc(id).set({ 
                 identifiant: id, 
