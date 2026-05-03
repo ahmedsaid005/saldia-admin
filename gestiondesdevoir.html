@@ -398,7 +398,7 @@
         </div>
         <div class="admin-nav">
             <button class="nav-admin-btn active" data-tab="countdown">📅 Comptes à rebours</button>
-            <button class="nav-admin-btn" data-tab="edt">📚 Emplois du temps spéciaux</button>
+            <button class="nav-admin-btn" data-tab="edt">📚 Emplois du temps devoir/compo</button>
         </div>
     </div>
 
@@ -705,7 +705,7 @@
         
         let html = `
             <div class="card">
-                <h2><i class="fas fa-plus-circle"></i> Nouvel emploi du temps spécial</h2>
+                <h2><i class="fas fa-plus-circle"></i> Nouvel emploi du temps </h2>
                 <div class="row">
                     <div class="col">
                         <div class="form-group">
@@ -804,10 +804,7 @@
     }
     
     // Créneaux horaires
-    const timeSlots = [
-        "08h00-09h00", "09h00-10h00", "10h00-10h50", "11h05-12h05",
-        "12h05-13h05", "13h35-14h35", "14h35-15h35", "15h35-16h35", "16h35-17h35"
-    ];
+   
     
     const jours = ["LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI"];
     
@@ -829,168 +826,441 @@
         return dates;
     }
     
-    async function showEdtEditor(edtId, title, startDate, endDate, selectedClasses) {
-        const weekDates = getWeekDates(startDate);
-        
-        let html = `
-            <button class="back-btn" id="backToEdtList"><i class="fas fa-arrow-left"></i> Retour</button>
-            <div class="card">
-                <h2 class="text-center"><i class="fas fa-calendar-edit"></i> ${title}</h2>
-                <p class="text-center" style="color: gray; margin-bottom: 1rem;">Du ${new Date(startDate).toLocaleDateString('fr-FR')} au ${endDate ? new Date(endDate).toLocaleDateString('fr-FR') : new Date(startDate).toLocaleDateString('fr-FR')}</p>
-                
-                <div style="overflow-x: auto;">
-                    <table class="edt-table">
-                        <thead>
-                            <tr><th>Horaire</th>
-                                ${jours.map((jour, idx) => {
-                                    const dateKey = ["monday", "tuesday", "wednesday", "thursday", "friday"][idx];
-                                    const dateStr = weekDates[dateKey];
-                                    const dateFormatted = new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-                                    return `<th>${jour}<br><span style="font-size:0.6rem;">${dateFormatted}</span></th>`;
-                                }).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
+async function showEdtEditor(edtId, title, startDate, endDate, selectedClasses) {
+    // Calculer TOUS les jours entre startDate et endDate
+    const allDaysInRange = [];
+    const start = new Date(startDate);
+    const end = endDate ? new Date(endDate) : new Date(startDate);
+    let current = new Date(start);
+    while (current <= end) {
+        const dayOfWeek = current.getDay();
+        if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+            allDaysInRange.push({
+                dateKey: current.toISOString().slice(0, 10),
+                dateFormatted: current.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
+                dayName: ["LUNDI", "MARDI", "MERCREDI", "JEUDI", "VENDREDI"][dayOfWeek - 1]
+            });
+        }
+        current.setDate(current.getDate() + 1);
+    }
+    
+    // Récupérer les données existantes
+    let selectedDaysKeys = [];
+    let examRows = [];
+    
+    if (edtId) {
+        const doc = await db.collection('special_timetables').doc(edtId).get();
+        if (doc.exists) {
+            selectedDaysKeys = doc.data().selectedDays || allDaysInRange.map(d => d.dateKey);
+            examRows = doc.data().examRows || [];
+        }
+    }
+    
+    if (selectedDaysKeys.length === 0) {
+        selectedDaysKeys = allDaysInRange.map(d => d.dateKey);
+    }
+    
+    let daysToShow = allDaysInRange.filter(day => selectedDaysKeys.includes(day.dateKey));
+    
+    // S'il n'y a pas de lignes, en créer une par défaut
+    if (examRows.length === 0) {
+        const defaultRow = {};
+        for (const day of daysToShow) {
+            defaultRow[day.dateKey] = { matiere: "", horaire: "" };
+        }
+        examRows.push(defaultRow);
+    }
+    
+    let html = `
+        <button class="back-btn" id="backToEdtList"><i class="fas fa-arrow-left"></i> Retour</button>
+        <div class="card">
+            <h2 class="text-center"><i class="fas fa-calendar-edit"></i> ${title}</h2>
+            <p class="text-center" style="color: gray; margin-bottom: 0.5rem;">Du ${start.toLocaleDateString('fr-FR')} au ${end.toLocaleDateString('fr-FR')}</p>
+            
+            <!-- Sélection des jours à afficher -->
+            <div style="margin-bottom: 1.5rem; padding: 1rem; background: var(--gray-100); border-radius: 1rem;">
+                <h3 style="font-size: 0.9rem; margin-bottom: 0.8rem;"><i class="fas fa-calendar-day"></i> Jours à afficher</h3>
+                <div id="daysSelector" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    ${allDaysInRange.map(day => `
+                        <label class="checkbox-item" style="background: white; padding: 0.3rem 0.8rem; border-radius: 2rem; cursor: pointer;">
+                            <input type="checkbox" value="${day.dateKey}" ${selectedDaysKeys.includes(day.dateKey) ? 'checked' : ''}>
+                            <span>${day.dayName} ${day.dateFormatted}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <button id="addRowBtn" class="btn btn-primary" style="background: var(--success);"><i class="fas fa-plus"></i> Ajouter une ligne</button>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table class="edt-table" id="edtTable">
+                    <thead>
+                        <tr>
+                            ${daysToShow.map(day => `
+                                <th>${day.dayName}<br><span style="font-size:0.6rem;">${day.dateFormatted}</span></th>
+                            `).join('')}
+                            <th style="min-width: 50px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="edtTableBody">
                 `;
+    
+    // Générer les lignes
+    for (let rowIdx = 0; rowIdx < examRows.length; rowIdx++) {
+        const row = examRows[rowIdx];
+        html += `<tr data-row-index="${rowIdx}">`;
         
-        for (const slot of timeSlots) {
-            html += `<tr><td class="time-cell">${slot}</td>`;
-            for (let i = 0; i < 5; i++) {
-                const dayKey = ["monday", "tuesday", "wednesday", "thursday", "friday"][i];
-                const dateStr = weekDates[dayKey];
-                const selectId = `slot_${dayKey}_${slot.replace(/[^0-9]/g, '_')}`;
-                html += `
-                    <td>
-                        <select class="edt-select" id="${selectId}" data-day="${dayKey}" data-time="${slot}">
-                            <option value="">-- Choisir une matière --</option>
-                            <option value="Français">📖 Français</option>
-                            <option value="Anglais">🇬🇧 Anglais</option>
-                            <option value="Mathématiques">📐 Mathématiques</option>
-                            <option value="Physique-Chimie">⚗️ Physique-Chimie</option>
-                            <option value="Histoire-Géographie">🌍 Histoire-Géographie</option>
-                            <option value="Philosophie">💭 Philosophie</option>
-                            <option value="SVT">🔬 SVT</option>
-                            <option value="Espagnol">🇪🇸 Espagnol</option>
-                            <option value="Arabe">🕌 Arabe</option>
-                            <option value="EPS">⚽ EPS</option>
-                        </select>
+        for (let dayIdx = 0; dayIdx < daysToShow.length; dayIdx++) {
+            const day = daysToShow[dayIdx];
+            const cellData = row[day.dateKey] || { matiere: "", horaire: "" };
+            html += `
+                <td style="min-width: 200px; padding: 8px;">
+                    <select id="matiere_${rowIdx}_${day.dateKey}" class="edt-select" style="width: 100%; margin-bottom: 5px;">
+                        <option value="">-- Choisir --</option>
+                        <option value="Français" ${cellData.matiere === 'Français' ? 'selected' : ''}> Français</option>
+                        <option value="Anglais" ${cellData.matiere === 'Anglais' ? 'selected' : ''}> Anglais</option>
+                        <option value="Mathématiques" ${cellData.matiere === 'Mathématiques' ? 'selected' : ''}> Mathématiques</option>
+                        <option value="Physique-Chimie" ${cellData.matiere === 'Physique-Chimie' ? 'selected' : ''}>⚗ Physique-Chimie</option>
+                        <option value="Histoire-Géographie" ${cellData.matiere === 'Histoire-Géographie' ? 'selected' : ''}> Histoire-Géographie</option>
+                        <option value="Philosophie" ${cellData.matiere === 'Philosophie' ? 'selected' : ''}>Philosophie</option>
+                        <option value="SVT" ${cellData.matiere === 'SVT' ? 'selected' : ''}> SVT</option>
+                        <option value="Espagnol" ${cellData.matiere === 'Espagnol' ? 'selected' : ''}> Espagnol</option>
+                        <option value="Dessin" ${cellData.matiere === 'Dessin' ? 'selected' : ''}> Dessin</option>
+                                                <option value="Ecofam" ${cellData.matiere === 'Ecofam' ? 'selected' : ''}> Ecofam</option>
+
+                         <option value="Informatique" ${cellData.matiere === 'Informatique' ? 'selected' : ''}> Informatique</option>
+                        <option value="EPS" ${cellData.matiere === 'EPS' ? 'selected' : ''}> EPS</option>
+                    </select>
+                    <input type="text" id="horaire_${rowIdx}_${day.dateKey}" value="${cellData.horaire}" placeholder="Horaire ex: 8h-12h" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid var(--gray-200); font-size: 0.7rem; text-align: center;">
+                </td>
+            `;
+        }
+        
+        html += `
+            <td style="text-align: center;">
+                <button class="delete-row-btn" data-row="${rowIdx}" style="background: var(--danger); color: white; border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        ./`;
+    }
+    
+    html += `
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem;">
+                <button id="saveEdtBtn" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('mainContent').innerHTML = html;
+    
+    // Fonction pour récupérer toutes les lignes
+    function getCurrentRows() {
+        const rows = [];
+        const rowElements = document.querySelectorAll('#edtTableBody tr');
+        rowElements.forEach((row, rowIdx) => {
+            const rowData = {};
+            for (const day of daysToShow) {
+                const matiereSelect = document.getElementById(`matiere_${rowIdx}_${day.dateKey}`);
+                const horaireInput = document.getElementById(`horaire_${rowIdx}_${day.dateKey}`);
+                if (matiereSelect && horaireInput) {
+                    rowData[day.dateKey] = {
+                        matiere: matiereSelect.value,
+                        horaire: horaireInput.value
+                    };
+                }
+            }
+            rows.push(rowData);
+        });
+        return rows;
+    }
+    
+    // Reconstruire le tableau
+    function rebuildTable() {
+        const newSelectedKeys = Array.from(document.querySelectorAll('#daysSelector input:checked')).map(cb => cb.value);
+        daysToShow = allDaysInRange.filter(day => newSelectedKeys.includes(day.dateKey));
+        const currentRows = getCurrentRows();
+        
+        let newHtml = `<thead>
+            <tr>
+                ${daysToShow.map(day => `<th>${day.dayName}<br><span style="font-size:0.6rem;">${day.dateFormatted}</span></th>`).join('')}
+                <th style="min-width: 50px;">Action</th>
+            </tr>
+        </thead>
+        <tbody id="edtTableBody">`;
+        
+        for (let rowIdx = 0; rowIdx < currentRows.length; rowIdx++) {
+            const row = currentRows[rowIdx];
+            newHtml += `<tr data-row-index="${rowIdx}">`;
+            
+            for (let dayIdx = 0; dayIdx < daysToShow.length; dayIdx++) {
+                const day = daysToShow[dayIdx];
+                const cellData = row[day.dateKey] || { matiere: "", horaire: "" };
+                newHtml += `
+                    <td style="min-width: 200px; padding: 8px;">
+                        <select id="matiere_${rowIdx}_${day.dateKey}" class="edt-select" style="width: 100%; margin-bottom: 5px;">
+                            <option value="">-- Choisir --</option>
+                        <option value="Français" ${cellData.matiere === 'Français' ? 'selected' : ''}> Français</option>
+                        <option value="Anglais" ${cellData.matiere === 'Anglais' ? 'selected' : ''}> Anglais</option>
+                        <option value="Mathématiques" ${cellData.matiere === 'Mathématiques' ? 'selected' : ''}> Mathématiques</option>
+                        <option value="Physique-Chimie" ${cellData.matiere === 'Physique-Chimie' ? 'selected' : ''}>⚗ Physique-Chimie</option>
+                        <option value="Histoire-Géographie" ${cellData.matiere === 'Histoire-Géographie' ? 'selected' : ''}> Histoire-Géographie</option>
+                        <option value="Philosophie" ${cellData.matiere === 'Philosophie' ? 'selected' : ''}>Philosophie</option>
+                        <option value="SVT" ${cellData.matiere === 'SVT' ? 'selected' : ''}> SVT</option>
+                        <option value="Espagnol" ${cellData.matiere === 'Espagnol' ? 'selected' : ''}> Espagnol</option>
+                        <option value="Dessin" ${cellData.matiere === 'Dessin' ? 'selected' : ''}> Dessin</option>
+                                                <option value="Ecofam" ${cellData.matiere === 'Ecofam' ? 'selected' : ''}> Ecofam</option>
+
+                         <option value="Informatique" ${cellData.matiere === 'Informatique' ? 'selected' : ''}> Informatique</option>
+                        <option value="EPS" ${cellData.matiere === 'EPS' ? 'selected' : ''}> EPS</option>
+                    </select>
+                        <input type="text" id="horaire_${rowIdx}_${day.dateKey}" value="${cellData.horaire}" placeholder="Horaire ex: 8h-12h" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid var(--gray-200); font-size: 0.7rem; text-align: center;">
                     </td>
                 `;
             }
-            html += `</tr>`;
+            
+            newHtml += `
+                <td style="text-align: center;">
+                    <button class="delete-row-btn" data-row="${rowIdx}" style="background: var(--danger); color: white; border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>`;
         }
         
-        html += `
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem;">
-                    <button id="saveEdtBtn" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer l'emploi du temps</button>
-                </div>
-            </div>
-        `;
+        newHtml += `</tbody>`;
         
-        document.getElementById('mainContent').innerHTML = html;
-        
-        // Si édition, charger les données existantes
-        if (edtId) {
-            const doc = await db.collection('special_timetables').doc(edtId).get();
-            if (doc.exists) {
-                const data = doc.data();
-                if (data.schedule) {
-                    for (const [key, value] of Object.entries(data.schedule)) {
-                        const select = document.getElementById(key);
-                        if (select && value) select.value = value;
-                    }
-                }
-            }
+        const table = document.getElementById('edtTable');
+        if (table) {
+            table.innerHTML = newHtml;
         }
         
-        document.getElementById('backToEdtList').addEventListener('click', () => renderEdtTab());
-        
-        document.getElementById('saveEdtBtn').addEventListener('click', async () => {
-            const schedule = {};
-            for (const slot of timeSlots) {
-                for (const dayKey of ["monday", "tuesday", "wednesday", "thursday", "friday"]) {
-                    const selectId = `slot_${dayKey}_${slot.replace(/[^0-9]/g, '_')}`;
-                    const select = document.getElementById(selectId);
-                    if (select && select.value) {
-                        const key = `${dayKey}_${slot}`;
-                        schedule[key] = select.value;
+        // Réattacher événements suppression
+        document.querySelectorAll('.delete-row-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.dataset.row);
+                const rows = getCurrentRows();
+                rows.splice(idx, 1);
+                if (rows.length === 0) {
+                    const emptyRow = {};
+                    for (const day of daysToShow) {
+                        emptyRow[day.dateKey] = { matiere: "", horaire: "" };
                     }
+                    rows.push(emptyRow);
                 }
-            }
-            
-            const edtData = {
-                title: title,
-                startDate: startDate,
-                endDate: endDate || startDate,
-                classes: selectedClasses,
-                schedule: schedule,
-                weekDates: weekDates,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            
-            if (edtId) {
-                await db.collection('special_timetables').doc(edtId).update(edtData);
-                alert("✅ Emploi du temps modifié !");
-            } else {
-                await db.collection('special_timetables').add(edtData);
-                alert("✅ Emploi du temps enregistré !");
-            }
-            
-            await renderEdtTab();
+                rebuildTable();
+            });
         });
     }
     
-    async function viewEdt(edtId) {
-        const doc = await db.collection('special_timetables').doc(edtId).get();
-        const data = doc.data();
-        if (!data) return;
+    // Changer les jours affichés
+    document.querySelectorAll('#daysSelector input').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            rebuildTable();
+        });
+    });
+    
+    // Ajouter une ligne
+    document.getElementById('addRowBtn').addEventListener('click', () => {
+        const currentRows = getCurrentRows();
+        const emptyRow = {};
+        for (const day of daysToShow) {
+            emptyRow[day.dateKey] = { matiere: "", horaire: "" };
+        }
+        currentRows.push(emptyRow);
         
-        let html = `
-            <button class="back-btn" id="backToEdtListView"><i class="fas fa-arrow-left"></i> Retour</button>
-            <div class="card">
-                <h2 class="text-center"><i class="fas fa-calendar-alt"></i> ${data.title}</h2>
-                <p class="text-center" style="color: gray; margin-bottom: 1rem;">Du ${new Date(data.startDate).toLocaleDateString('fr-FR')} au ${new Date(data.endDate).toLocaleDateString('fr-FR')}</p>
-                <p class="text-center" style="color: gray; margin-bottom: 1rem;">🏫 Classes: ${data.classes.map(c => c.name).join(', ')}</p>
-                
-                <div style="overflow-x: auto;">
-                    <table class="edt-table">
-                        <thead>
-                            <tr><th>Horaire</th>
-                                ${jours.map((jour, idx) => {
-                                    const dateKey = ["monday", "tuesday", "wednesday", "thursday", "friday"][idx];
-                                    const dateStr = data.weekDates ? data.weekDates[dateKey] : '';
-                                    const dateFormatted = dateStr ? new Date(dateStr).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
-                                    return `<th>${jour}<br><span style="font-size:0.6rem;">${dateFormatted}</span></th>`;
-                                }).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
+        daysToShow = allDaysInRange.filter(day => 
+            Array.from(document.querySelectorAll('#daysSelector input:checked')).map(cb => cb.value).includes(day.dateKey)
+        );
+        
+        let newHtml = `<thead>
+            <tr>
+                ${daysToShow.map(day => `<th>${day.dayName}<br><span style="font-size:0.6rem;">${day.dateFormatted}</span></th>`).join('')}
+                <th style="min-width: 50px;">Action</th>
+            </tr>
+        </thead>
+        <tbody id="edtTableBody">`;
+        
+        for (let rowIdx = 0; rowIdx < currentRows.length; rowIdx++) {
+            const row = currentRows[rowIdx];
+            newHtml += `<tr data-row-index="${rowIdx}">`;
+            
+            for (let dayIdx = 0; dayIdx < daysToShow.length; dayIdx++) {
+                const day = daysToShow[dayIdx];
+                const cellData = row[day.dateKey] || { matiere: "", horaire: "" };
+                newHtml += `
+                    <td style="min-width: 200px; padding: 8px;">
+                        <select id="matiere_${rowIdx}_${day.dateKey}" class="edt-select" style="width: 100%; margin-bottom: 5px;">
+                            <option value="">-- Choisir --</option>
+                        <option value="Français" ${cellData.matiere === 'Français' ? 'selected' : ''}> Français</option>
+                        <option value="Anglais" ${cellData.matiere === 'Anglais' ? 'selected' : ''}> Anglais</option>
+                        <option value="Mathématiques" ${cellData.matiere === 'Mathématiques' ? 'selected' : ''}> Mathématiques</option>
+                        <option value="Physique-Chimie" ${cellData.matiere === 'Physique-Chimie' ? 'selected' : ''}>⚗ Physique-Chimie</option>
+                        <option value="Histoire-Géographie" ${cellData.matiere === 'Histoire-Géographie' ? 'selected' : ''}> Histoire-Géographie</option>
+                        <option value="Philosophie" ${cellData.matiere === 'Philosophie' ? 'selected' : ''}>Philosophie</option>
+                        <option value="SVT" ${cellData.matiere === 'SVT' ? 'selected' : ''}> SVT</option>
+                        <option value="Espagnol" ${cellData.matiere === 'Espagnol' ? 'selected' : ''}> Espagnol</option>
+                        <option value="Dessin" ${cellData.matiere === 'Dessin' ? 'selected' : ''}> Dessin</option>
+                                                <option value="Ecofam" ${cellData.matiere === 'Ecofam' ? 'selected' : ''}> Ecofam</option>
+
+                         <option value="Informatique" ${cellData.matiere === 'Informatique' ? 'selected' : ''}> Informatique</option>
+                        <option value="EPS" ${cellData.matiere === 'EPS' ? 'selected' : ''}> EPS</option>
+                    </select>
+                        <input type="text" id="horaire_${rowIdx}_${day.dateKey}" value="${cellData.horaire}" placeholder="Horaire ex: 8h-12h" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid var(--gray-200); font-size: 0.7rem; text-align: center;">
+                    </td>
                 `;
-        
-        for (const slot of timeSlots) {
-            html += `<tr><td class="time-cell">${slot}</td>`;
-            for (const dayKey of ["monday", "tuesday", "wednesday", "thursday", "friday"]) {
-                const key = `${dayKey}_${slot}`;
-                const value = data.schedule ? data.schedule[key] : '';
-                html += `<td style="text-align:center;">${value ? `<strong>${value}</strong>` : '-'}</td>`;
             }
-            html += `</tr>`;
+            
+            newHtml += `
+                <td style="text-align: center;">
+                    <button class="delete-row-btn" data-row="${rowIdx}" style="background: var(--danger); color: white; border: none; border-radius: 8px; padding: 5px 10px; cursor: pointer;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>`;
         }
         
-        html += `
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        `;
+        newHtml += `</tbody>`;
         
-        document.getElementById('mainContent').innerHTML = html;
-        document.getElementById('backToEdtListView').addEventListener('click', () => renderEdtTab());
+        const table = document.getElementById('edtTable');
+        if (table) {
+            table.innerHTML = newHtml;
+        }
+        
+        document.querySelectorAll('.delete-row-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.dataset.row);
+                const rows = getCurrentRows();
+                rows.splice(idx, 1);
+                if (rows.length === 0) {
+                    const emptyRow = {};
+                    for (const day of daysToShow) {
+                        emptyRow[day.dateKey] = { matiere: "", horaire: "" };
+                    }
+                    rows.push(emptyRow);
+                }
+                rebuildTable();
+            });
+        });
+    });
+    
+    // Supprimer ligne existante
+    document.querySelectorAll('.delete-row-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(btn.dataset.row);
+            const rows = getCurrentRows();
+            rows.splice(idx, 1);
+            if (rows.length === 0) {
+                const emptyRow = {};
+                for (const day of daysToShow) {
+                    emptyRow[day.dateKey] = { matiere: "", horaire: "" };
+                }
+                rows.push(emptyRow);
+            }
+            rebuildTable();
+        });
+    });
+    
+    document.getElementById('backToEdtList').addEventListener('click', () => renderEdtTab());
+    
+    document.getElementById('saveEdtBtn').addEventListener('click', async () => {
+        const selectedDayKeys = Array.from(document.querySelectorAll('#daysSelector input:checked')).map(cb => cb.value);
+        const finalRows = getCurrentRows();
+        
+        const edtData = {
+            title: title,
+            startDate: startDate,
+            endDate: endDate || startDate,
+            classes: selectedClasses,
+            examRows: finalRows,
+            allDays: allDaysInRange,
+            selectedDays: selectedDayKeys,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        if (edtId) {
+            await db.collection('special_timetables').doc(edtId).update(edtData);
+            alert("✅ Emploi du temps modifié !");
+        } else {
+            await db.collection('special_timetables').add(edtData);
+            alert("✅ Emploi du temps enregistré !");
+        }
+        
+        await renderEdtTab();
+    });
+}
+    
+async function viewEdt(edtId) {
+    const doc = await db.collection('special_timetables').doc(edtId).get();
+    const data = doc.data();
+    if (!data) return;
+    
+    // Récupérer les données
+    const examRows = data.examRows || [];
+    const allDays = data.allDays || [];
+    const selectedDays = data.selectedDays || (allDays.map(d => d.dateKey));
+    
+    // Filtrer les jours à afficher selon la sélection
+    const daysToShow = allDays.filter(day => selectedDays.includes(day.dateKey));
+    
+    let html = `
+        <button class="back-btn" id="backToEdtListView"><i class="fas fa-arrow-left"></i> Retour</button>
+        <div class="card">
+            <h2 class="text-center"><i class="fas fa-calendar-alt"></i> ${data.title}</h2>
+            <p class="text-center" style="color: gray; margin-bottom: 1rem;">Du ${new Date(data.startDate).toLocaleDateString('fr-FR')} au ${new Date(data.endDate).toLocaleDateString('fr-FR')}</p>
+            <p class="text-center" style="color: gray; margin-bottom: 1rem;">🏫 Classes: ${data.classes.map(c => c.name).join(', ')}</p>
+            
+            <div style="overflow-x: auto;">
+                <table class="edt-table">
+                    <thead>
+                        <tr>
+                            ${daysToShow.map(day => `
+                                <th>${day.dayName}<br><span style="font-size:0.6rem;">${day.dateFormatted}</span></th>
+                            `).join('')}
+                        </th>
+                    </thead>
+                    <tbody>
+            `;
+    
+    if (examRows.length === 0) {
+        html += `<tr><td colspan="${daysToShow.length}" style="text-align:center;">Aucune épreuve enregistrée</td></tr>`;
+    } else {
+        // Pour chaque ligne (chaque épreuve)
+        for (let rowIdx = 0; rowIdx < examRows.length; rowIdx++) {
+            const row = examRows[rowIdx];
+            html += `<tr>`;
+            
+            for (let dayIdx = 0; dayIdx < daysToShow.length; dayIdx++) {
+                const day = daysToShow[dayIdx];
+                const cellData = row[day.dateKey] || { matiere: "", horaire: "" };
+                html += `
+                    <td style="padding: 10px; text-align: center;">
+                        ${cellData.matiere ? `<strong>${cellData.matiere}</strong>` : '-'}
+                        ${cellData.horaire ? `<br><span style="font-size: 0.7rem; color: gray;">${cellData.horaire}</span>` : ''}
+                    </td>
+                `;
+            }
+            
+            html += `</tr>`;
+        }
     }
+    
+    html += `
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('mainContent').innerHTML = html;
+    document.getElementById('backToEdtListView').addEventListener('click', () => renderEdtTab());
+}
     
     async function editEdt(edtId) {
         const doc = await db.collection('special_timetables').doc(edtId).get();
