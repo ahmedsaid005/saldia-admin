@@ -1220,121 +1220,167 @@
             downloadPDF(combinedHTML, `Bulletins_${currentClasseName}_tous.pdf`);
         }
 
- function generateBulletinHTML(student) {
-    // Calcul des statistiques de classe
-    const moyennes = studentsList.map(s => s.moyenneGenerale).filter(m => m !== null);
-    const moyenneClasse = moyennes.length > 0 ? moyennes.reduce((a,b) => a+b, 0) / moyennes.length : 0;
-    const minMoyenne = moyennes.length > 0 ? Math.min(...moyennes) : 0;
-    const maxMoyenne = moyennes.length > 0 ? Math.max(...moyennes) : 0;
+function generateBulletinHTML(student) {
+    // Calcul des statistiques de classe par type de note (CC1, CC2, Composition)
+    let allCC1 = [], allCC2 = [], allComp = [], allMoyennes = [];
     
-    // Calcul de la moyenne élève
-    let totalPoints = 0;
-    let totalCoeffs = 0;
+    for (const s of studentsList) {
+        let moyCC1 = 0, moyCC2 = 0, moyComp = 0, moyGen = 0;
+        let countCC1 = 0, countCC2 = 0, countComp = 0, countGen = 0;
+        
+        for (const matiere of matieresList) {
+            const note = s.notes[matiere];
+            const coeff = coefficients[matiere] || 1;
+            
+            if (note?.cc1 !== null && note?.cc1 !== undefined) {
+                moyCC1 += note.cc1 * coeff;
+                countCC1 += coeff;
+            }
+            if (note?.cc2 !== null && note?.cc2 !== undefined) {
+                moyCC2 += note.cc2 * coeff;
+                countCC2 += coeff;
+            }
+            if (note?.comp !== null && note?.comp !== undefined) {
+                moyComp += note.comp * coeff;
+                countComp += coeff;
+            }
+            if (note?.moyenne !== null && note?.moyenne !== undefined) {
+                moyGen += note.moyenne * coeff;
+                countGen += coeff;
+            }
+        }
+        
+        if (countCC1 > 0) allCC1.push(moyCC1 / countCC1);
+        if (countCC2 > 0) allCC2.push(moyCC2 / countCC2);
+        if (countComp > 0) allComp.push(moyComp / countComp);
+        if (countGen > 0) allMoyennes.push(moyGen / countGen);
+    }
+    
+    const moyenneClasseCC1 = allCC1.length > 0 ? allCC1.reduce((a,b) => a+b, 0) / allCC1.length : 0;
+    const moyenneClasseCC2 = allCC2.length > 0 ? allCC2.reduce((a,b) => a+b, 0) / allCC2.length : 0;
+    const moyenneClasseComp = allComp.length > 0 ? allComp.reduce((a,b) => a+b, 0) / allComp.length : 0;
+    const moyenneClasseGen = allMoyennes.length > 0 ? allMoyennes.reduce((a,b) => a+b, 0) / allMoyennes.length : 0;
+    
+    const minMoyenneCC1 = allCC1.length > 0 ? Math.min(...allCC1) : 0;
+    const maxMoyenneCC1 = allCC1.length > 0 ? Math.max(...allCC1) : 0;
+    const minMoyenneCC2 = allCC2.length > 0 ? Math.min(...allCC2) : 0;
+    const maxMoyenneCC2 = allCC2.length > 0 ? Math.max(...allCC2) : 0;
+    const minMoyenneComp = allComp.length > 0 ? Math.min(...allComp) : 0;
+    const maxMoyenneComp = allComp.length > 0 ? Math.max(...allComp) : 0;
+    
+    // Calcul des moyennes de l'élève
+    let moyCC1 = 0, moyCC2 = 0, moyComp = 0, moyGen = 0;
+    let countCC1 = 0, countCC2 = 0, countComp = 0, countGen = 0;
+    
     for (const matiere of matieresList) {
         const note = student.notes[matiere];
         const coeff = coefficients[matiere] || 1;
+        if (note?.cc1 !== null && note?.cc1 !== undefined) {
+            moyCC1 += note.cc1 * coeff;
+            countCC1 += coeff;
+        }
+        if (note?.cc2 !== null && note?.cc2 !== undefined) {
+            moyCC2 += note.cc2 * coeff;
+            countCC2 += coeff;
+        }
+        if (note?.comp !== null && note?.comp !== undefined) {
+            moyComp += note.comp * coeff;
+            countComp += coeff;
+        }
         if (note?.moyenne !== null && note?.moyenne !== undefined) {
-            totalPoints += note.moyenne * coeff;
-            totalCoeffs += coeff;
+            moyGen += note.moyenne * coeff;
+            countGen += coeff;
         }
     }
-    const moyenneEleve = totalCoeffs > 0 ? totalPoints / totalCoeffs : 0;
     
-    // Déterminer le niveau (COLLEGE ou LYCEE)
-    const niveauTexte = currentClasseName.includes('ème') ? 'COLLÈGE' : 'LYCÉE';
+    const moyenneEleveCC1 = countCC1 > 0 ? moyCC1 / countCC1 : 0;
+    const moyenneEleveCC2 = countCC2 > 0 ? moyCC2 / countCC2 : 0;
+    const moyenneEleveComp = countComp > 0 ? moyComp / countComp : 0;
+    const moyenneEleveGen = countGen > 0 ? moyGen / countGen : 0;
+    
+    // Calcul du rang de l'élève
+    const sortedRanks = [...studentsList].sort((a,b) => {
+        let moyA = 0, moyB = 0, countA = 0, countB = 0;
+        for (const m of matieresList) {
+            if (a.notes[m]?.moyenne) { moyA += a.notes[m].moyenne * (coefficients[m]||1); countA += (coefficients[m]||1); }
+            if (b.notes[m]?.moyenne) { moyB += b.notes[m].moyenne * (coefficients[m]||1); countB += (coefficients[m]||1); }
+        }
+        const finalA = countA > 0 ? moyA/countA : 0;
+        const finalB = countB > 0 ? moyB/countB : 0;
+        return finalB - finalA;
+    });
+    const rank = sortedRanks.findIndex(s => s.id === student.id) + 1;
     
     // Génération des lignes du tableau
     let tableRows = '';
     for (const matiere of matieresList) {
         const note = student.notes[matiere];
         const coeff = coefficients[matiere] || 1;
-        const appreciation = student.appreciations[matiere] || '';
         
         tableRows += `
             <tr>
-                <td style="border: 1px solid #000; padding: 6px 4px; font-size: 10pt;">${matiere.charAt(0).toUpperCase() + matiere.slice(1)}</td>
-                <td style="border: 1px solid #000; padding: 6px 4px; text-align: center; font-size: 10pt;">${coeff}</td>
+                <td style="border: 1px solid #000; padding: 6px 4px; font-size: 10pt; font-weight: 500;">${matiere.charAt(0).toUpperCase() + matiere.slice(1)}</td>
+                <td style="border: 1px solid #000; padding: 6px 4px; text-align: center; font-size: 10pt; font-weight: 500;">${coeff.toFixed(1)}</td>
                 <td style="border: 1px solid #000; padding: 6px 4px; text-align: center; font-size: 10pt;">${note?.cc1 !== null && note?.cc1 !== undefined ? note.cc1.toFixed(1) : '-'}</td>
                 <td style="border: 1px solid #000; padding: 6px 4px; text-align: center; font-size: 10pt;">${note?.cc2 !== null && note?.cc2 !== undefined ? note.cc2.toFixed(1) : '-'}</td>
                 <td style="border: 1px solid #000; padding: 6px 4px; text-align: center; font-size: 10pt;">${note?.comp !== null && note?.comp !== undefined ? note.comp.toFixed(1) : '-'}</td>
-                <td style="border: 1px solid #000; padding: 6px 4px; text-align: center; font-weight: bold; font-size: 10pt; background: #f0f0f0;">${note?.moyenne !== null ? note.moyenne.toFixed(2) : '-'}</td>
-                <td style="border: 1px solid #000; padding: 6px 4px; font-size: 8pt;">${appreciation || ''}</td>
+                <td style="border: 1px solid #000; padding: 6px 4px; text-align: center; font-weight: bold; font-size: 10pt; background: #f5f5f5;">${note?.moyenne !== null ? note.moyenne.toFixed(2) : '-'}</td>
             </tr>
         `;
     }
     
+    // Déterminer le niveau
+    const niveauTexte = currentClasseName.includes('ème') ? 'COLLÈGE' : 'LYCÉE';
+    
+    // Date de naissance fictive pour l'exemple
+    const dateNaissance = student.dateNaissance || '___/___/_____';
+    const lieuNaissance = student.lieuNaissance || '_______________';
+    
     return `
-        <div style="font-family: Arial, Helvetica, sans-serif; width: 210mm; min-height: 297mm; margin: 0; padding: 10mm; box-sizing: border-box; position: relative; background: white;">
+        <div style="font-family: Arial, Helvetica, sans-serif; width: 297mm; min-height: 210mm; margin: 0; padding: 10mm; box-sizing: border-box; position: relative; background: white;">
             
             <!-- FILIGRANE CENTRAL -->
-            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.08; font-size: 60px; font-weight: bold; color: #000; white-space: nowrap; z-index: 0; pointer-events: none; letter-spacing: 8px;">SALDIA</div>
-            
-            <!-- BORDURE LATÉRALE DROITE -->
-            <div style="position: absolute; right: 5mm; top: 50%; transform: translateY(-50%) rotate(90deg); font-size: 6pt; color: #999; white-space: nowrap; letter-spacing: 2px; z-index: 0;">SALDIA SCHOOL MANAGEMENT SYSTEM</div>
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.06; font-size: 70px; font-weight: bold; color: #000; white-space: nowrap; z-index: 0; pointer-events: none; letter-spacing: 10px;">GROUPE SALDIA</div>
             
             <div style="position: relative; z-index: 1;">
                 
                 <!-- EN-TÊTE -->
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8mm;">
-                    
-                    <!-- Bloc Gauche : Logo + Groupe SALDIA -->
-                    <div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <img src="https://groupescolairesaldia.com/wp-content/uploads/2022/06/logo.png" alt="Logo SALDIA" style="width: 50px; height: auto;">
-                            <div style="font-size: 18pt; font-weight: bold; letter-spacing: 1px;">GROUPE SALDIA</div>
-                        </div>
-                        <div style="font-size: 10pt; margin-top: 2px;">SALDIA</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6mm; border-bottom: 2px solid #000; padding-bottom: 5mm;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <img src="https://groupescolairesaldia.com/wp-content/uploads/2022/06/logo.png" alt="Logo" style="width: 55px; height: auto;">
+                        <div style="font-size: 22pt; font-weight: bold; letter-spacing: 2px;">GROUPE SALDIA</div>
                     </div>
-                    
-                    <!-- Bloc Central : Rectangle BULLETIN DE NOTES -->
                     <div style="text-align: center;">
-                        <div style="border: 2px solid #000; border-radius: 25px; padding: 6px 20px;">
-                            <div style="font-size: 13pt; font-weight: bold; letter-spacing: 2px;">BULLETIN DE NOTES</div>
-                        </div>
-                        <div style="font-size: 10pt; letter-spacing: 4px; font-weight: bold; margin-top: 4px;">${niveauTexte}</div>
+                        <div style="font-size: 18pt; font-weight: bold; letter-spacing: 3px;">BULLETIN DE NOTES</div>
+                        <div style="font-size: 11pt; letter-spacing: 5px; font-weight: bold;">${niveauTexte}</div>
                     </div>
-                    
-                    <!-- Bloc Droit : Année et Photo -->
                     <div style="text-align: right;">
-                        <div style="font-size: 10pt; font-weight: bold;">Année scolaire 2025-2026</div>
-                        <div style="width: 90px; height: 110px; border: 1px solid #000; margin-top: 5px; background: #f5f5f5;"></div>
-                        <div style="margin-top: 5px;">
-                            <div style="width: 50px; height: 50px; margin: 0 auto; border: 1px solid #000; display: flex; align-items: center; justify-content: center; font-size: 7pt;">QR</div>
-                            <div style="font-size: 8pt; font-family: monospace; margin-top: 2px;">${student.matricule}</div>
-                        </div>
+                        <div style="font-size: 10pt;">Année scolaire 2025-2026</div>
                     </div>
                 </div>
                 
-                <!-- INFORMATIONS DE L'ÉLÈVE -->
-                <div style="display: flex; justify-content: space-between; margin: 5mm 0 5mm 0; font-size: 10pt;">
-                    <div>
+                <!-- INFORMATIONS ÉLÈVE - 2 LIGNES -->
+                <div style="margin: 5mm 0;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11pt; margin-bottom: 4px;">
                         <div><strong>Nom et Prénom(s) :</strong> ${student.nomComplet.toUpperCase()}</div>
-                        <div style="margin-top: 4px;"><strong>Date et lieu de Naissance :</strong> _______________</div>
-                    </div>
-                    <div style="text-align: right;">
                         <div><strong>Classe(s) doublée(s) :</strong> _______________</div>
-                        <div style="margin-top: 4px;"><strong>Classe :</strong> ${currentClasseName} &nbsp;|&nbsp; <strong>Effectif :</strong> ${studentsList.length}</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11pt;">
+                        <div><strong>Date et lieu de Naissance :</strong> ${dateNaissance} à ${lieuNaissance}</div>
+                        <div><strong>Classe :</strong> ${currentClasseName} &nbsp;|&nbsp; <strong>Effectif :</strong> ${studentsList.length}</div>
                     </div>
                 </div>
                 
-                <!-- TABLEAU DES NOTES -->
-                <table style="width: 100%; border-collapse: collapse; margin-top: 3mm;">
+                <!-- TABLEAU DES NOTES (PAYSAGE : colonnes élargies) -->
+                <table style="width: 100%; border-collapse: collapse; margin: 4mm 0; font-size: 10pt;">
                     <thead>
-                        <tr>
-                            <th style="border: 1px solid #000; padding: 8px 4px; font-size: 10pt; font-weight: bold; text-align: left;">MATIERES</th>
-                            <th style="border: 1px solid #000; padding: 8px 4px; font-size: 10pt; font-weight: bold; text-align: center;">Coef</th>
-                            <th colspan="3" style="border: 1px solid #000; padding: 8px 4px; font-size: 10pt; font-weight: bold; text-align: center;">Semestre ${currentSemestre}</th>
-                            <th style="border: 1px solid #000; padding: 8px 4px; font-size: 10pt; font-weight: bold; text-align: center;">Moy.</th>
-                            <th style="border: 1px solid #000; padding: 8px 4px; font-size: 10pt; font-weight: bold; text-align: left;">Appréciations</th>
-                        </tr>
-                        <tr>
-                            <td style="border: 1px solid #000;"></td>
-                            <td style="border: 1px solid #000;"></td>
-                            <td style="border: 1px solid #000; text-align: center; font-size: 9pt; padding: 4px;">CC1</td>
-                            <td style="border: 1px solid #000; text-align: center; font-size: 9pt; padding: 4px;">CC2</td>
-                            <td style="border: 1px solid #000; text-align: center; font-size: 9pt; padding: 4px;">Compo.</td>
-                            <td style="border: 1px solid #000;"></td>
-                            <td style="border: 1px solid #000;"></td>
+                        <tr style="background: #e8e8e8;">
+                            <th style="border: 1px solid #000; padding: 8px 5px; text-align: left;">MATIERES</th>
+                            <th style="border: 1px solid #000; padding: 8px 5px; text-align: center;">Coef</th>
+                            <th style="border: 1px solid #000; padding: 8px 5px; text-align: center;">Note CC1</th>
+                            <th style="border: 1px solid #000; padding: 8px 5px; text-align: center;">Note CC2</th>
+                            <th style="border: 1px solid #000; padding: 8px 5px; text-align: center;">Compo.</th>
+                            <th style="border: 1px solid #000; padding: 8px 5px; text-align: center;">Moy.</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1342,69 +1388,108 @@
                     </tbody>
                 </table>
                 
-                <!-- BLOC DE SYNTHÈSE (3 COLONNES) -->
-                <div style="display: flex; gap: 5mm; margin-top: 6mm; margin-bottom: 6mm;">
+                <!-- BLOC STATISTIQUES COMPLET (comme dans l'image) -->
+                <div style="display: flex; gap: 8mm; margin: 5mm 0;">
                     
-                    <!-- Gauche : Statistiques -->
-                    <div style="flex: 1.2; border: 1px solid #000;">
-                        <div style="background: #e0e0e0; padding: 5px; font-weight: bold; font-size: 10pt; text-align: center;">STATISTIQUES</div>
-                        <table style="width: 100%; border-collapse: collapse; font-size: 10pt;">
-                            <tr><td style="padding: 5px 8px; border-bottom: 1px solid #ccc;"><strong>Moyenne élève</strong></td><td style="padding: 5px 8px; text-align: right; border-bottom: 1px solid #ccc; font-weight: bold;">${moyenneEleve.toFixed(2)}</td></tr>
-                            <tr><td style="padding: 5px 8px; border-bottom: 1px solid #ccc;"><strong>Moyenne classe</strong></td><td style="padding: 5px 8px; text-align: right; border-bottom: 1px solid #ccc;">${moyenneClasse.toFixed(2)}</td></tr>
-                            <tr><td style="padding: 5px 8px; border-bottom: 1px solid #ccc;"><strong>Rang</strong></td><td style="padding: 5px 8px; text-align: right; border-bottom: 1px solid #ccc; font-weight: bold;">${student.rang}${student.rang === 1 ? 'er' : 'ème'} / ${studentsList.length}</td></tr>
-                            <tr><td style="padding: 5px 8px; border-bottom: 1px solid #ccc;"><strong>Moyenne minimale</strong></td><td style="padding: 5px 8px; text-align: right; border-bottom: 1px solid #ccc;">${minMoyenne.toFixed(2)}</td></tr>
-                            <tr><td style="padding: 5px 8px;"><strong>Moyenne maximale</strong></td><td style="padding: 5px 8px; text-align: right;">${maxMoyenne.toFixed(2)}</td></tr>
+                    <!-- Colonne gauche : Statistiques détaillées -->
+                    <div style="flex: 2;">
+                        <table style="width: 100%; border-collapse: collapse; border: 1px solid #000;">
+                            <thead>
+                                <tr style="background: #e8e8e8;">
+                                    <th style="border: 1px solid #000; padding: 6px; text-align: left;">&nbsp;</th>
+                                    <th style="border: 1px solid #000; padding: 6px; text-align: center;">/20</th>
+                                    <th style="border: 1px solid #000; padding: 6px; text-align: center;">CC1</th>
+                                    <th style="border: 1px solid #000; padding: 6px; text-align: center;">CC2</th>
+                                    <th style="border: 1px solid #000; padding: 6px; text-align: center;">Compo.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border: 1px solid #000; padding: 6px; font-weight: bold;">Moyenne élève</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">/20</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${moyenneEleveCC1.toFixed(2)}</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${moyenneEleveCC2.toFixed(2)}</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${moyenneEleveComp.toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #000; padding: 6px; font-weight: bold;">Moyenne classe</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">/20</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${moyenneClasseCC1.toFixed(2)}</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${moyenneClasseCC2.toFixed(2)}</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${moyenneClasseComp.toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #000; padding: 6px; font-weight: bold;">Rang de l'élève</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">/${studentsList.length}</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${rank}${rank === 1 ? 'er' : 'ème'}</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">-</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">-</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #000; padding: 6px; font-weight: bold;">Moyenne minimale</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">/20</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${minMoyenneCC1.toFixed(2)}</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${minMoyenneCC2.toFixed(2)}</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${minMoyenneComp.toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #000; padding: 6px; font-weight: bold;">Moyenne maximale</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">/20</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${maxMoyenneCC1.toFixed(2)}</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${maxMoyenneCC2.toFixed(2)}</td>
+                                    <td style="border: 1px solid #000; padding: 6px; text-align: center;">${maxMoyenneComp.toFixed(2)}</td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                     
-                    <!-- Centre : Décisions -->
-                    <div style="flex: 1; border: 1px solid #000;">
-                        <div style="background: #e0e0e0; padding: 5px; font-weight: bold; font-size: 10pt; text-align: center;">DÉCISIONS</div>
-                        <div style="padding: 8px;">
-                            <div style="margin: 5px 0;"><span style="font-size: 12pt;">☐</span> Félicitations</div>
-                            <div style="margin: 5px 0;"><span style="font-size: 12pt;">☐</span> Encouragements</div>
-                            <div style="margin: 5px 0;"><span style="font-size: 12pt;">☐</span> Tableau d'honneur</div>
+                    <!-- Colonne centre : Décisions + Conduite -->
+                    <div style="flex: 1.2;">
+                        <div style="border: 1px solid #000; padding: 6px;">
+                            <div style="margin: 3px 0;"><span style="font-size: 12pt;">☐</span> Félicitations</div>
+                            <div style="margin: 3px 0;"><span style="font-size: 12pt;">☐</span> Encouragements</div>
+                            <div style="margin: 3px 0;"><span style="font-size: 12pt;">☐</span> Tableau d'honneur</div>
+                            <div style="margin: 3px 0;"><span style="font-size: 12pt;">☐</span> Abréviation</div>
+                            <div style="margin-top: 6px; border-top: 1px solid #ccc; padding-top: 6px;"><strong>Conduite :</strong></div>
+                            <div style="margin: 3px 0;"><span style="font-size: 12pt;">☐</span> Bonne</div>
+                            <div style="margin: 3px 0;"><span style="font-size: 12pt;">☐</span> Avertissement</div>
+                            <div style="margin: 3px 0;"><span style="font-size: 12pt;">☐</span> Blâme</div>
                         </div>
                     </div>
                     
-                    <!-- Droite : Assiduité -->
-                    <div style="flex: 0.9; border: 1px solid #000;">
-                        <div style="background: #e0e0e0; padding: 5px; font-weight: bold; font-size: 10pt; text-align: center;">ASSIDUITÉ</div>
-                        <div style="padding: 8px; font-size: 9pt;">
-                            <div>Absences justifiées : ______</div>
-                            <div style="margin-top: 5px;">Absences non justifiées : ______</div>
-                            <div style="margin-top: 5px;">Retards : ______</div>
-                            <div style="margin-top: 5px;">Retenues : ______</div>
+                    <!-- Colonne droite : Assiduité -->
+                    <div style="flex: 1;">
+                        <div style="border: 1px solid #000; padding: 6px;">
+                            <div><strong>Renvoi(s) :</strong> _______________</div>
+                            <div style="margin-top: 5px;"><strong>Assiduités cumulées :</strong></div>
+                            <div>Absence(s) : ______ Justifié(e) : ______</div>
+                            <div>Retard(s) : ______</div>
+                            <div>Retenue(s) : ______</div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- SIGNATURES -->
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 5mm;">
-                    <!-- Directeur avec cachet rouge -->
+                <!-- SIGNATURES (3 colonnes) -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8mm; border-top: 1px solid #ccc; padding-top: 5mm;">
                     <div style="text-align: center; width: 100px;">
                         <div style="font-size: 9pt; font-weight: bold;">Le Directeur des études</div>
-                        <div style="position: relative; width: 60px; height: 50px; margin: 8px auto;">
-                            <div style="width: 60px; height: 50px; border: 1px solid #ccc; border-radius: 35px;"></div>
-                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18pt; color: #cc0000; opacity: 0.6;">●</div>
+                        <div style="position: relative; width: 50px; height: 40px; margin: 5px auto;">
+                            <div style="width: 50px; height: 40px; border: 1px dashed #999; border-radius: 30px;"></div>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 14pt; color: #cc0000; opacity: 0.5;">●</div>
                         </div>
                     </div>
-                    
-                    <!-- Signature parents -->
                     <div style="text-align: center; flex: 1;">
                         <div style="font-size: 9pt; font-weight: bold;">Signature des parents</div>
-                        <div style="width: 80%; margin: 12px auto 0 auto; border-bottom: 1px solid #000;"></div>
+                        <div style="width: 70%; margin: 8px auto 0 auto; border-bottom: 1px solid #000;"></div>
                     </div>
-                    
-                    <!-- Date -->
                     <div style="text-align: right;">
-                        <div style="font-size: 9pt;">Date d'édition : ${new Date().toLocaleDateString('fr-FR')}</div>
+                        <div style="font-size: 8pt;">Scanne avec CamScanner</div>
                     </div>
                 </div>
                 
-                <!-- MENTIONS LÉGALES (pied de page) -->
-                <div style="text-align: center; margin-top: 6mm; font-size: 7pt; color: #666; border-top: 1px solid #ccc; padding-top: 3mm;">
-                    GROUPE SALDIA - Dakar | Tél: (+221) 33 123 45 67 | www.groupescolairesaldia.com | contact@saldia.sn
+                <!-- MENTIONS LÉGALES (pied) -->
+                <div style="text-align: center; margin-top: 6mm; font-size: 7pt; color: #555; border-top: 1px solid #ccc; padding-top: 3mm;">
+                    GROUPE SCOLAIRE SALDIA, Sicap Dieupel 3 DAKAR, Tél : +221338259546, Site web : http://www.groupescolairesaldia.com, Email : saldia@orange.sn
                 </div>
                 
             </div>
@@ -1412,16 +1497,17 @@
     `;
 }
 
-      function downloadPDF(htmlContent, filename) {
+   function downloadPDF(htmlContent, filename) {
     const style = `
         <style>
             @page {
-                size: portrait;
-                margin: 0mm;  /* ← SUPPRIME LES MARGES DU NAVIGATEUR */
+                size: A4 landscape;
+                margin: 0mm;
             }
             body {
                 margin: 0;
                 padding: 0;
+                background: white;
             }
             * {
                 margin: 0;
@@ -1439,22 +1525,20 @@
         ${style}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
     </head>
-    <body>
+    <body style="margin: 0; padding: 0;">
         ${htmlContent}
         <script>
             window.onload = function() {
                 setTimeout(function() {
                     var element = document.body;
                     var opt = {
-                        margin: [0, 0, 0, 0],  // ← CHANGÉ : PLUS DE MARGES !
+                        margin: 0,
                         filename: '${filename}',
                         image: { type: 'jpeg', quality: 0.98 },
                         html2canvas: { scale: 2, letterRendering: true, useCORS: true },
-                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }  // ← CHANGÉ : mm au lieu de in
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
                     };
-                    html2pdf().set(opt).from(element).save().then(function() {
-                        window.close();
-                    });
+                    html2pdf().set(opt).from(element).save();
                 }, 500);
             };
         <\/script>
@@ -1465,6 +1549,8 @@
     win.document.write(fullHTML);
     win.document.close();
 }
+    
+  
 
         function renderHomePage() {
             currentNiveau = null;
